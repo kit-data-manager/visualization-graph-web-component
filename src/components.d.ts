@@ -11,6 +11,7 @@ export namespace Components {
           * The first name
          */
         "first": string;
+        "includedProperties": string;
         /**
           * The last name
          */
@@ -19,6 +20,7 @@ export namespace Components {
           * The middle name
          */
         "middle": string;
+        "visualizationMode": string;
     }
 }
 declare global {
@@ -38,6 +40,7 @@ declare namespace LocalJSX {
           * The first name
          */
         "first"?: string;
+        "includedProperties"?: string;
         /**
           * The last name
          */
@@ -46,6 +49,7 @@ declare namespace LocalJSX {
           * The middle name
          */
         "middle"?: string;
+        "visualizationMode"?: string;
     }
     interface IntrinsicElements {
         "my-component": MyComponent;
