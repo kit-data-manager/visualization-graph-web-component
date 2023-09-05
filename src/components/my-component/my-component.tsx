@@ -15,10 +15,10 @@ export class MyComponent {
 
     componentDidLoad() {
         this.renderD3Graph();
+        console.log('componentDidLoad called')
     }
 
     renderD3Graph() {
-
         let store = new FDOStore();
         let currentlyClicked = null;
         let clicked = false;
@@ -31,8 +31,8 @@ export class MyComponent {
 
         // Set up the SVG container
         const svg = d3.select("#graph")
-            .attr("width", "100%")
-            .attr("height", "100%")
+            .attr("width", "740px")
+            .attr("height", "580px")
             .attr('marker-end', 'url(#arrow)');
 
         const width = +svg.style('width').replace('px', '');
@@ -46,7 +46,6 @@ export class MyComponent {
             .force("charge", d3.forceManyBody().strength(-90))
             .force("x", d3.forceX(width / 2))
             .force("y", d3.forceY(height / 2));
-
         // Create the links
         const links = svg.selectAll(".link")
             .data(data.links)
@@ -56,7 +55,7 @@ export class MyComponent {
             .attr("opacity", "1")
             .attr("opacity", "1")
             .attr("category", d => d.category)  // Add a category attribute to identify link type
-
+        console.log('links', links)
         // Create the nodes
         const nodes = svg.selectAll(".node")
             .data(data.nodes)
@@ -107,6 +106,8 @@ export class MyComponent {
         function drag(simulation) {
             function dragstarted(event, d) {
                 if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;  // Save the initial position when dragging starts
+                d.fy = d.y;
             }
 
             function dragged(event, d) {
@@ -117,6 +118,8 @@ export class MyComponent {
 
             function dragended(event, d) {
                 if (!event.active) simulation.alphaTarget(0);
+                d.fx = null;  // Release the fixed position when dragging ends
+                d.fy = null;
             }
 
             return d3.drag()
@@ -285,84 +288,87 @@ export class MyComponent {
 
                 //     }
                 // })
-                .on("click", function (event, d) {
-                    clicked = true;
-                    // un-highlight currently clicked nodes
-                    unHighlight();
-                    // highlight new clicked node
-                    highlightConnectedPrimaryNodes(event, d);
-                    // set the new clicked node
-                    currentlyClicked = d;
-                    // Add a class to the link
-                    d3.select(this).classed("link-highlighted", true);
-                    d3.select(this).attr("marker-end", "url(#arrowhead-highlighted)");
+                // .on("click", function (event, d) {
+                //     clicked = true;
+                //     // un-highlight currently clicked nodes
+                //     unHighlight();
+                //     // highlight new clicked node
+                //     highlightConnectedPrimaryNodes(event, d);
+                //     // set the new clicked node
+                //     currentlyClicked = d;
+                //     // Add a class to the link
+                //     d3.select(this).classed("link-highlighted", true);
+                //     d3.select(this).attr("marker-end", "url(#arrowhead-highlighted)");
 
-                }).on("mouseover", function (event, d) {
-                    // If a node has been clicked previously and it's not the current node being hovered over
-                    if (clicked && currentlyClicked && currentlyClicked !== d) {
-                        // Un-highlight previously highlighted nodes and links
-                        // unHighlight();
+                // }).on("mouseover", function (event, d) {
+                //     // If a node has been clicked previously and it's not the current node being hovered over
+                //     if (clicked && currentlyClicked && currentlyClicked !== d) {
+                //         // Un-highlight previously highlighted nodes and links
+                //         // unHighlight();
 
-                        // Highlight connected nodes and links of the hovered node
-                        highlightConnectedNodesAndLinks(event, d);
+                //         // Highlight connected nodes and links of the hovered node
+                //         highlightConnectedNodesAndLinks(event, d);
 
-                        // Highlight connected links
-                        const connectedLinks = data.links.filter(link =>
-                            link.source.id === d.id || link.target.id === d.id
-                        );
+                //         // Highlight connected links
+                //         const connectedLinks = data.links.filter(link =>
+                //             link.source.id === d.id || link.target.id === d.id
+                //         );
 
 
-                        function highlightConnected(event, d) {
-                            d3.select(event.currentTarget).classed("primary", true);
-                            links.each(function (l) {
-                                if (l.category === 'non_attribute' && (l.source.id === d.id || l.target.id === d.id)) {
-                                    d3.select(this).classed("primary", true);
-                                    nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
-                                    d3.select(this).attr("opacity", "1");
-                                }
-                            });
-                        }
+                //         function highlightConnected(event, d) {
+                //             d3.select(event.currentTarget).classed("primary", true);
+                //             links.each(function (l) {
+                //                 if (l.category === 'non_attribute' && (l.source.id === d.id || l.target.id === d.id)) {
+                //                     d3.select(this).classed("primary", true);
+                //                     nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
+                //                     d3.select(this).attr("opacity", "1");
+                //                 }
+                //             });
+                //         }
 
-                        connectedLinks.forEach(link => {
-                            d3.select(`.link[source="${link.source.id}"][target="${link.target.id}"]`)
-                                .classed("link-highlighted", true)
-                                .attr("marker-end", "url(#arrowhead-highlighted)");
-                            d3.select(`.link[source="${link.target.id}"][target="${link.source.id}"]`)
-                                .classed("link-highlighted", true)
-                                .attr("marker-end", "url(#arrowhead-highlighted)");
-                        });
+                //         connectedLinks.forEach(link => {
+                //             d3.select(`.link[source="${link.source.id}"][target="${link.target.id}"]`)
+                //                 .classed("link-highlighted", true)
+                //                 .attr("marker-end", "url(#arrowhead-highlighted)");
+                //             d3.select(`.link[source="${link.target.id}"][target="${link.source.id}"]`)
+                //                 .classed("link-highlighted", true)
+                //                 .attr("marker-end", "url(#arrowhead-highlighted)");
+                //         });
 
-                    }
-                })
-                .on("mouseout", function (event, currentlyClicked) {
-                    if (currentlyClicked && clicked) {
-                        // Un-highlight nodes and links when mouse moves out of the node
-                        unHighlightOtherThanSelected();
-                        // Highlight connected nodes and links of the clicked node
-                        highlightConnectedNodesAndLinks(event, currentlyClicked);
-                    } else {
-                        // Un-highlight nodes and links when mouse moves out of the node
-                        unHighlight();
-                    }
-                }).on("click.secondary", function (event, d) {
-                    if (d.type === "attribute") {
-                        // Trigger the display of the component here
-                        displayComponent(d);
-                    }
-                });
+                //     }
+                // })
+                // .on("mouseout", function (event, currentlyClicked) {
+                //     if (currentlyClicked && clicked) {
+                //         // Un-highlight nodes and links when mouse moves out of the node
+                //         unHighlightOtherThanSelected();
+                //         // Highlight connected nodes and links of the clicked node
+                //         highlightConnectedNodesAndLinks(event, currentlyClicked);
+                //     } else {
+                //         // Un-highlight nodes and links when mouse moves out of the node
+                //         unHighlight();
+                //     }
+                // })
+                // .on("click.secondary", function (event, d) {
+                //     if (d.type === "attribute") {
+                //         // Trigger the display of the component here
+                //         displayComponent(d);
+                //     }
+                // })
+                ;
 
-            function displayComponent(d) {
-                // Assuming you have a container element with the id "component-container"
-                const componentContainer = document.getElementById("component-container");
+            // function displayComponent(d) {
+            //     // Assuming you have a container element with the id "component-container"
+            //     const componentContainer = document.getElementById("component-container");
 
-                // Create the element for the component
-                const componentElement = document.createElement("display-magic");
-                componentElement.setAttribute("value", d.id); // Set the value attribute
+            //     // Create the element for the component
+            //     const componentElement = document.createElement("display-magic");
+            //     componentElement.setAttribute("value", d.id); // Set the value attribute
 
-                // Clear the container and add the component
-                componentContainer.innerHTML = "";
-                componentContainer.appendChild(componentElement);
-            }
+            //     // Clear the container and add the component
+            //     console.log('componentContainer.innerHTML');
+            //     if (componentContainer.innerHTML != null) componentContainer.innerHTML = "";
+            //     componentContainer.appendChild(componentElement);
+            // }
 
             function unHighlightOtherThanSelected() {
                 nodes.classed("primary", false);
@@ -505,7 +511,7 @@ export class MyComponent {
                 <div class="graph"></div>
                 <p>Included Properties: {this.includedProperties}</p>
                 <p>Visualization Mode: {this.visualizationMode}</p>
-                <svg id="graph"></svg>
+                {/* <svg id="graph"></svg> */}
             </div>
         );
     }

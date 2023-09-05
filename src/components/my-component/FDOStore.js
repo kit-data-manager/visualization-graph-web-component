@@ -40,6 +40,7 @@ class FDOStore {
         // console.log('generateClusters is called')
         // props=this.props;
         // this.props=['contact','url','KIP','location','version','checksum'];
+
         this.proplength=props.length;
         // console.log('props inside clusture ', this.proplength);
         //primary Nodes
@@ -50,7 +51,7 @@ class FDOStore {
             baseFDO.setGroup(`Group 15`);
             baseFDO.setType('primaryNodes');
             this.addFdo(baseFDO);
-
+            
         //seconday nodes = attributes
             for (let j = 0; j < this.proplength; j++) {
                 const connectedNodeId = `${i}_${j}`;
@@ -68,8 +69,6 @@ class FDOStore {
             }
         }
     }
-
-
     toData() {
 
         let data = { "nodes": [], "links": [] };
