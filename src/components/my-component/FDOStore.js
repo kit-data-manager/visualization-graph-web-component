@@ -34,15 +34,7 @@ class FDOStore {
 
 
     generateClusters(props) {
-        // console.log('props inside MEE', props); // Use props here
-
-        // console.log('props inside clusture ', this.includedProperties);
-        // console.log('generateClusters is called')
-        // props=this.props;
-        // this.props=['contact','url','KIP','location','version','checksum'];
-
         this.proplength=props.length;
-        // console.log('props inside clusture ', this.proplength);
         //primary Nodes
         for (let i = 0; i < 10; i++) {
             const baseNodeId = `${i}`;
@@ -51,7 +43,7 @@ class FDOStore {
             baseFDO.setGroup(`Group 15`);
             baseFDO.setType('primaryNodes');
             this.addFdo(baseFDO);
-            
+
         //seconday nodes = attributes
             for (let j = 0; j < this.proplength; j++) {
                 const connectedNodeId = `${i}_${j}`;
@@ -59,7 +51,6 @@ class FDOStore {
                 connectedFDO.setLabel(`${connectedNodeId}`);
                 connectedFDO.setGroup(`Group ${j}`);
                 connectedFDO.setType('attribute');
-                // connectedFDO.addProperty(`${connectedNodeId}`,`${connectedNodeId}`);
                    // Add properties based on the propertyNames list
             for (const properties of props) {
                 connectedFDO.addProperty(properties, properties);
