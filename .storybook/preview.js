@@ -1,3 +1,6 @@
+import {defineCustomElements} from '../loader';
+
+defineCustomElements();
 /** @type { import('@storybook/web-components').Preview } */
 const preview = {
   parameters: {

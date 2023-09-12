@@ -1,4 +1,4 @@
-import { Component, Prop, h, Element } from '@stencil/core';
+import { Component, Prop, h, Element, Watch } from '@stencil/core';
 import { format } from '../../utils/utils';
 import * as d3 from 'd3';  // Import D3.js
 import { FDOStore } from './FDOStore.js'; // Import the FDOStore class
@@ -12,6 +12,21 @@ export class MyComponent {
     @Element() hostElement: HTMLElement;
     @Prop() includedProperties: string = 'KIP,SIP,TIP,KIT,SAP,RWTH,BIRLA,KPMG,IIT';
     @Prop() visualizationMode: string = 'all';
+
+    // Getter and setter for includedProperties
+    @Watch('includedProperties')
+    includedPropertiesChanged(newIncludedProperties: string) {
+        // You can perform any necessary actions when includedProperties changes
+        this.includedProperties = newIncludedProperties;
+    }
+
+    // Getter and setter for visualizationMode
+    @Watch('visualizationMode')
+    visualizationModeChanged(newVisualizationMode: string) {
+        // You can perform any necessary actions when visualizationMode changes
+        this.visualizationMode = newVisualizationMode;
+    }
+
     componentDidLoad() {
         this.setupD3Graph();
     }
@@ -20,8 +35,8 @@ export class MyComponent {
         const svg = this.hostElement.shadowRoot.querySelector(".graph");
         console.log('Selected SVG element first line setup:', svg);
         let store = new FDOStore();
-        // let currentlyClicked = null;
-        // let clicked = false;
+        let currentlyClicked = null;
+        let clicked = false;
         const includedProperties = this.includedProperties.split(',');
         store.generateClusters(includedProperties); // Generate clusters using the included properties
         // updateVisualization(this.visualizationMode, includedProperties);
@@ -71,6 +86,31 @@ export class MyComponent {
                 .force("x", d3.forceX(width / 2))
                 .force("y", d3.forceY(height / 2));
 
+
+            // Create the links
+            const links = svg.selectAll(".link")
+                .data(data.links)
+                .enter()
+                .append("line")
+                .attr("marker-end", d => 'url(#marker_' + d.relationType + ')')
+
+                .attr("class", (d) => {
+                    // Check if a reverse link exists
+                    const hasReverseLink = data.links.some((link) => {
+                        return (
+                            link.source.id === d.target.id &&
+                            link.target.id === d.source.id &&
+                            link.category === d.category
+                        );
+                    });
+                    return hasReverseLink ? "two-way-dashed" : "link";
+                })
+                .attr("stroke-opacity", 1)
+                .attr("opacity", "1")
+                // .attr("stroke-width", d => Math.sqrt(d.value))
+                .attr("category", d => d.castegory)  // Add a category attribute to identify link type
+
+
             const nodes = svg.selectAll(".node")
                 .data(data.nodes)
                 .enter()
@@ -82,7 +122,66 @@ export class MyComponent {
                 .attr("stroke-width", 1.5)
                 .attr("cx", d => d.x) // No offset here
                 .attr("cy", d => d.y) // No offset here
-                .call(drag(simulation));
+                .call(drag(simulation)).on("click", function (event, d) {
+                    clicked = true;
+                    // un-highlight currently clicked nodes
+                    unHighlight();
+                    // highlight new clicked node
+                    highlightConnectedPrimaryNodes(event, d);
+                    // set the new clicked node
+                    currentlyClicked = d;
+                    // Add a class to the link
+                    d3.select(this).classed("link-highlighted", true);
+                    d3.select(this).attr("marker-end", "url(#arrowhead-highlighted)");
+
+                }).on("mouseover", function (event, d) {
+                    // If a node has been clicked previously and it's not the current node being hovered over
+                    if (clicked && currentlyClicked && currentlyClicked !== d) {
+                        // Un-highlight previously highlighted nodes and links
+                        // unHighlight();
+
+                        // Highlight connected nodes and links of the hovered node
+                        highlightConnectedNodesAndLinks(event, d);
+
+                        // Highlight connected links
+                        const connectedLinks = data.links.filter(link =>
+                            link.source.id === d.id || link.target.id === d.id
+                        );
+
+
+                        // function highlightConnected(event, d) {
+                        //     d3.select(event.currentTarget).classed("primary", true);
+                        //     links.each(function (l) {
+                        //         if (l.category === 'non_attribute' && (l.source.id === d.id || l.target.id === d.id)) {
+                        //             d3.select(this).classed("primary", true);
+                        //             nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
+                        //             d3.select(this).attr("opacity", "1");
+                        //         }
+                        //     });
+                        // }
+
+                        connectedLinks.forEach(link => {
+                            d3.select(`.link[source="${link.source.id}"][target="${link.target.id}"]`)
+                                .classed("link-highlighted", true)
+                                .attr("marker-end", "url(#arrowhead-highlighted)");
+                            d3.select(`.link[source="${link.target.id}"][target="${link.source.id}"]`)
+                                .classed("link-highlighted", true)
+                                .attr("marker-end", "url(#arrowhead-highlighted)");
+                        });
+
+                    }
+                })
+                .on("mouseout", function (event, currentlyClicked) {
+                    if (currentlyClicked && clicked) {
+                        // Un-highlight nodes and links when mouse moves out of the node
+                        unHighlightOtherThanSelected();
+                        // Highlight connected nodes and links of the clicked node
+                        highlightConnectedNodesAndLinks(event, currentlyClicked);
+                    } else {
+                        // Un-highlight nodes and links when mouse moves out of the node
+                        unHighlight();
+                    }
+                })
 
             // Create the labels for nodes
             // const nodeLabels = svg.selectAll(".label")
@@ -94,16 +193,69 @@ export class MyComponent {
             //     .attr("dy", 5)
             //     .text(d => d.label)
 
-            // Create the links
-            const links = svg.selectAll(".link")
-                .data(data.links)
-                .enter()
-                .append("line")
-                .attr("class", "link")
-                .attr("stroke-opacity", 0.6)
-                .attr("opacity", "1")
-                // .attr("stroke-width", d => Math.sqrt(d.value))
-                .attr("category", d => d.castegory)  // Add a category attribute to identify link type
+
+            function unHighlight() {
+                nodes.classed("primary", false);
+                nodes.classed("secondary", false);
+                links.classed("primary", false);
+                links.classed("secondary", false);
+            }
+
+            function highlightConnectedPrimaryNodes(event, d) {
+
+                d3.select(event.currentTarget).classed("primary", true);
+                links.each(function (l) {
+                    if (l.category === 'primary' && (l.source.id === d.id || l.target.id === d.id)) {
+                        d3.select(this).classed("primary", true);
+                        nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
+                        d3.select(this).attr("opacity", "1");
+                    }
+                });
+
+            }
+
+
+            function highlightConnectedNodesAndLinks(event, clickedNode) {
+                // Highlight the clicked node
+                d3.select(`.node[id="${clickedNode.id}"]`).classed("primary", true);
+
+                // Find the links connected to the clicked node
+                const connectedLinks = data.links.filter(link =>
+                    link.source.id === clickedNode.id || link.target.id === clickedNode.id
+                );
+
+                // Highlight the connected links and nodes
+                connectedLinks.forEach(link => {
+                    d3.select(`.link[source="${link.source.id}"][target="${link.target.id}"]`).classed("primary", true);
+                    d3.select(`.link[source="${link.target.id}"][target="${link.source.id}"]`).classed("primary", true);
+                    d3.select(`.node[id="${link.source.id}"]`).classed("secondary", true);
+                    d3.select(`.node[id="${link.target.id}"]`).classed("secondary", true);
+                });
+
+                d3.select(event.currentTarget).classed("primary", true);
+                links.each(function (l) {
+                    if (l.category === 'primary' && (l.source.id === clickedNode.id || l.target.id === clickedNode.id)) {
+                        d3.select(this).classed("primary", true);
+                        nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
+                        d3.select(this).attr("opacity", "1");
+                    }
+                });
+            }
+            function unHighlightOtherThanSelected() {
+                nodes.classed("primary", false);
+                // nodes.classed("secondary", false);
+                // links.classed("primary", false);
+                links.classed("secondary", false);
+            }
+
+            //When clicking outside nodes or links unhighlight everything
+            d3.select("body").on("click", function (event) {
+                if (event.target.nodeName === "body" || event.target.nodeName === "svg") {
+                    unHighlight();
+                    currentlyClicked = null;
+                }
+            });
+
             // function drag(simulation) {
 
             function drag(simulation) {
@@ -129,17 +281,17 @@ export class MyComponent {
             // Define the tick function
             const ticked = () => {
                 links
-                .attr("x1", d => d.source.x)
-                .attr("y1", d => d.source.y)
-                .attr("x2", d => d.target.x)
-                .attr("y2", d => d.target.y);
+                    .attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
                 // .attr("class", d => `link ${d.category}`);  // Apply the category class to links
 
                 nodes
                     .attr("cx", d => d.x)
                     .attr("cy", d => d.y);
 
-                
+
                 // nodeLabels
                 //     .attr("x", d => d.x)
                 //     .attr("y", d => d.y);
