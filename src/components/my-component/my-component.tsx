@@ -13,21 +13,7 @@ export class MyComponent {
     @Prop() includedProperties: string = 'KIP,SIP,TIP,KIT,SAP,RWTH,BIRLA,KPMG,IIT';
     @Prop() visualizationMode: string = 'all';
     componentDidLoad() {
-        // console.log('Host element:', this.hostElement);
-        // const shadowRoot = this.hostElement.shadowRoot;
-        // console.log('Shadow DOM:', shadowRoot);
-
-        // console.log('d3.select(this.hostElement)', this.hostElement.shadowRoot);
-        // const svg = d3.select(shadowRoot.querySelector(".graph"));
-        // console.log('D3-selected element within shadow DOM:', svg);
-        console.log('Host element:', this.hostElement);
-        console.log('Shadow root:', this.hostElement.shadowRoot);
-        // const svg = this.hostElement.shadowRoot.querySelector(".graph");
-        // console.log('Selected SVG element:', svg);
-
-
         this.setupD3Graph();
-        console.log('componentDidLoad called')
     }
 
     setupD3Graph() {
@@ -52,8 +38,6 @@ export class MyComponent {
 
             // .attr("transform","scale(0.2,0.2)")
             console.log('SVG element found:', svg);
-
-
             console.log('if (svg.empty()) ', svg);
             const width = +svg.style('width').replace('px', '');
             const height = +svg.style('height').replace('px', '');
@@ -86,8 +70,6 @@ export class MyComponent {
                 .force("charge", d3.forceManyBody().strength(-90))
                 .force("x", d3.forceX(width / 2))
                 .force("y", d3.forceY(height / 2));
-
-
 
             const nodes = svg.selectAll(".node")
                 .data(data.nodes)
@@ -122,9 +104,6 @@ export class MyComponent {
                 .attr("opacity", "1")
                 // .attr("stroke-width", d => Math.sqrt(d.value))
                 .attr("category", d => d.castegory)  // Add a category attribute to identify link type
-
-
-
             // function drag(simulation) {
 
             function drag(simulation) {
@@ -156,13 +135,11 @@ export class MyComponent {
                 .attr("y2", d => d.target.y);
                 // .attr("class", d => `link ${d.category}`);  // Apply the category class to links
 
-
                 nodes
                     .attr("cx", d => d.x)
                     .attr("cy", d => d.y);
 
-                    
-
+                
                 // nodeLabels
                 //     .attr("x", d => d.x)
                 //     .attr("y", d => d.y);
