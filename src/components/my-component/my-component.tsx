@@ -45,12 +45,6 @@ export class MyComponent {
             const svg = d3.select(this.hostElement.shadowRoot.querySelector(".graph")) as d3.Selection<SVGSVGElement, any, any, any>;
             console.log('Selected SVG element inside updateVisualization()', svg);
             console.log('mode ', mode);
-            // Set up the SVG container
-            // const svg = d3.select("#graph")
-
-            // const svg = d3.select(this.hostElement).shadowRoot.querySelector(".graph");
-
-            // const svg = d3.select(this.hostElement).shadowRoot.querySelector(".graph")
             svg
                 .attr("width", '780px')
                 .attr("height", '780px')
@@ -107,8 +101,6 @@ export class MyComponent {
                 .attr("cx", d => d.x) // No offset here
                 .attr("cy", d => d.y) // No offset here
                 .call(drag(simulation));
-                
-            console.log('inside nodes', nodes);
 
             // Create the labels for nodes
             // const nodeLabels = svg.selectAll(".label")
@@ -130,19 +122,6 @@ export class MyComponent {
                 .attr("opacity", "1")
                 // .attr("stroke-width", d => Math.sqrt(d.value))
                 .attr("category", d => d.castegory)  // Add a category attribute to identify link type
-                .attr("x1", d => d.source.x)
-                .attr("y1", d => d.source.y)
-                .attr("x2", d => d.target.x)
-                .attr("y2", d => d.target.y);
-
-                // const links = svg.selectAll(".link")
-                // .data(data.link)
-                // .enter()
-                // .append("line")
-                // .attr("class", "link")
-                // .attr("stroke", "#999")
-                // .attr("stroke-opacity", 0.6)
-                // .attr("opacity", "1")
 
 
 
