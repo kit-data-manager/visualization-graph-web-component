@@ -16,19 +16,19 @@ Stencil components are just Web Components, so they work in any major framework 
 
 ## Getting Started
 
-To start building a new web component using Stencil, clone this repo to a new directory:
+To start using the component using Stensil, clone this repo to a new directory:
 
 ```bash
-git clone https://github.com/ionic-team/stencil-component-starter.git my-component
-cd my-component
-git remote rm origin
+git clone https://github.com/ajaykirarkit/visualization-component.git
+
 ```
 
 and run:
 
 ```bash
 npm install
-npm start
+npm install @stencil/core@latest --save-exact
+npm run start
 ```
 
 To build the component for production, run:
@@ -74,5 +74,10 @@ The first step for all three of these strategies is to [publish to NPM](https://
 - Add an import to the npm packages `import my-component;`
 - Then you can use the element anywhere in your template, JSX, html etc
 
+
+
                  │
-│   To run Storybook manually, run npm run storybook.
+│   To run Storybook manually, npm run storybook.
+
+To build : npm run build
+to run : npm run start
