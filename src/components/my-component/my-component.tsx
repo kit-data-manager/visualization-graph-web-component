@@ -38,7 +38,7 @@ export class MyComponent {
         let currentlyClicked = null;
         let clicked = false;
         const includedProperties = this.includedProperties.split(',');
-        store.generateClusters(includedProperties); // Generate clusters using the included properties
+        // store.generateClusters(includedProperties); // Generate clusters using the included properties
         // updateVisualization(this.visualizationMode, includedProperties);
         console.log('included props', includedProperties);
 
@@ -69,7 +69,7 @@ export class MyComponent {
                     data = store.getPrimaryNodesData(includedProperties);
                     break;
                 case "all":
-                    data = store.toData(includedProperties);
+                    data = store.toDataWithClusters(includedProperties);
                     break;
                 case "primaryWithLinks":
                     data = store.getPrimaryNodesWithLinksData(includedProperties);
@@ -85,6 +85,11 @@ export class MyComponent {
                 .force("charge", d3.forceManyBody().strength(-90))
                 .force("x", d3.forceX(width / 2))
                 .force("y", d3.forceY(height / 2));
+
+                
+            const colorType = d3.scaleOrdinal() // Define a scale for relationType to colors
+                .domain(["solid", "dashed", /* add more relationType values here */])
+                .range(["#FF5733", "#33FF57", /* add corresponding colors here */]);
 
 
             // Create the links
@@ -109,6 +114,11 @@ export class MyComponent {
                 .attr("opacity", "1")
                 // .attr("stroke-width", d => Math.sqrt(d.value))
                 .attr("category", d => d.castegory)  // Add a category attribute to identify link type
+                .attr("stroke", d => colorType(d.relationType)) // Set stroke color based on relationType
+                .attr("stroke-dasharray", (d) => {
+                    // Set stroke-dasharray based on relationType (e.g., "5,5" for dashed)
+                    return d.relationType === "dashed" ? "5,5" : "none";
+                });
 
 
             const nodes = svg.selectAll(".node")
@@ -117,7 +127,7 @@ export class MyComponent {
                 .append("circle")
                 .attr("class", "node")
                 .attr("r", 10)
-                .attr("fill", d => colorScale(d.group))
+                .attr("fill", d => colorScale(d.id))
                 .attr("stroke", "#fff")
                 .attr("stroke-width", 1.5)
                 .attr("cx", d => d.x) // No offset here
