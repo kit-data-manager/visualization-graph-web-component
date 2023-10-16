@@ -3,11 +3,16 @@ import { FDO} from './FDO.js'; // Import the FDOStore class
 class FDOStore {
 
     
-    constructor() {
+    constructor(initialFDOData = []) {
         this.fdos = new Map();
         this.links = []; // Step 1: Create a links array to store the links
         this.proplength = 0;
         this.props=[];
+
+        for (const fdoData of initialFDOData) {
+            const fdo = new FDO(fdoData.label,fdoData.pid,fdoData.properties); // Assuming FDO can be constructed from its data
+            this.addFdo(fdo);
+        }
     }
 
     addFdo(fdo) {
@@ -33,85 +38,94 @@ class FDOStore {
     }
 
 
-toDataWithClusters(props) {
+toDataWithClusters(excludedProps) {
+    console.log('excludedProps',excludedProps);
     let data = { "nodes": [], "links": [] };
     let pids = this.getPids();
     let allPropertyValues = [];
     let primaryNodeIds = []; // Store IDs of primary nodes
     let primaryNodePropertyMap = {}; // Map primary node IDs to their properties
+    console.log('this.fdos', this.fdos);
 
-    this.proplength = props.length;
+    const clusterCount =pids.length;
+    console.log('clusterCount', clusterCount);
+    // this.proplength = props.length;
+    // console.log('this.proplength', this.proplength)
 
     // Generate clusters
-    for (let i = 0; i < 10; i++) {
-        const baseNodeId = `${i}`;
-        let baseFDO = new FDO(` ${baseNodeId}`, baseNodeId);
-        baseFDO.setLabel(` ${baseNodeId}`);
-        // baseFDO.setGroup(`Group 15`);
-        baseFDO.setType('primaryNodes');
-        this.addFdo(baseFDO);
-
-        // Add primary node to data
-        let node = baseFDO.toNode();
+    // Assuming you want to create a cluster for each existing FDO in the store
+    for (const [pid, fdo] of this.fdos.entries()) {
+        let node = fdo.toNode();
         data.nodes.push(node);
-
         primaryNodeIds.push(node.id);
         primaryNodePropertyMap[node.id] = Object.values(node.props);
 
-        // Secondary nodes (attributes) within the cluster
-        for (let j = 0; j < this.proplength; j++) {
-            const connectedNodeId = `${i}_${j}`;
-            let connectedFDO = new FDO(`${connectedNodeId}`, connectedNodeId);
-            connectedFDO.setLabel(`${connectedNodeId}`);
-            // connectedFDO.setGroup(`Group ${j}`);
-            connectedFDO.setType('attribute');
+        // // Create secondary nodes and links within the cluster
+        // for (let j = 0; j < props.length; j++) {
+        //     // Create secondary nodes here if needed
+        //     let secondaryNode = {
+        //         id: `secondary_${pid}_${j}`,
+        //         // Define other properties for secondary nodes
+        //     };
+        //     data.nodes.push(secondaryNode);
 
-            // Add properties based on the propertyNames list
-            for (const property of props) {
-                connectedFDO.addProperty(property, property);
-            }
+        //     // Create a link between the primary node and the secondary node
+        //     let link = {
+        //         source: node.id,
+        //         target: secondaryNode.id,
+        //         category: "secondary",
+        //         name: props[j],
+        //     };
+        //     data.links.push(link);
+        // }
+        
+           // Create secondary nodes and links within the cluster
+           for (const [propKey, propValue] of Object.entries(node.props)) {
+            if (!excludedProps.includes(propKey)) {
+                // Create secondary nodes only for properties not in the exclusion list
+                let secondaryNode = {
+                    id: `secondary_${pid}_${propKey}`,
+                    [propKey]: propValue, // Copy the property to the secondary node
+                    // Define other properties for secondary nodes
+                };
+                data.nodes.push(secondaryNode);
 
-            this.addFdo(connectedFDO);
-
-            // Add secondary node to data
-            node = connectedFDO.toNode();
-            data.nodes.push(node);
-
-            // Create secondary links between primary nodes and attributes
-            let link = {
-                "source": baseNodeId,
-                "target": connectedNodeId,
-                "category": "secondary",
-                "name": props[j]
-            };
-            data.links.push(link);
-        }
+                // Create a link between the primary node and the secondary node
+                let link = {
+                    source: node.id,
+                    target: secondaryNode.id,
+                    category: "secondary",
+                    name: propKey,
+                };
+                data.links.push(link);
+            }}
+        
     }
 
     // Populate allPropertyValues after data.nodes is populated
-    data.nodes.forEach(node => {
-        for (const propValue of Object.values(node.props)) {
-            allPropertyValues.push(propValue);
-        }
-    });
+    // data.nodes.forEach(node => {
+    //     for (const propValue of Object.values(node.props)) {
+    //         allPropertyValues.push(propValue);
+    //     }
+    // });
 
-    // Create primary links between primary nodes
-    const probability = 0.09;
-    const primaryNodesWithSecondaryLinks = 10; // Adjust the number of primary nodes with secondary links
-    for (let i = 0; i < primaryNodesWithSecondaryLinks; i++) {
-        const sourcePrimaryNodeId = primaryNodeIds[i];
-        if (Math.random() < probability) {
-            for (let j = i + 1; j < primaryNodesWithSecondaryLinks; j++) {
-                const targetPrimaryNodeId = primaryNodeIds[j];
-                let link = {
-                    "source": sourcePrimaryNodeId,
-                    "target": targetPrimaryNodeId,
-                    "category": "primary"
-                };
-                data.links.push(link);
-            }
-        }
-    }
+    // // Create primary links between primary nodes
+    // const probability = 0.09;
+    // const primaryNodesWithSecondaryLinks = 10; // Adjust the number of primary nodes with secondary links
+    // for (let i = 0; i < primaryNodesWithSecondaryLinks; i++) {
+    //     const sourcePrimaryNodeId = primaryNodeIds[i];
+    //     if (Math.random() < probability) {
+    //         for (let j = i + 1; j < primaryNodesWithSecondaryLinks; j++) {
+    //             const targetPrimaryNodeId = primaryNodeIds[j];
+    //             let link = {
+    //                 "source": sourcePrimaryNodeId,
+    //                 "target": targetPrimaryNodeId,
+    //                 "category": "primary"
+    //             };
+    //             data.links.push(link);
+    //         }
+    //     }
+    // }
 
     return data;
 }

@@ -12,12 +12,19 @@ export class MyComponent {
     @Element() hostElement: HTMLElement;
     @Prop() includedProperties: string = 'KIP,SIP,TIP,KIT,SAP,RWTH,BIRLA,KPMG,IIT';
     @Prop() visualizationMode: string = 'all';
+    @Prop() initialData: any[] | null = null;
 
+    // private store: FDOStore; // Declare a private store property
+    // constructor() {
+    //     this.store = null; // Initialize the store property
+    // }
     // Getter and setter for includedProperties
     @Watch('includedProperties')
     includedPropertiesChanged(newIncludedProperties: string) {
         // You can perform any necessary actions when includedProperties changes
         this.includedProperties = newIncludedProperties;
+        // this.updateStoreData(); // Update the store when includedProperties changes
+        this.setupD3Graph(this.initialData); // Update the visualization
     }
 
     // Getter and setter for visualizationMode
@@ -25,16 +32,80 @@ export class MyComponent {
     visualizationModeChanged(newVisualizationMode: string) {
         // You can perform any necessary actions when visualizationMode changes
         this.visualizationMode = newVisualizationMode;
+        // this.setupD3Graph(); // Update the visualization when visualizationMode changes
+
     }
+    @Watch('initialData')
+initialDataChanged(newData: any[]) {
+    // Update the visualization with the new initial data
+    this.setupD3Graph(newData);
+}
+
+    
+    // private updateStoreData() {
+    //     // Create or update the store based on this.includedProperties
+    //     // You can initialize the store with the appropriate data here
+    //     const dataForStore = [
+    //         // Construct the data for the store based on includedProperties
+    //     ];
+
+    //     this.store = new FDOStore(dataForStore);
+    // }
 
     componentDidLoad() {
-        this.setupD3Graph();
-    }
+        // this.setupD3Graph();
+        this.setupD3Graph(this.initialData);
 
-    setupD3Graph() {
+        
+
+    }
+    connectedCallback() {
+        // Listen for the custom event to set initial data
+        this.hostElement.addEventListener('setInitialData', (event: CustomEvent) => {
+            const newInitialData = event.detail;
+            this.initialData = newInitialData;
+        });
+    }
+    
+    setupD3Graph(data: any[]) {
         const svg = this.hostElement.shadowRoot.querySelector(".graph");
         console.log('Selected SVG element first line setup:', svg);
-        let store = new FDOStore();
+
+         data = [
+            {
+                pid: '1',
+                label: 'FDO 1',
+                properties:
+                {
+                    'k1':'K1',
+                    'k2':'K2'
+                }
+                // Add other properties as needed
+            },
+            {
+                pid: '2',
+                label: 'FDO 2',
+                properties:
+                {
+                    'p1':'P1',
+                    'p2':'P2'
+                }
+                // Add other properties as needed
+            },
+            {
+                pid: '3',
+                label: 'FDO 3',
+                properties:
+                {
+                    'm1':'M1',
+                    'm2':'M2'
+                }
+                // Add other properties as needed
+            },
+            // Add more FDO data objects as needed
+        ];
+        
+        let store = new FDOStore(data);
         let currentlyClicked = null;
         let clicked = false;
         const includedProperties = this.includedProperties.split(',');
@@ -337,7 +408,7 @@ export class MyComponent {
     render() {
         return (
             <div>
-                <div>Hello, World! I'm {this.getText()}</div>
+                <div>{this.getText()}</div>
                 <svg class="graph"></svg>
 
                 {/* <svg id="graph"></svg> */}

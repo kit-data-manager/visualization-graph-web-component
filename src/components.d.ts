@@ -12,6 +12,7 @@ export namespace Components {
          */
         "first": string;
         "includedProperties": string;
+        "initialData": any[] | null;
         /**
           * The last name
          */
@@ -41,6 +42,7 @@ declare namespace LocalJSX {
          */
         "first"?: string;
         "includedProperties"?: string;
+        "initialData"?: any[] | null;
         /**
           * The last name
          */

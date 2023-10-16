@@ -1,8 +1,9 @@
 class FDO {
-    constructor(customName, pid) {
+    constructor(customName, pid, properties = {}) {
         this.customName = customName;
         this.pid = pid;
-        this.properties = [];
+        this.properties = properties;
+
     }
     setLabel(label) {
         this.label = label;
@@ -49,8 +50,8 @@ class FDO {
 
     getProperties() {
         return this.properties;
+       
     }
-
     fromTypedPidMaker(document) {
         let result = new FDO();
         result.pid = document.pid;
@@ -114,23 +115,50 @@ class FDO {
         node.label = this.label;
         node.group = this.group;
         node.type = this.type;
+        node.props = []; 
         
-        for (const [key, value] of Object.entries(this.properties)) {
-            if (key == "21.T11148/1c699a5d1b4ad3ba4956") {
-                node.type = value;
-                break;
-            }
-        }
-        node.customName = this.customName;
-        let props = {};
-        for (let i = 0; i < this.properties.length; i++) {
-            let prop = this.properties[i];
-            props[prop.key] = prop.value;
-            // somewhere here use addProperty
-            // this.addProperty(prop.key, prop.value);
+        if (this.properties && typeof this.properties === 'object') {
+            for (const [key, value] of Object.entries(this.properties)) {
+                    node.props[key] = value; // Copy other properties to node.props
+                }
+            
 
-        }
-        node.props = props;
+    }
+        // console.log('node.props',node.props)
+        // for (const [key, value] of Object.entries(this.properties)) {
+        //     if (key == "21.T11148/1c699a5d1b4ad3ba4956") {
+        //         node.type = value;
+        //         break;
+        //     }
+        //     else {
+        //         node.props[key] = value; // Copy other properties to node.props
+        //     }
+        // }
+        node.customName = this.customName;
+    
+
+        // let props = {};
+        // const propertyKeys = Object.keys(this.properties);
+   
+        // for (let i = 0; i < propertyKeys.length; i++) {
+        //     const key = propertyKeys[i];
+        //     const value = this.properties[key];
+            
+        //     console.log('Inside loop - Key:', key, 'Value:', value);
+        //     props[key] = value;
+        // }
+        // node.props = props;
+        // console.log('Props after loop:', props);
+
+        // for (const [key, value] of Object.entries(this.properties)) {
+        //     console.log('Inside loop - Key:');
+
+        //     props[key] = key;
+        //     // props[value] = value;
+        // }
+        // node.props = props;
+        // console.log('Props after loop:', props);
+    
         // console.log('node.props', node.props);
         
 
