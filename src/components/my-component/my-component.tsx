@@ -1,7 +1,7 @@
 import { Component, Prop, h, Element, Watch } from '@stencil/core';
 import { format } from '../../utils/utils';
 import * as d3 from 'd3';  // Import D3.js
-import { FDOStore } from './FDOStore.js'; // Import the FDOStore class
+// import { FDOStore } from './FDOStore.js'; // Import the FDOStore class
 
 @Component({
     tag: 'my-component',
@@ -10,22 +10,16 @@ import { FDOStore } from './FDOStore.js'; // Import the FDOStore class
 })
 export class MyComponent {
     @Element() hostElement: HTMLElement;
-    @Prop() includedProperties: string = 'KIP,SIP,TIP,KIT,SAP,RWTH,BIRLA,KPMG,IIT';
+    // @Prop() includedProperties: string = 'KIP,SIP,TIP,KIT,SAP,RWTH,BIRLA,KPMG,IIT';
     @Prop() visualizationMode: string = 'all';
-    @Prop() initialData: any[] | null = null;
-
-    // private store: FDOStore; // Declare a private store property
-    // constructor() {
-    //     this.store = null; // Initialize the store property
-    // }
-    // Getter and setter for includedProperties
-    @Watch('includedProperties')
-    includedPropertiesChanged(newIncludedProperties: string) {
-        // You can perform any necessary actions when includedProperties changes
-        this.includedProperties = newIncludedProperties;
-        // this.updateStoreData(); // Update the store when includedProperties changes
-        this.setupD3Graph(this.initialData); // Update the visualization
-    }
+    // @Prop() data: any[] | null = null;
+    @Prop() data: string = "[]";
+    @Prop() excludedProperties: string = ''; // Initialize with an empty string
+    // @Prop() data: any[] = [];
+    public chartData: any;
+    constructor(){
+        this.chartData = JSON.parse(this.data)
+      }
 
     // Getter and setter for visualizationMode
     @Watch('visualizationMode')
@@ -33,98 +27,73 @@ export class MyComponent {
         // You can perform any necessary actions when visualizationMode changes
         this.visualizationMode = newVisualizationMode;
         // this.setupD3Graph(); // Update the visualization when visualizationMode changes
-
+        this.setupD3Graph(this.chartData);
     }
-    @Watch('initialData')
-initialDataChanged(newData: any[]) {
-    // Update the visualization with the new initial data
-    this.setupD3Graph(newData);
-}
+    @Watch('data')
+    initialDataChanged(newData) {
+        // Update the visualization with the new initial data
+        this.data = newData;
+        this.chartData = JSON.parse(newData);
+        this.setupD3Graph(this.chartData);
+    }
 
-    
-    // private updateStoreData() {
-    //     // Create or update the store based on this.includedProperties
-    //     // You can initialize the store with the appropriate data here
-    //     const dataForStore = [
-    //         // Construct the data for the store based on includedProperties
-    //     ];
-
-    //     this.store = new FDOStore(dataForStore);
-    // }
 
     componentDidLoad() {
         // this.setupD3Graph();
-        this.setupD3Graph(this.initialData);
-
-        
+        this.setupD3Graph(this.chartData);
 
     }
-    connectedCallback() {
-        // Listen for the custom event to set initial data
-        this.hostElement.addEventListener('setInitialData', (event: CustomEvent) => {
-            const newInitialData = event.detail;
-            this.initialData = newInitialData;
-        });
-    }
-    
+
     setupD3Graph(data: any[]) {
-        const svg = this.hostElement.shadowRoot.querySelector(".graph");
-        console.log('Selected SVG element first line setup:', svg);
+        // const svg = this.hostElement.shadowRoot.querySelector(".graph");
+        const excludedProperties = this.excludedProperties.split(',');
+        let componentData = data;
+        console.log('componentData', componentData);
+        if (componentData === undefined) {
+            componentData = [
+                {
+                    pid: '1',
+                    label: 'FDO 1',
+                    properties:
+                    {
+                        'k1': 'K1',
+                        'k2': 'K2'
+                    }
+                    // Add other properties as needed
+                },
+                {
+                    pid: '2',
+                    label: 'FDO 2',
+                    properties:
+                    {
+                        'p1': 'P1',
+                        'p2': 'P2'
+                    }
+                    // Add other properties as needed
+                },
+                {
+                    pid: '3',
+                    label: 'FDO 3',
+                    properties:
+                    {
+                        'm1': 'M1',
+                        'm2': 'M2'
+                    }
+                    // Add other properties as needed
+                },
+                // Add more FDO data objects as needed
+            ];
+        }
 
-         data = [
-            {
-                pid: '1',
-                label: 'FDO 1',
-                properties:
-                {
-                    'k1':'K1',
-                    'k2':'K2'
-                }
-                // Add other properties as needed
-            },
-            {
-                pid: '2',
-                label: 'FDO 2',
-                properties:
-                {
-                    'p1':'P1',
-                    'p2':'P2'
-                }
-                // Add other properties as needed
-            },
-            {
-                pid: '3',
-                label: 'FDO 3',
-                properties:
-                {
-                    'm1':'M1',
-                    'm2':'M2'
-                }
-                // Add other properties as needed
-            },
-            // Add more FDO data objects as needed
-        ];
-        
-        let store = new FDOStore(data);
+        // let store = new FDOStore(componentData);
         let currentlyClicked = null;
         let clicked = false;
-        const includedProperties = this.includedProperties.split(',');
-        // store.generateClusters(includedProperties); // Generate clusters using the included properties
-        // updateVisualization(this.visualizationMode, includedProperties);
-        console.log('included props', includedProperties);
-
-        const updateVisualization = (mode, includedProperties) => {
+        const updateVisualization = (mode, excludedProperties) => {
             const svg = d3.select(this.hostElement.shadowRoot.querySelector(".graph")) as d3.Selection<SVGSVGElement, any, any, any>;
-            console.log('Selected SVG element inside updateVisualization()', svg);
-            console.log('mode ', mode);
             svg
                 .attr("width", '780px')
                 .attr("height", '780px')
                 .attr('marker-end', 'url(#arrow)');
-
-            // .attr("transform","scale(0.2,0.2)")
-            console.log('SVG element found:', svg);
-            console.log('if (svg.empty()) ', svg);
             const width = +svg.style('width').replace('px', '');
             const height = +svg.style('height').replace('px', '');
             // Create a color scale for node groups
@@ -134,30 +103,31 @@ initialDataChanged(newData: any[]) {
             svg.selectAll("*").remove();
             // let includedProperties = document.getElementById("includedProperties").value.split(",");
 
-            let data;
+            let componentData;
             switch (mode) {
-                case "primary":
-                    data = store.getPrimaryNodesData(includedProperties);
-                    break;
+                // case "primary":
+                //     componentData = store.getPrimaryNodesData(excludedProperties);
+                //     break;
                 case "all":
-                    data = store.toDataWithClusters(includedProperties);
+                    componentData = this.prepareDataWithClusters(data, excludedProperties);
                     break;
-                case "primaryWithLinks":
-                    data = store.getPrimaryNodesWithLinksData(includedProperties);
-                    break;
+                // case "primaryWithLinks":
+                //     componentData = store.getPrimaryNodesWithLinksData(excludedProperties);
+                //     break;
                 default:
                     console.error("Invalid visualization mode:", mode);
                     return;
             }
 
+            
             // Create a force simulation
-            const simulation = d3.forceSimulation(data.nodes)
-                .force("link", d3.forceLink(data.links).id(d => d.id).distance(70)) // Ensure the id accessor is correct
+            const simulation = d3.forceSimulation(componentData.nodes)
+                .force("link", d3.forceLink(componentData.links).id(d => d.id).distance(70)) // Ensure the id accessor is correct
                 .force("charge", d3.forceManyBody().strength(-90))
                 .force("x", d3.forceX(width / 2))
                 .force("y", d3.forceY(height / 2));
 
-                
+
             const colorType = d3.scaleOrdinal() // Define a scale for relationType to colors
                 .domain(["solid", "dashed", /* add more relationType values here */])
                 .range(["#FF5733", "#33FF57", /* add corresponding colors here */]);
@@ -165,14 +135,14 @@ initialDataChanged(newData: any[]) {
 
             // Create the links
             const links = svg.selectAll(".link")
-                .data(data.links)
+                .data(componentData.links)
                 .enter()
                 .append("line")
                 .attr("marker-end", d => 'url(#marker_' + d.relationType + ')')
 
                 .attr("class", (d) => {
                     // Check if a reverse link exists
-                    const hasReverseLink = data.links.some((link) => {
+                    const hasReverseLink = componentData.links.some((link) => {
                         return (
                             link.source.id === d.target.id &&
                             link.target.id === d.source.id &&
@@ -193,7 +163,7 @@ initialDataChanged(newData: any[]) {
 
 
             const nodes = svg.selectAll(".node")
-                .data(data.nodes)
+                .data(componentData.nodes)
                 .enter()
                 .append("circle")
                 .attr("class", "node")
@@ -225,7 +195,7 @@ initialDataChanged(newData: any[]) {
                         highlightConnectedNodesAndLinks(event, d);
 
                         // Highlight connected links
-                        const connectedLinks = data.links.filter(link =>
+                        const connectedLinks = componentData.links.filter(link =>
                             link.source.id === d.id || link.target.id === d.id
                         );
 
@@ -263,18 +233,6 @@ initialDataChanged(newData: any[]) {
                         unHighlight();
                     }
                 })
-
-            // Create the labels for nodes
-            // const nodeLabels = svg.selectAll(".label")
-            //     .data(data.nodes)
-            //     .enter()
-            //     .append("text")
-            //     .attr("class", "label")
-            //     .attr("dx", 15)
-            //     .attr("dy", 5)
-            //     .text(d => d.label)
-
-
             function unHighlight() {
                 nodes.classed("primary", false);
                 nodes.classed("secondary", false);
@@ -301,7 +259,7 @@ initialDataChanged(newData: any[]) {
                 d3.select(`.node[id="${clickedNode.id}"]`).classed("primary", true);
 
                 // Find the links connected to the clicked node
-                const connectedLinks = data.links.filter(link =>
+                const connectedLinks = componentData.links.filter(link =>
                     link.source.id === clickedNode.id || link.target.id === clickedNode.id
                 );
 
@@ -382,9 +340,50 @@ initialDataChanged(newData: any[]) {
             // Run the simulation
             simulation.on("tick", ticked);
         }
-        updateVisualization(this.visualizationMode, includedProperties);
-        console.log('included props', includedProperties);
+        updateVisualization(this.visualizationMode, excludedProperties);
 
+    }
+    prepareDataWithClusters(data: any[], excludedProperties: string[]) {
+        const nodes = [];
+        const links = [];   
+
+    
+        for (const item of data) {
+            const node = {
+                id: item.pid,
+                label: item.label,
+                group: item.group,
+                type: item.type,
+                props: [],
+            };
+    
+            nodes.push(node);
+    
+            if (item.properties && typeof item.properties === 'object') {
+                for (const [propKey, propValue] of Object.entries(item.properties)) {
+                    if (!excludedProperties.includes(propKey)) {
+                        const secondaryNode = {
+                            id: `secondary_${item.pid}_${propKey}`,
+                            [propKey]: propValue, // Copy the property to the secondary node
+                            // Define other properties for secondary nodes
+                        };
+    
+                        nodes.push(secondaryNode);
+    
+                        const link = {
+                            source: node.id,
+                            target: secondaryNode.id,
+                            category: "secondary",
+                            name: propKey,
+                        };
+    
+                        links.push(link);
+                    }
+                }
+            }
+        }
+    
+        return { nodes, links };
     }
     /**
      * The first name
