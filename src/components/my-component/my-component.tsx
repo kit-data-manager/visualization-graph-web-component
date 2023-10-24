@@ -10,25 +10,27 @@ import * as d3 from 'd3';  // Import D3.js
 })
 export class MyComponent {
     @Element() hostElement: HTMLElement;
-    // @Prop() includedProperties: string = 'KIP,SIP,TIP,KIT,SAP,RWTH,BIRLA,KPMG,IIT';
-    @Prop() visualizationMode: string = 'all';
+    @Prop() showAttributes: boolean = true;
+    @Prop() showPrimaryLinks: boolean = false;
+    // @Prop() visualizationMode: string = 'all';
     // @Prop() data: any[] | null = null;
     @Prop() data: string = "[]";
     @Prop() excludedProperties: string = ''; // Initialize with an empty string
     // @Prop() data: any[] = [];
     public chartData: any;
-    constructor(){
+
+    constructor() {
         this.chartData = JSON.parse(this.data)
-      }
+    }
 
     // Getter and setter for visualizationMode
-    @Watch('visualizationMode')
-    visualizationModeChanged(newVisualizationMode: string) {
-        // You can perform any necessary actions when visualizationMode changes
-        this.visualizationMode = newVisualizationMode;
-        // this.setupD3Graph(); // Update the visualization when visualizationMode changes
-        this.setupD3Graph(this.chartData);
-    }
+    // @Watch('visualizationMode')
+    // visualizationModeChanged(newVisualizationMode: string) {
+    //     // You can perform any necessary actions when visualizationMode changes
+    //     this.visualizationMode = newVisualizationMode;
+    //     // this.setupD3Graph(); // Update the visualization when visualizationMode changes
+    //     this.setupD3Graph(this.chartData);
+    // }
     @Watch('data')
     initialDataChanged(newData) {
         // Update the visualization with the new initial data
@@ -47,9 +49,8 @@ export class MyComponent {
     setupD3Graph(data: any[]) {
         // const svg = this.hostElement.shadowRoot.querySelector(".graph");
         const excludedProperties = this.excludedProperties.split(',');
-        let componentData = data;
-        console.log('componentData', componentData);
-        if (componentData === undefined) {
+        var componentData = data;
+        if (!Array.isArray(componentData) || componentData.length === 0) {
             componentData = [
                 {
                     pid: '1',
@@ -88,7 +89,7 @@ export class MyComponent {
         // let store = new FDOStore(componentData);
         let currentlyClicked = null;
         let clicked = false;
-        const updateVisualization = (mode, excludedProperties) => {
+        const updateVisualization = (excludedProperties) => {
             const svg = d3.select(this.hostElement.shadowRoot.querySelector(".graph")) as d3.Selection<SVGSVGElement, any, any, any>;
             svg
                 .attr("width", '780px')
@@ -102,27 +103,26 @@ export class MyComponent {
             // Clear the existing SVG content
             svg.selectAll("*").remove();
             // let includedProperties = document.getElementById("includedProperties").value.split(",");
+            let data;
+            // switch (mode) {
+            // case "primary":
+            //     componentData = store.getPrimaryNodesData(excludedProperties);
+            //     break;
+            // case "all":
+            data = this.prepareDataWithClusters(componentData, excludedProperties);
+            // break;
+            // case "primaryWithLinks":
+            //     componentData = store.getPrimaryNodesWithLinksData(excludedProperties);
+            //     break;
+            //     default:
+            //         console.error("Invalid visualization mode:", mode);
+            //         return;
+            // }
 
-            let componentData;
-            switch (mode) {
-                // case "primary":
-                //     componentData = store.getPrimaryNodesData(excludedProperties);
-                //     break;
-                case "all":
-                    componentData = this.prepareDataWithClusters(data, excludedProperties);
-                    break;
-                // case "primaryWithLinks":
-                //     componentData = store.getPrimaryNodesWithLinksData(excludedProperties);
-                //     break;
-                default:
-                    console.error("Invalid visualization mode:", mode);
-                    return;
-            }
 
-            
             // Create a force simulation
-            const simulation = d3.forceSimulation(componentData.nodes)
-                .force("link", d3.forceLink(componentData.links).id(d => d.id).distance(70)) // Ensure the id accessor is correct
+            const simulation = d3.forceSimulation(data.nodes)
+                .force("link", d3.forceLink(data.links).id(d => d.id).distance(70)) // Ensure the id accessor is correct
                 .force("charge", d3.forceManyBody().strength(-90))
                 .force("x", d3.forceX(width / 2))
                 .force("y", d3.forceY(height / 2));
@@ -135,14 +135,14 @@ export class MyComponent {
 
             // Create the links
             const links = svg.selectAll(".link")
-                .data(componentData.links)
+                .data(data.links)
                 .enter()
                 .append("line")
                 .attr("marker-end", d => 'url(#marker_' + d.relationType + ')')
 
                 .attr("class", (d) => {
                     // Check if a reverse link exists
-                    const hasReverseLink = componentData.links.some((link) => {
+                    const hasReverseLink = data.links.some((link) => {
                         return (
                             link.source.id === d.target.id &&
                             link.target.id === d.source.id &&
@@ -163,7 +163,7 @@ export class MyComponent {
 
 
             const nodes = svg.selectAll(".node")
-                .data(componentData.nodes)
+                .data(data.nodes)
                 .enter()
                 .append("circle")
                 .attr("class", "node")
@@ -195,7 +195,7 @@ export class MyComponent {
                         highlightConnectedNodesAndLinks(event, d);
 
                         // Highlight connected links
-                        const connectedLinks = componentData.links.filter(link =>
+                        const connectedLinks = data.links.filter(link =>
                             link.source.id === d.id || link.target.id === d.id
                         );
 
@@ -252,14 +252,12 @@ export class MyComponent {
                 });
 
             }
-
-
             function highlightConnectedNodesAndLinks(event, clickedNode) {
                 // Highlight the clicked node
                 d3.select(`.node[id="${clickedNode.id}"]`).classed("primary", true);
 
                 // Find the links connected to the clicked node
-                const connectedLinks = componentData.links.filter(link =>
+                const connectedLinks = data.links.filter(link =>
                     link.source.id === clickedNode.id || link.target.id === clickedNode.id
                 );
 
@@ -340,49 +338,107 @@ export class MyComponent {
             // Run the simulation
             simulation.on("tick", ticked);
         }
-        updateVisualization(this.visualizationMode, excludedProperties);
+        updateVisualization(excludedProperties);
 
     }
     prepareDataWithClusters(data: any[], excludedProperties: string[]) {
         const nodes = [];
-        const links = [];   
-
-    
+        const links = [];
+        const pids = [];
         for (const item of data) {
             const node = {
                 id: item.pid,
-                label: item.label,
+                label: 'Initial nodes',
                 group: item.group,
                 type: item.type,
                 props: [],
             };
-    
-            nodes.push(node);
-    
             if (item.properties && typeof item.properties === 'object') {
                 for (const [propKey, propValue] of Object.entries(item.properties)) {
-                    if (!excludedProperties.includes(propKey)) {
-                        const secondaryNode = {
-                            id: `secondary_${item.pid}_${propKey}`,
-                            [propKey]: propValue, // Copy the property to the secondary node
-                            // Define other properties for secondary nodes
+                    const pattern = /21\.[A-Za-z0-9\-]+\/[A-Za-z0-9\-]+/; // Adjust the pattern as needed
+                    const propValueAsString = String(propValue);
+                    node.props.push({
+                        name: propKey,
+                        value: propValue,
+                    });
+                    if (pattern.test(propValueAsString)) {
+                        const nodeConnected = {
+                            id: item.pid,
+                            label: 'nodeConnected',
+                            group: item.group,
+                            type: item.type,
+                            props: [],
                         };
-    
-                        nodes.push(secondaryNode);
-    
-                        const link = {
-                            source: node.id,
-                            target: secondaryNode.id,
-                            category: "secondary",
+                        // Add properties to the 'props' array of nodeConnected
+                        nodeConnected.props.push({
                             name: propKey,
-                        };
-    
-                        links.push(link);
+                            value: propValue,
+                        });
+                        nodes.push(nodeConnected);
+                        // nodes.push(pids)
                     }
+
+                }
+            }
+
+            nodes.push(node);
+
+            // pids.push(node.id);
+
+            if (item.properties && typeof item.properties === 'object') {
+                for (const [propKey, propValue] of Object.entries(item.properties)) {
+                    const pattern = /21\.[A-Za-z0-9\-]+\/[A-Za-z0-9\-]+/; // Adjust the pattern as needed
+                    const propValueAsString = String(propValue);
+                    if (propValue)
+                        if (!excludedProperties.includes(propKey) && this.showAttributes) {
+                            const secondaryNode = {
+                                id: `secondary_${item.pid}_${propKey}`,
+                                [propKey]: propValue, // Copy the property to the secondary node
+                                // Define other properties for secondary nodes
+                            };
+                            nodes.push(secondaryNode);
+                            const link = {
+                                source: node.id,
+                                target: secondaryNode.id,
+                                category: "secondary",
+                                name: propKey,
+                            };
+                            links.push(link);
+                            // links.push(primaryLink);
+                        }
                 }
             }
         }
-    
+        console.log('nodes List', nodes);
+        for (const linkNode of nodes) {
+            if (linkNode.props && Array.isArray(linkNode.props)) {
+                const matchingNodes = nodes.filter(node => node.id === linkNode.id);
+               
+                // console.log('inside loopo', linkNode.props)      
+                for (const prop of linkNode.props) {
+                    // console.log('prop', prop);
+                    const propKey = prop.name;
+                    const propValue = prop.value;
+                    // Find a node with an ID that matches the property value
+                    // console.log('linkNodes.id', linkNodes.id);
+                    // //    console.log( 'propKey',propKey);
+                    // console.log('propValue', propValue);
+                    
+                    for (const matchingNode of matchingNodes) {
+                        // Create primary links for each matching node
+                        let primaryLink = {
+                            source: linkNode.id,
+                            target: matchingNode.id,
+                            category: "primary",
+                            name: propKey
+                        }
+                        links.push(primaryLink);
+                    }
+                     console.log('matchingNodes', matchingNodes)
+                }
+            }
+        }
+
         return { nodes, links };
     }
     /**
