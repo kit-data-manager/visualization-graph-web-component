@@ -13,7 +13,58 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.6.1/d3.min.js"></script>
 
 <body>
-  <my-component included-properties="KIP,SIP,TIP,KIT,SAP,RWTH,KPMG,IIT" visualization-mode="all"></my-component>
+  <!-- <my-component included-properties="K1" excluded-properties="k1,p1,k2" visualization-mode="all"></my-component> -->
+  <my-component data='[
+  {
+    "pid": "1",
+    "label": "FDO 1",
+    "properties": {
+      "profile": "KIP",
+      "hasMetada": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3"
+    }
+  },
+  {
+    "pid": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
+    "label": "FDO 2",
+    "properties": {
+      "profile": "KIP",
+      "Licence": "cc4"
+    }
+  }
+]
+'
+  excluded-properties=""
+  show-attributes="true"
+  show-primary-links="false">></my-component>
+ <script>
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     const myComponent = document.querySelector('my-component');
+    
+//     // Emit a custom event to set the initial data
+//     const initialData = [
+//     {
+//                 pid: '1',
+//                 label: 'FDO 1',
+//                 properties:
+//                 {
+//                     'k1':'K1',
+//                     'k2':'K2'
+//                 }
+//                 // Add other properties as needed
+//             }
+//         // Your initial data here
+//     ];
+    
+//     const event = new CustomEvent('setInitialData', {
+//         detail: initialData,
+//     });
+    
+//     myComponent.dispatchEvent(event);
+// });
+
+
+  </script>
 </body>
 
 </html>

@@ -1,7 +1,6 @@
 import { Component, Prop, h, Element, Watch } from '@stencil/core';
-import { format } from '../../utils/utils';
 import * as d3 from 'd3';  // Import D3.js
-import { FDOStore } from './FDOStore.js'; // Import the FDOStore class
+// import { FDOStore } from './FDOStore.js'; // Import the FDOStore class
 
 @Component({
     tag: 'my-component',
@@ -10,50 +9,91 @@ import { FDOStore } from './FDOStore.js'; // Import the FDOStore class
 })
 export class MyComponent {
     @Element() hostElement: HTMLElement;
-    @Prop() includedProperties: string = 'KIP,SIP,TIP,KIT,SAP,RWTH,BIRLA,KPMG,IIT';
-    @Prop() visualizationMode: string = 'all';
+    @Prop() showAttributes: boolean = true;
+    @Prop() showPrimaryLinks: boolean = false;
+    // @Prop() visualizationMode: string = 'all';
+    // @Prop() data: any[] | null = null;
+    @Prop() data: string = "[]";
+    @Prop() excludedProperties: string = ''; // Initialize with an empty string
+    // @Prop() data: any[] = [];
+    public chartData: any;
 
-    // Getter and setter for includedProperties
-    @Watch('includedProperties')
-    includedPropertiesChanged(newIncludedProperties: string) {
-        // You can perform any necessary actions when includedProperties changes
-        this.includedProperties = newIncludedProperties;
+    constructor() {
+        this.chartData = JSON.parse(this.data)
     }
 
     // Getter and setter for visualizationMode
-    @Watch('visualizationMode')
-    visualizationModeChanged(newVisualizationMode: string) {
-        // You can perform any necessary actions when visualizationMode changes
-        this.visualizationMode = newVisualizationMode;
+    // @Watch('visualizationMode')
+    // visualizationModeChanged(newVisualizationMode: string) {
+    //     // You can perform any necessary actions when visualizationMode changes
+    //     this.visualizationMode = newVisualizationMode;
+    //     // this.setupD3Graph(); // Update the visualization when visualizationMode changes
+    //     this.setupD3Graph(this.chartData);
+    // }
+    @Watch('data')
+    initialDataChanged(newData) {
+        // Update the visualization with the new initial data
+        this.data = newData;
+        this.chartData = JSON.parse(newData);
+        this.setupD3Graph(this.chartData);
     }
+
 
     componentDidLoad() {
-        this.setupD3Graph();
+        // this.setupD3Graph();
+        this.setupD3Graph(this.chartData);
+
     }
 
-    setupD3Graph() {
-        const svg = this.hostElement.shadowRoot.querySelector(".graph");
-        console.log('Selected SVG element first line setup:', svg);
-        let store = new FDOStore();
+    setupD3Graph(data: any[]) {
+        // const svg = this.hostElement.shadowRoot.querySelector(".graph");
+        const excludedProperties = this.excludedProperties.split(',');
+        var componentData = data;
+        if (!Array.isArray(componentData) || componentData.length === 0) {
+            componentData = [
+                {
+                    pid: '1',
+                    label: 'FDO 1',
+                    properties:
+                    {
+                        'k1': 'K1',
+                        'k2': 'K2'
+                    }
+                    // Add other properties as needed
+                },
+                {
+                    pid: '2',
+                    label: 'FDO 2',
+                    properties:
+                    {
+                        'p1': 'P1',
+                        'p2': 'P2'
+                    }
+                    // Add other properties as needed
+                },
+                {
+                    pid: '3',
+                    label: 'FDO 3',
+                    properties:
+                    {
+                        'm1': 'M1',
+                        'm2': 'M2'
+                    }
+                    // Add other properties as needed
+                },
+                // Add more FDO data objects as needed
+            ];
+        }
+
+        // let store = new FDOStore(componentData);
         let currentlyClicked = null;
         let clicked = false;
-        const includedProperties = this.includedProperties.split(',');
-        store.generateClusters(includedProperties); // Generate clusters using the included properties
-        // updateVisualization(this.visualizationMode, includedProperties);
-        console.log('included props', includedProperties);
-
-        const updateVisualization = (mode, includedProperties) => {
+        const updateVisualization = (excludedProperties) => {
             const svg = d3.select(this.hostElement.shadowRoot.querySelector(".graph")) as d3.Selection<SVGSVGElement, any, any, any>;
-            console.log('Selected SVG element inside updateVisualization()', svg);
-            console.log('mode ', mode);
             svg
                 .attr("width", '780px')
                 .attr("height", '780px')
                 .attr('marker-end', 'url(#arrow)');
-
-            // .attr("transform","scale(0.2,0.2)")
-            console.log('SVG element found:', svg);
-            console.log('if (svg.empty()) ', svg);
             const width = +svg.style('width').replace('px', '');
             const height = +svg.style('height').replace('px', '');
             // Create a color scale for node groups
@@ -62,22 +102,22 @@ export class MyComponent {
             // Clear the existing SVG content
             svg.selectAll("*").remove();
             // let includedProperties = document.getElementById("includedProperties").value.split(",");
-
             let data;
-            switch (mode) {
-                case "primary":
-                    data = store.getPrimaryNodesData(includedProperties);
-                    break;
-                case "all":
-                    data = store.toData(includedProperties);
-                    break;
-                case "primaryWithLinks":
-                    data = store.getPrimaryNodesWithLinksData(includedProperties);
-                    break;
-                default:
-                    console.error("Invalid visualization mode:", mode);
-                    return;
-            }
+            // switch (mode) {
+            // case "primary":
+            //     componentData = store.getPrimaryNodesData(excludedProperties);
+            //     break;
+            // case "all":
+            data = this.prepareDataWithClusters(componentData, excludedProperties);
+            // break;
+            // case "primaryWithLinks":
+            //     componentData = store.getPrimaryNodesWithLinksData(excludedProperties);
+            //     break;
+            //     default:
+            //         console.error("Invalid visualization mode:", mode);
+            //         return;
+            // }
+
 
             // Create a force simulation
             const simulation = d3.forceSimulation(data.nodes)
@@ -86,6 +126,10 @@ export class MyComponent {
                 .force("x", d3.forceX(width / 2))
                 .force("y", d3.forceY(height / 2));
 
+
+            const colorType = d3.scaleOrdinal() // Define a scale for relationType to colors
+                .domain(["solid", "dashed", /* add more relationType values here */])
+                .range(["#FF5733", "#33FF57", /* add corresponding colors here */]);
 
             // Create the links
             const links = svg.selectAll(".link")
@@ -109,15 +153,18 @@ export class MyComponent {
                 .attr("opacity", "1")
                 // .attr("stroke-width", d => Math.sqrt(d.value))
                 .attr("category", d => d.castegory)  // Add a category attribute to identify link type
-
-
+                .attr("stroke", d => colorType(d.relationType)) // Set stroke color based on relationType
+                .attr("stroke-dasharray", (d) => {
+                    // Set stroke-dasharray based on relationType (e.g., "5,5" for dashed)
+                    return d.relationType === "dashed" ? "5,5" : "none";
+                });
             const nodes = svg.selectAll(".node")
                 .data(data.nodes)
                 .enter()
                 .append("circle")
                 .attr("class", "node")
                 .attr("r", 10)
-                .attr("fill", d => colorScale(d.group))
+                .attr("fill", d => colorScale(d.id))
                 .attr("stroke", "#fff")
                 .attr("stroke-width", 1.5)
                 .attr("cx", d => d.x) // No offset here
@@ -133,7 +180,6 @@ export class MyComponent {
                     // Add a class to the link
                     d3.select(this).classed("link-highlighted", true);
                     d3.select(this).attr("marker-end", "url(#arrowhead-highlighted)");
-
                 }).on("mouseover", function (event, d) {
                     // If a node has been clicked previously and it's not the current node being hovered over
                     if (clicked && currentlyClicked && currentlyClicked !== d) {
@@ -159,7 +205,6 @@ export class MyComponent {
                         //         }
                         //     });
                         // }
-
                         connectedLinks.forEach(link => {
                             d3.select(`.link[source="${link.source.id}"][target="${link.target.id}"]`)
                                 .classed("link-highlighted", true)
@@ -168,7 +213,6 @@ export class MyComponent {
                                 .classed("link-highlighted", true)
                                 .attr("marker-end", "url(#arrowhead-highlighted)");
                         });
-
                     }
                 })
                 .on("mouseout", function (event, currentlyClicked) {
@@ -182,18 +226,6 @@ export class MyComponent {
                         unHighlight();
                     }
                 })
-
-            // Create the labels for nodes
-            // const nodeLabels = svg.selectAll(".label")
-            //     .data(data.nodes)
-            //     .enter()
-            //     .append("text")
-            //     .attr("class", "label")
-            //     .attr("dx", 15)
-            //     .attr("dy", 5)
-            //     .text(d => d.label)
-
-
             function unHighlight() {
                 nodes.classed("primary", false);
                 nodes.classed("secondary", false);
@@ -213,8 +245,6 @@ export class MyComponent {
                 });
 
             }
-
-
             function highlightConnectedNodesAndLinks(event, clickedNode) {
                 // Highlight the clicked node
                 d3.select(`.node[id="${clickedNode.id}"]`).classed("primary", true);
@@ -301,9 +331,68 @@ export class MyComponent {
             // Run the simulation
             simulation.on("tick", ticked);
         }
-        updateVisualization(this.visualizationMode, includedProperties);
-        console.log('included props', includedProperties);
+        updateVisualization(excludedProperties);
 
+    }
+    prepareDataWithClusters(data: any[], excludedProperties: string[]) {
+        const nodes = [];
+        const links = [];
+        const connectedNodes = [];
+        const pidList = [];
+        //Primary nodes creation
+        for (const item of data) {
+            const node = {
+                id: item.pid,
+                label: 'Initial nodes',
+                // group: item.group,
+                // type: item.type,
+                props: [],
+            };
+            pidList.push(item.pid);
+            nodes.push(node);
+        }
+        //iterate over all properties
+        //check if property value is in pidlist-- link source: item.id, target: propertyValue, type : propkey
+        //else create secondary node
+        //link secondary: item.id , , type: for color
+        for (const item of data) {
+            for (const [propKey, propValue] of Object.entries(item.properties)) {
+                //Primary links (between FDOs) As pidList has FDOs and if propvalue is among thos pids that means it is a link.
+                if (pidList.includes(propValue)) {
+                    const link =
+                    {
+                        source: item.pid,
+                        target: propValue,
+                        type: propKey
+                    }
+                    if (this.showPrimaryLinks) links.push(link);
+                }
+                //if it is not in the property value it should be an ordinary node
+                else {
+                    if (!excludedProperties.includes(propKey) && this.showAttributes) {
+                        const secondaryNode =
+                        {
+                            id: `secondary_${item.pid}_${propKey}`,
+                            [propKey]: propValue,
+                        }
+                        nodes.push(secondaryNode);
+                        const link =
+                        {
+                            source: item.pid,
+                            target: secondaryNode.id
+                        }
+                        links.push(link)
+                    }
+                }
+            }
+
+
+
+        }
+
+        console.log('nodes and links', nodes, links);
+
+        return { nodes, links };
     }
     /**
      * The first name
@@ -319,17 +408,10 @@ export class MyComponent {
      * The last name
      */
     @Prop() last: string;
-
-    private getText(): string {
-        return format(this.first, this.middle, this.last);
-    }
-
     render() {
         return (
             <div>
-                <div>Hello, World! I'm {this.getText()}</div>
                 <svg class="graph"></svg>
-
                 {/* <svg id="graph"></svg> */}
             </div>
         );
