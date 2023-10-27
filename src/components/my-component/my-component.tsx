@@ -1,5 +1,4 @@
 import { Component, Prop, h, Element, Watch } from '@stencil/core';
-import { format } from '../../utils/utils';
 import * as d3 from 'd3';  // Import D3.js
 // import { FDOStore } from './FDOStore.js'; // Import the FDOStore class
 
@@ -357,19 +356,20 @@ export class MyComponent {
         //else create secondary node
         //link secondary: item.id , , type: for color
         for (const item of data) {
-                for (const [propKey, propValue] of Object.entries(item.properties)) {
-                    //Primary links (between FDOs) As pidList has FDOs and if propvalue is among thos pids that means it is a link.
-                    if (pidList.includes(propValue)) {
-                        const link =
-                        {
-                            source: item.id,
-                            target: propValue,
-                            type: propKey
-                        }
-                        links.push(link);
+            for (const [propKey, propValue] of Object.entries(item.properties)) {
+                //Primary links (between FDOs) As pidList has FDOs and if propvalue is among thos pids that means it is a link.
+                if (pidList.includes(propValue)) {
+                    const link =
+                    {
+                        source: item.pid,
+                        target: propValue,
+                        type: propKey
                     }
-                    //if it is not in the property value it should be an ordinary node
-                    else {
+                    if (this.showPrimaryLinks) links.push(link);
+                }
+                //if it is not in the property value it should be an ordinary node
+                else {
+                    if (!excludedProperties.includes(propKey) && this.showAttributes) {
                         const secondaryNode =
                         {
                             id: `secondary_${item.pid}_${propKey}`,
@@ -378,195 +378,19 @@ export class MyComponent {
                         nodes.push(secondaryNode);
                         const link =
                         {
-                            source: item.id,
+                            source: item.pid,
                             target: secondaryNode.id
                         }
                         links.push(link)
                     }
+                }
             }
 
 
 
         }
-        //     if (item.properties && typeof item.properties === 'object') {
-        //         for (const [propKey, propValue] of Object.entries(item.properties)) {
-        //             const pattern = /21\.[A-Za-z0-9\-]+\/[A-Za-z0-9\-]+/; // Adjust the pattern as needed
-        //             const propValueAsString = String(propValue);
-        //             node.props.push({
-        //                 name: propKey,
-        //                 value: propValue,
-        //             });
-        //             // console.log('node.props', node.props);
-        //             if (pattern.test(propValueAsString)) {
-        //                 const nodeConnected = {
-        //                     id: propValue,
-        //                     label: item.pid,
-        //                     group: item.group,
-        //                     type: item.type,
-        //                     props: [],
-        //                 };
-        //                 // Add properties to the 'props' array of nodeConnected
-        //                 // nodeConnected.props.push({
-        //                 //     name: propKey,
-        //                 //     value: propValue,
-        //                 // });
-        //                 nodes.push(nodeConnected);
-        //                 connectedNodes.push(nodeConnected);
-        //                 // nodes.push(pids)
-        //             }
 
-        //         }
-        //     }
-        //     nodes.push(node);
-
-        //     // pids.push(node.id);
-
-        //     if (item.properties && typeof item.properties === 'object') {
-        //         for (const [propKey, propValue] of Object.entries(item.properties)) {
-        //             const pattern = /21\.[A-Za-z0-9\-]+\/[A-Za-z0-9\-]+/; // Adjust the pattern as needed
-        //             const propValueAsString = String(propValue);
-        //             if (propValue)
-        //                 if (!excludedProperties.includes(propKey) && this.showAttributes) {
-        //                     //secondaryNodes are nodes based on properties/attributes
-        //                     const secondaryNode = {
-        //                         id: `secondary_${item.pid}_${propKey}`,
-        //                         [propKey]: propValue, // Copy the property to the secondary node
-        //                         // Define other properties for secondary nodes
-        //                     };
-        //                     nodes.push(secondaryNode);
-        //                     const link = {
-        //                         source: node.id,
-        //                         target: secondaryNode.id,
-        //                         category: "secondary",
-        //                         name: propKey,
-        //                     };
-        //                     links.push(link);
-        //                     // links.push(primaryLink);
-        //                 }
-        //         }
-        //     }
-
-        // }
-        // console.log('nodes', nodes);
-        // for(const item of data) {
-        //     for (const connectedNode of connectedNodes) {
-        //         if (connectedNode.id === item.id) {
-        //             const link = {
-        //                 source: connectedNode.id,
-        //                 target: connectedNode.label
-        //             };
-        //             // Push the link into the links array
-        //             // links.push(link);
-        //         }
-        //     }
-        // }
-        console.log('nodes and links',nodes, links);
-        // for (const linkNode of nodes) {
-        //     if (linkNode.props && Array.isArray(linkNode.props)) {
-        //         const matchingNodes = nodes.filter(node => node.id === linkNode.id);
-        //         // console.log('inside loopo', linkNode.props)      
-        //         for (const prop of linkNode.props) {
-        //             // console.log('prop', prop);
-        //             const propKey = prop.name;
-        //             const propValue = prop.value;
-        //             // Find a node with an ID that matches the property value
-        //             // console.log('linkNodes.id', linkNodes.id);
-        //             // //    console.log( 'propKey',propKey);
-        //             // console.log('propValue', propValue);
-
-        //             for (const matchingNode of matchingNodes) {
-        //                 // Create primary links for each matching node
-        //                 let primaryLink = {
-        //                     source: linkNode.id,
-        //                     target: matchingNode.id,
-        //                     category: "primary",
-        //                     name: propKey
-        //                 }
-        //                 links.push(primaryLink);
-        //             }
-        //             console.log('matchingNodes', matchingNodes)
-        //         }
-        //     }
-        // }
-        //         const matchingNodesObject = [];
-        //         const seenIds = new Set();
-        // console.log('connectedNodes',connectedNodes);   
-        //         // Identify matching nodes
-        //         for (const node of nodes) {
-        //             if (node.props && Array.isArray(node.props)) {
-        //                 for (const prop of node.props) {
-        //                     const propValue = prop.value;
-        //                     const nodeId=node.id;
-        //                     const matchingNode = nodes.find((otherNode) => otherNode.id === propValue);
-        //                     const matchingProp = {
-        //                         id: nodeId,
-        //                         label: propValue,
-        //                         // group: item.group,
-        //                         // type: item.type,
-        //                         props: [],
-        //                     };
-        //                     // Add properties to the 'props' array of nodeConnected
-        //                     // nodeConnected.props.push({
-        //                     //     name: propKey,
-        //                     //     value: propValue,
-        //                     // });
-
-
-        //                     if (matchingNode && !seenIds.has(matchingProp.id)) {
-        //                         matchingNodesObject.push(matchingProp);
-        //                         seenIds.add(matchingProp.id);
-        //                         // Store matching nodes in an object with the property id as the key
-        //                         // if (!matchingNodesObject[propValue]) {
-        //                         //     // matchingNodesObject[propValue] = [];
-        //                         //     matchingNodesObject.push(matchingNode);
-        //                         // }
-
-        //                     }
-        //                 }
-        //             }
-        //         }
-        // for (const matchingNode of matchingNodesObject) {
-        //     // Find the corresponding "nodeConnected" node for the current matching node
-        //     const nodeConnected = nodes.find((node) => node.id === matchingNode.id);
-        //     // Check if a corresponding "nodeConnected" node was found
-        //     if (nodeConnected) {
-        //         // Create a link between the matching node and the "nodeConnected" node
-        //         const link = {
-        //             source: matchingNode.id,
-        //             target: nodeConnected.id,
-        //             category: "matching",
-        //         };
-
-        //         // Push the link into the links array
-        //         links.push(link);
-        //     }
-        // }
-
-        // for (const matchingNode of matchingNodesObject) {
-        //     const nodeConnected = nodes.find((node) => node.id === matchingNode.id);
-
-        //     // Check if a corresponding "nodeConnected" node was found
-        //     if (nodeConnected) {
-        //         // Assuming you have an outer loop iterating over data items
-        //         for (const item of data) {
-        //             // Use item.id as the source
-        //             const source = item.id;
-
-        //             // Create a link between the source (item.id) and the "nodeConnected" node
-        //             const link = {
-        //                 source,
-        //                 target: nodeConnected.id,
-        //                 category: "matching",
-        //             };
-
-        //             // Push the link into the links array
-        //             links.push(link);
-        //         }
-        //     }
-        // }
-
-
-
+        console.log('nodes and links', nodes, links);
 
         return { nodes, links };
     }
@@ -584,15 +408,9 @@ export class MyComponent {
      * The last name
      */
     @Prop() last: string;
-
-    private getText(): string {
-        return format(this.first, this.middle, this.last);
-    }
-
     render() {
         return (
             <div>
-                <div>{this.getText()}</div>
                 <svg class="graph"></svg>
                 {/* <svg id="graph"></svg> */}
             </div>
