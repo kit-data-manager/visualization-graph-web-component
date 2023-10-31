@@ -1,6 +1,5 @@
 import { Component, Prop, h, Element, Watch } from '@stencil/core';
 import * as d3 from 'd3';  // Import D3.js
-// import { FDOStore } from './FDOStore.js'; // Import the FDOStore class
 
 @Component({
     tag: 'my-component',
@@ -11,25 +10,13 @@ export class MyComponent {
     @Element() hostElement: HTMLElement;
     @Prop() showAttributes: boolean = true;
     @Prop() showPrimaryLinks: boolean = false;
-    // @Prop() visualizationMode: string = 'all';
-    // @Prop() data: any[] | null = null;
     @Prop() data: string = "[]";
     @Prop() excludedProperties: string = ''; // Initialize with an empty string
-    // @Prop() data: any[] = [];
     public chartData: any;
 
     constructor() {
         this.chartData = JSON.parse(this.data)
     }
-
-    // Getter and setter for visualizationMode
-    // @Watch('visualizationMode')
-    // visualizationModeChanged(newVisualizationMode: string) {
-    //     // You can perform any necessary actions when visualizationMode changes
-    //     this.visualizationMode = newVisualizationMode;
-    //     // this.setupD3Graph(); // Update the visualization when visualizationMode changes
-    //     this.setupD3Graph(this.chartData);
-    // }
     @Watch('data')
     initialDataChanged(newData) {
         // Update the visualization with the new initial data
@@ -37,16 +24,10 @@ export class MyComponent {
         this.chartData = JSON.parse(newData);
         this.setupD3Graph(this.chartData);
     }
-
-
     componentDidLoad() {
-        // this.setupD3Graph();
         this.setupD3Graph(this.chartData);
-
     }
-
     setupD3Graph(data: any[]) {
-        // const svg = this.hostElement.shadowRoot.querySelector(".graph");
         const excludedProperties = this.excludedProperties.split(',');
         var componentData = data;
         if (!Array.isArray(componentData) || componentData.length === 0) {
@@ -84,8 +65,6 @@ export class MyComponent {
                 // Add more FDO data objects as needed
             ];
         }
-
-        // let store = new FDOStore(componentData);
         let currentlyClicked = null;
         let clicked = false;
         const updateVisualization = (excludedProperties) => {
@@ -101,31 +80,13 @@ export class MyComponent {
 
             // Clear the existing SVG content
             svg.selectAll("*").remove();
-            // let includedProperties = document.getElementById("includedProperties").value.split(",");
-            let data;
-            // switch (mode) {
-            // case "primary":
-            //     componentData = store.getPrimaryNodesData(excludedProperties);
-            //     break;
-            // case "all":
-            data = this.prepareDataWithClusters(componentData, excludedProperties);
-            // break;
-            // case "primaryWithLinks":
-            //     componentData = store.getPrimaryNodesWithLinksData(excludedProperties);
-            //     break;
-            //     default:
-            //         console.error("Invalid visualization mode:", mode);
-            //         return;
-            // }
-
-
+            let data = this.prepareDataWithClusters(componentData, excludedProperties);
             // Create a force simulation
             const simulation = d3.forceSimulation(data.nodes)
                 .force("link", d3.forceLink(data.links).id(d => d.id).distance(70)) // Ensure the id accessor is correct
                 .force("charge", d3.forceManyBody().strength(-90))
                 .force("x", d3.forceX(width / 2))
                 .force("y", d3.forceY(height / 2));
-
 
             const colorType = d3.scaleOrdinal() // Define a scale for relationType to colors
                 .domain(["solid", "dashed", /* add more relationType values here */])
@@ -136,7 +97,7 @@ export class MyComponent {
                 .data(data.links)
                 .enter()
                 .append("line")
-                .attr("marker-end", d => 'url(#marker_' + d.relationType + ')')
+                // .attr("marker-end", d => 'url(#marker_' + d.type + ')')
 
                 .attr("class", (d) => {
                     // Check if a reverse link exists
@@ -169,6 +130,8 @@ export class MyComponent {
                 .attr("stroke-width", 1.5)
                 .attr("cx", d => d.x) // No offset here
                 .attr("cy", d => d.y) // No offset here
+                .attr("class", d => `node ${d.type}`) // Use the "type" for class
+                .attr("id", d => d.id) // Set the "id" as the node's ID
                 .call(drag(simulation)).on("click", function (event, d) {
                     clicked = true;
                     // un-highlight currently clicked nodes
@@ -205,14 +168,14 @@ export class MyComponent {
                         //         }
                         //     });
                         // }
-                        connectedLinks.forEach(link => {
-                            d3.select(`.link[source="${link.source.id}"][target="${link.target.id}"]`)
-                                .classed("link-highlighted", true)
-                                .attr("marker-end", "url(#arrowhead-highlighted)");
-                            d3.select(`.link[source="${link.target.id}"][target="${link.source.id}"]`)
-                                .classed("link-highlighted", true)
-                                .attr("marker-end", "url(#arrowhead-highlighted)");
-                        });
+                        // connectedLinks.forEach(link => {
+                        //     d3.select(`.link[source="${link.source.id}"][target="${link.target.id}"]`)
+                        //         .classed("link-highlighted", true)
+                        //         .attr("marker-end", "url(#arrowhead-highlighted)");
+                        //     d3.select(`.link[source="${link.target.id}"][target="${link.source.id}"]`)
+                        //         .classed("link-highlighted", true)
+                        //         .attr("marker-end", "url(#arrowhead-highlighted)");
+                        // });
                     }
                 })
                 .on("mouseout", function (event, currentlyClicked) {
@@ -237,7 +200,7 @@ export class MyComponent {
 
                 d3.select(event.currentTarget).classed("primary", true);
                 links.each(function (l) {
-                    if (l.category === 'primary' && (l.source.id === d.id || l.target.id === d.id)) {
+                    if (l.type === 'primary' && (l.source.id === d.id || l.target.id === d.id)) {
                         d3.select(this).classed("primary", true);
                         nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
                         d3.select(this).attr("opacity", "1");
@@ -264,7 +227,7 @@ export class MyComponent {
 
                 d3.select(event.currentTarget).classed("primary", true);
                 links.each(function (l) {
-                    if (l.category === 'primary' && (l.source.id === clickedNode.id || l.target.id === clickedNode.id)) {
+                    if (l.type === 'primary' && (l.source.id === clickedNode.id || l.target.id === clickedNode.id)) {
                         d3.select(this).classed("primary", true);
                         nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
                         d3.select(this).attr("opacity", "1");
@@ -337,15 +300,14 @@ export class MyComponent {
     prepareDataWithClusters(data: any[], excludedProperties: string[]) {
         const nodes = [];
         const links = [];
-        const connectedNodes = [];
         const pidList = [];
         //Primary nodes creation
         for (const item of data) {
             const node = {
                 id: item.pid,
-                label: 'Initial nodes',
+                // label: 'Initial nodes',
                 // group: item.group,
-                // type: item.type,
+                type: 'primary',
                 props: [],
             };
             pidList.push(item.pid);
@@ -357,7 +319,7 @@ export class MyComponent {
         //link secondary: item.id , , type: for color
         for (const item of data) {
             for (const [propKey, propValue] of Object.entries(item.properties)) {
-                //Primary links (between FDOs) As pidList has FDOs and if propvalue is among thos pids that means it is a link.
+                //Primary links (between FDOs) as pidList has FDOs and if propvalue is among those pids that means it is a primary link.
                 if (pidList.includes(propValue)) {
                     const link =
                     {
@@ -374,23 +336,21 @@ export class MyComponent {
                         {
                             id: `secondary_${item.pid}_${propKey}`,
                             [propKey]: propValue,
+                            type:'secondary'
                         }
                         nodes.push(secondaryNode);
                         const link =
                         {
                             source: item.pid,
-                            target: secondaryNode.id
+                            target: secondaryNode.id,
+                            type:'secondary'
                         }
                         links.push(link)
                     }
                 }
             }
 
-
-
         }
-
-        console.log('nodes and links', nodes, links);
 
         return { nodes, links };
     }
@@ -412,7 +372,6 @@ export class MyComponent {
         return (
             <div>
                 <svg class="graph"></svg>
-                {/* <svg id="graph"></svg> */}
             </div>
         );
     }
