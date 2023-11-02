@@ -50,7 +50,6 @@ export class MyComponent {
         }
         let currentlyClicked = null;
         let clicked = false;
-        // const pidList = [];
 
         const updateVisualization = (excludedProperties, pidList) => {
             const svg = d3.select(this.hostElement.shadowRoot.querySelector(".graph")) as d3.Selection<SVGSVGElement, any, any, any>;
@@ -110,16 +109,15 @@ export class MyComponent {
                     d.highlighted = false;
                 })
                 .call(drag(simulation))
+                //On click increase the size of the nodes connected
                 .on("click", function (event, d) {
                     if (pidList.includes(d.id)) {
                         const node = d3.select(this);
-
                         if (!d.highlighted) {
                             // Highlight the clicked node with a transition
                             node.transition()
                                 .attr("r", 20)
                                 .attr("stroke-width", 5.5);
-
                             // Find the connected primary nodes within pidList
                             const connectedNode = svg.selectAll(".node")
                                 .filter(node => {
@@ -130,7 +128,6 @@ export class MyComponent {
 
                                     return isConnected;
                                 });
-
                             connectedNode.transition()
                                 .attr("r", 20)
                                 .attr("stroke-width", 5.5);
@@ -147,7 +144,6 @@ export class MyComponent {
                             node.transition()
                                 .attr("r", 10)
                                 .attr("stroke-width", 1.5);
-
                             // Revert the connected primary nodes within pidList
                             const connectedNode = svg.selectAll(".node")
                                 .filter(node => {
@@ -156,11 +152,9 @@ export class MyComponent {
                                         (link.target.id === d.id && link.source.id === node.id))
                                     ); return isConnected;
                                 });
-
                             connectedNode.transition()
                                 .attr("r", 10)
                                 .attr("stroke-width", 1.5);
-
                             // Revert the connected primary links
                             svg.selectAll(".link")
                                 .filter(link => {
@@ -169,7 +163,6 @@ export class MyComponent {
                                 .transition()
                                 .attr("stroke", d => colorType(d.type));
                         }
-
                         // Toggle the highlighted state
                         d.highlighted = !d.highlighted;
                     }
@@ -341,13 +334,15 @@ export class MyComponent {
     }
     prepareDataWithClusters(data: any[], excludedProperties: string[]) {
         const nodes = [];
-        const links = [];
+        const contionalLinks = [];
         const pidList = [];
+        const linkList = [];
+        let links = [];
         //Primary nodes creation
         for (const item of data) {
             const node = {
                 id: item.pid,
-                type: 'primary',
+                // type: 'primary',
                 props: [],
             };
             pidList.push(item.pid);
@@ -369,7 +364,9 @@ export class MyComponent {
                         target: propValue,
                         type: propKey
                     }
-                    if (this.showPrimaryLinks) links.push(link);
+                    if (this.showPrimaryLinks) { contionalLinks.push(link); }
+                    linkList.push(link);
+                    // links.push(link);
                 }
                 //if it is not in the property value it should be an ordinary node
                 else {
@@ -378,7 +375,7 @@ export class MyComponent {
                         {
                             id: `secondary_${item.pid}_${propKey}`,
                             [propKey]: propValue,
-                            type: 'secondary'
+                            // type: 'secondary'
                         }
                         nodes.push(secondaryNode);
                         const link =
@@ -387,11 +384,14 @@ export class MyComponent {
                             target: secondaryNode.id,
                             // type: 'secondary'
                         }
-                        links.push(link)
+                        contionalLinks.push(link);
+                        linkList.push(link);
                     }
 
                 }
             }
+            // Create the links based on showPrimaryLinks flag
+            links = this.showPrimaryLinks ? linkList : contionalLinks;
 
         }
 
