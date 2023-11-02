@@ -33,34 +33,20 @@ export class MyComponent {
         if (!Array.isArray(componentData) || componentData.length === 0) {
             componentData = [
                 {
-                    pid: '1',
-                    properties:
-                    {
-                        'k1': 'K1',
-                        'k2': 'K2'
-                    }
-                    // Add other properties as needed
+                  "pid": "1",
+                  "properties": {
+                    "profile": "KIP",
+                    "hasMetada": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3"
+                  }
                 },
                 {
-                    pid: '2',
-                    properties:
-                    {
-                        'p1': 'P1',
-                        'p2': 'P2'
-                    }
-                    // Add other properties as needed
-                },
-                {
-                    pid: '3',
-                    properties:
-                    {
-                        'm1': 'M1',
-                        'm2': 'M2'
-                    }
-                    // Add other properties as needed
-                },
-                // Add more FDO data objects as needed
-            ];
+                  "pid": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
+                  "properties": {
+                    "profile": "KIP",
+                    "Licence": "cc4"
+                  }
+                }
+              ];
         }
         let currentlyClicked = null;
         let clicked = false;

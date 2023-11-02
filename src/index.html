@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
   <title>Stencil Component Starter</title>
-
   <script type="module" src="/build/visualization-component.esm.js"></script>
   <script nomodule src="/build/visualization-component.js"></script>
 </head>
@@ -17,7 +15,6 @@
   <my-component data='[
   {
     "pid": "1",
-    "label": "FDO 1",
     "properties": {
       "profile": "KIP",
       "hasMetada": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3"
@@ -25,7 +22,6 @@
   },
   {
     "pid": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
-    "label": "FDO 2",
     "properties": {
       "profile": "KIP",
       "Licence": "cc4"
@@ -35,7 +31,7 @@
 '
   excluded-properties=""
   show-attributes="true"
-  show-primary-links="false">></my-component>
+  show-primary-links="true">></my-component>
  <script>
 
 // document.addEventListener('DOMContentLoaded', () => {
