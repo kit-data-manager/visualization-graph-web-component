@@ -115,7 +115,6 @@ export class MyComponent {
                         if (!d.highlighted) {
                             // Highlight the clicked node with a transition
                             node.transition()
-                                .duration(200)
                                 .attr("r", 20)
                                 .attr("stroke-width", 5.5);
 
@@ -128,7 +127,6 @@ export class MyComponent {
                                 });
 
                             connectedNode.transition()
-                                .duration(200)
                                 .attr("r", 20)
                                 .attr("stroke-width", 5.5);
 
@@ -138,12 +136,10 @@ export class MyComponent {
                                     return data.links.some(link => link.source.id === d.id && pidList.includes(link.target.id));
                                 })
                                 .transition()
-                                .duration(200)
                                 .attr("stroke", "red");
                         } else {
                             // Revert to the original state with a transition
                             node.transition()
-                                .duration(200)
                                 .attr("r", 10)
                                 .attr("stroke-width", 1.5);
 
@@ -155,7 +151,6 @@ export class MyComponent {
                                 });
 
                             connectedNode.transition()
-                                .duration(200)
                                 .attr("r", 10)
                                 .attr("stroke-width", 1.5);
 
@@ -165,7 +160,6 @@ export class MyComponent {
                                     return data.links.some(link => link.source.id === d.id );
                                 })
                                 .transition()
-                                .duration(200)
                                 .attr("stroke", d => colorType(d.type));
                         }
 
