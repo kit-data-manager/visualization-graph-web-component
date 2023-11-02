@@ -33,24 +33,25 @@ export class MyComponent {
         if (!Array.isArray(componentData) || componentData.length === 0) {
             componentData = [
                 {
-                  "pid": "1",
-                  "properties": {
-                    "profile": "KIP",
-                    "hasMetada": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3"
-                  }
+                    "pid": "1",
+                    "properties": {
+                        "profile": "KIP",
+                        "hasMetada": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3"
+                    }
                 },
                 {
-                  "pid": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
-                  "properties": {
-                    "profile": "KIP",
-                    "Licence": "cc4"
-                  }
+                    "pid": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
+                    "properties": {
+                        "profile": "KIP",
+                        "Licence": "cc4"
+                    }
                 }
-              ];
+            ];
         }
         let currentlyClicked = null;
         let clicked = false;
         // const pidList = [];
+
         const updateVisualization = (excludedProperties, pidList) => {
             const svg = d3.select(this.hostElement.shadowRoot.querySelector(".graph")) as d3.Selection<SVGSVGElement, any, any, any>;
             svg
@@ -89,6 +90,7 @@ export class MyComponent {
 
             const highlightColor = "yellow"; // Define a highlight color
             console.log('links', links);
+            console.log(' data.links', data.links);
             const nodes = svg.selectAll(".node")
                 .data(data.nodes)
                 .enter()
@@ -121,8 +123,11 @@ export class MyComponent {
                             // Find the connected primary nodes within pidList
                             const connectedNode = svg.selectAll(".node")
                                 .filter(node => {
-                                    const isConnected = pidList.includes(node.id) && data.links.some(link => link.source.id === d.id
-                                        && link.target.id === node.id);
+                                    const isConnected = pidList.includes(node.id) && data.links.some(link =>
+                                    ((link.source.id === d.id && link.target.id === node.id) ||
+                                        (link.target.id === d.id && link.source.id === node.id))
+                                    );
+
                                     return isConnected;
                                 });
 
@@ -146,8 +151,10 @@ export class MyComponent {
                             // Revert the connected primary nodes within pidList
                             const connectedNode = svg.selectAll(".node")
                                 .filter(node => {
-                                    const isConnected = data.links.some(link => link.source.id === d.id  && link.target.id === node.id);
-                                    return isConnected;
+                                    const isConnected = pidList.includes(node.id) && data.links.some(link =>
+                                    ((link.source.id === d.id && link.target.id === node.id) ||
+                                        (link.target.id === d.id && link.source.id === node.id))
+                                    ); return isConnected;
                                 });
 
                             connectedNode.transition()
@@ -157,7 +164,7 @@ export class MyComponent {
                             // Revert the connected primary links
                             svg.selectAll(".link")
                                 .filter(link => {
-                                    return data.links.some(link => link.source.id === d.id );
+                                    return data.links.some(link => link.source.id === d.id);
                                 })
                                 .transition()
                                 .attr("stroke", d => colorType(d.type));
@@ -346,6 +353,7 @@ export class MyComponent {
             pidList.push(item.pid);
             nodes.push(node);
         }
+        console.log('data', data);
         console.log('pidList', pidList);
         //iterate over all properties
         //check if property value is in pidlist-- link source: item.id, target: propertyValue, type : propkey
