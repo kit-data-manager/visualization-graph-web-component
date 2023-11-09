@@ -1,32 +1,63 @@
+// Import necessary modules and libraries
 import { Component, Prop, h, Element, Watch } from '@stencil/core';
-import * as d3 from 'd3';  // Import D3.js
+import * as d3 from 'd3';  // Import D3.js for data visualisation
 
+// Define the Stencil component
 @Component({
     tag: 'my-component',
     styleUrl: 'my-component.css',
-    shadow: true,
+    shadow: true, // Enable shadow DOM to encapsulate the component
 })
 export class MyComponent {
+    // Define component properties and variables
     @Element() hostElement: HTMLElement;
-    @Prop() showAttributes: boolean = true;
+    @Prop() showAttributes: boolean = true; // accesible from outside the component, used to show/hide properties 
     @Prop() showPrimaryLinks: boolean = false;
-    @Prop() data: string = "[]";
-    @Prop() excludedProperties: string = ''; // Initialize with an empty string
-    public chartData: any;
-
+    @Prop() data: string = "[]"; // Input data in JSON format
+    @Prop() excludedProperties: string = ''; // the properties which are excluded from outside the component
+    public chartData: any; //
     constructor() {
-        this.chartData = JSON.parse(this.data)
+        // Parse the input data when the component is initialized
+        try {
+            if (this.data! == '') {
+                this.chartData = JSON.parse(this.data)
+            }
+            else {
+                this.chartData = [];
+            }
+
+        } catch (error) {
+            console.error('Input data is incorrect', error);
+            this.chartData = [];
+        }
+
     }
     @Watch('data')
-    initialDataChanged(newData) {
-        // Update the visualization with the new initial data
-        this.data = newData;
-        this.chartData = JSON.parse(newData);
-        this.setupD3Graph(this.chartData);
+    inputDataChanged(newData) {
+        // Update the visualization when the data is changed from outside the component.
+        try {
+            this.data = newData;
+            this.chartData = JSON.parse(newData);
+            this.setupD3Graph(this.chartData);
+
+        }
+        catch (error) {
+            console.error('Error in input data', error);
+            this.chartData = [];
+        }
+
     }
+
     componentDidLoad() {
-        this.setupD3Graph(this.chartData);
+        // Initialize and set up the D3.js graph when the component is loaded
+        try {
+            this.setupD3Graph(this.chartData);
+        }
+        catch (error) {
+            console.error('Error in input data', error);
+        }
     }
+    // Set up the D3.js graph visualization based on the input data
     setupD3Graph(data: any[]) {
         const excludedProperties = this.excludedProperties.split(',');
         var componentData = data;
@@ -49,10 +80,8 @@ export class MyComponent {
             ];
         }
         let currentlyClicked = null;
-        let clicked = false;
-
         const updateVisualization = (excludedProperties, pidList) => {
-            const svg = d3.select(this.hostElement.shadowRoot.querySelector(".graph")) as d3.Selection<SVGSVGElement, any, any, any>;
+            const svg = d3.select(this.hostElement.shadowRoot.querySelector(".graph"));
             svg
                 .attr("width", '780px')
                 .attr("height", '780px')
@@ -86,10 +115,6 @@ export class MyComponent {
                 .attr("category", d => d.castegory)  // Add a category attribute to identify link type
                 .attr("stroke", d => colorType(d.type)) // Set stroke color based on relationType
 
-
-            const highlightColor = "yellow"; // Define a highlight color
-            console.log('links', links);
-            console.log(' data.links', data.links);
             const nodes = svg.selectAll(".node")
                 .data(data.nodes)
                 .enter()
@@ -103,79 +128,18 @@ export class MyComponent {
                 .attr("cy", d => d.y)
                 .attr("class", d => `node ${d.type}`) // Use the "type" for class
                 .attr("id", d => d.id) // Set the "id" as the node's ID
-                .each(function (d) {
-                    d.originalR = 10;
-                    d.originalStrokeWidth = 1.5;
-                    d.highlighted = false;
-                })
                 .call(drag(simulation))
-                //On click increase the size of the nodes connected
-                .on("click", function (event, d) {
-                    if (pidList.includes(d.id)) {
-                        const node = d3.select(this);
-                        if (!d.highlighted) {
-                            // Highlight the clicked node with a transition
-                            node.transition()
-                                .attr("r", 20)
-                                .attr("stroke-width", 5.5);
-                            // Find the connected primary nodes within pidList
-                            const connectedNode = svg.selectAll(".node")
-                                .filter(node => {
-                                    const isConnected = pidList.includes(node.id) && data.links.some(link =>
-                                    ((link.source.id === d.id && link.target.id === node.id) ||
-                                        (link.target.id === d.id && link.source.id === node.id))
-                                    );
+                .on("mouseover", function (event, d) {
+                    showTooltip(event, d);
+                    // highlightConnected(event, d);
+                    // if (!currentlyClicked) {
+                    highlightConnected(event, d);
 
-                                    return isConnected;
-                                });
-                            connectedNode.transition()
-                                .attr("r", 20)
-                                .attr("stroke-width", 5.5);
+                    // }
 
-                            // Find and highlight the connected primary links
-                            svg.selectAll(".link")
-                                .filter(link => {
-                                    return data.links.some(link => link.source.id === d.id && pidList.includes(link.target.id));
-                                })
-                                .transition()
-                                .attr("stroke", "red");
-                        } else {
-                            // Revert to the original state with a transition
-                            node.transition()
-                                .attr("r", 10)
-                                .attr("stroke-width", 1.5);
-                            // Revert the connected primary nodes within pidList
-                            const connectedNode = svg.selectAll(".node")
-                                .filter(node => {
-                                    const isConnected = pidList.includes(node.id) && data.links.some(link =>
-                                    ((link.source.id === d.id && link.target.id === node.id) ||
-                                        (link.target.id === d.id && link.source.id === node.id))
-                                    ); return isConnected;
-                                });
-                            connectedNode.transition()
-                                .attr("r", 10)
-                                .attr("stroke-width", 1.5);
-                            // Revert the connected primary links
-                            svg.selectAll(".link")
-                                .filter(link => {
-                                    return data.links.some(link => link.source.id === d.id);
-                                })
-                                .transition()
-                                .attr("stroke", d => colorType(d.type));
-                        }
-                        // Toggle the highlighted state
-                        d.highlighted = !d.highlighted;
-                    }
 
-                    // clicked = true;
-                    // // un-highlight currently clicked nodes
-                    // unHighlight();
-                    // // highlight new clicked node
-                    // highlightConnectedPrimaryNodes(event, d);
-                    // // set the new clicked node
-                    // currentlyClicked = d;
 
-                }).on("mouseover", function (event, d) {
+                    // this.displayNodeDetails(d);
                     // If a node has been clicked previously and it's not the current node being hovered over
                     // if (clicked && currentlyClicked && currentlyClicked !== d) {
                     //     // Un-highlight previously highlighted nodes and links
@@ -209,10 +173,20 @@ export class MyComponent {
                     //         .attr("marker-end", "url(#arrowhead-highlighted)");
                     // });
 
-
-
                 })
-                .on("mouseout", function (event, currentlyClicked) {
+                .on("mouseout", function (event, d) {
+
+                    if (currentlyClicked) return;
+                    unHighlight();
+                    hideTooltip();
+                    // Hide the links again
+                    // links.each(function (l) {
+                    //     // Change opacity only for 'non_attribute' links
+                    //     if (l.category === 'non_attribute' && (l.source.id === d.id || l.target.id === d.id)) {
+                    //         d3.select(this).attr("opacity", "0");
+                    //     }
+                    // });
+                    // console.log('Mouseout');
                     // if (currentlyClicked && clicked) {
                     //     // Un-highlight nodes and links when mouse moves out of the node
                     //     unHighlightOtherThanSelected();
@@ -222,6 +196,75 @@ export class MyComponent {
                     //     // Un-highlight nodes and links when mouse moves out of the node
                     //     unHighlight();
                     // }
+                })
+                //On click increase the size of the nodes connected
+                .on("click", function (event, d) {
+                    currentlyClicked = d;
+                    this.selectedNode = d;
+                    if (pidList.includes(d.id)) {
+                        const node = d3.select(this);
+                        if (!d.highlighted) {
+                            // Highlight the clicked node with a transition
+                            node.transition()
+                                .attr("r", 20)
+                            // .attr("stroke-width", 5.5);
+                            // Find the connected primary nodes within pidList
+                            const connectedNode = svg.selectAll(".node")
+                                .filter(node => {
+                                    const isConnected = pidList.includes(node.id) && data.links.some(link =>
+                                    ((link.source.id === d.id && link.target.id === node.id) ||
+                                        (link.target.id === d.id && link.source.id === node.id))
+                                    );
+
+                                    return isConnected;
+                                });
+                            connectedNode.transition()
+                                .attr("r", 20)
+                            // .attr("stroke-width", 5.5);
+
+                            // Find and highlight the connected primary links
+                            svg.selectAll(".link")
+                                .filter(link => {
+                                    return data.links.some(link => link.source.id === d.id && pidList.includes(link.target.id));
+                                })
+                                .transition()
+                                .attr("stroke", "red");
+                        } else {
+                            // Revert to the original state with a transition
+                            node.transition()
+                                .attr("r", 10)
+                            // .attr("stroke-width", 5.5);
+                            // Revert the connected primary nodes within pidList
+                            const connectedNode = svg.selectAll(".node")
+                                .filter(node => {
+                                    const isConnected = pidList.includes(node.id) && data.links.some(link =>
+                                    ((link.source.id === d.id && link.target.id === node.id) ||
+                                        (link.target.id === d.id && link.source.id === node.id))
+                                    ); return isConnected;
+                                });
+                            connectedNode.transition()
+                                .attr("r", 10)
+                            // .attr("stroke-width", 5.5);
+                            // Revert the connected primary links
+                            svg.selectAll(".link")
+                                .filter(link => {
+                                    return data.links.some(link => link.source.id === d.id);
+                                })
+                                .transition()
+                                .attr("stroke", d => colorType(d.type));
+                        }
+                        // Toggle the highlighted state
+                        d.highlighted = !d.highlighted;
+                    }
+
+                    // clicked = true;
+                    // // un-highlight currently clicked nodes
+                    // unHighlight();
+                    // // highlight new clicked node
+                    // highlightConnectedPrimaryNodes(event, d);
+                    // // set the new clicked node
+                    // currentlyClicked = d;
+
                 })
             function unHighlight() {
                 nodes.classed("primary", false);
@@ -274,14 +317,42 @@ export class MyComponent {
                 // links.classed("primary", false);
                 links.classed("secondary", false);
             }
+            function highlightConnected(event, d) {
+                d3.select(event.currentTarget).classed("primary", true);
+                links.each(function (l) {
+                    if (l.category === 'non_attribute' && (l.source.id === d.id || l.target.id === d.id)) {
+                        d3.select(this).classed("primary", true);
+                        nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
+                        d3.select(this).attr("opacity", "1");
+                    }
+                });
+            }
+
+            // Tooltip functions
+            const tooltip = d3.select("body")
+                .append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
+
+            function showTooltip(event, d) {
+                tooltip.transition().duration(200).style("opacity", 0.9);
+                tooltip.html("Node ID: " + d.id)
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 30) + "px");
+            }
+            function hideTooltip() {
+                tooltip.transition().duration(200).style("opacity", 0);
+            }
+
+
 
             //When clicking outside nodes or links unhighlight everything
             d3.select("body").on("click", function (event) {
                 if (event.target.nodeName === "body" || event.target.nodeName === "svg") {
-                    unHighlight();
                     currentlyClicked = null;
                 }
             });
+
 
             // function drag(simulation) {
 
@@ -334,7 +405,7 @@ export class MyComponent {
     }
     prepareDataWithClusters(data: any[], excludedProperties: string[]) {
         const nodes = [];
-        const contionalLinks = [];
+        const conditionalLinks = [];
         const pidList = [];
         const linkList = [];
         let links = [];
@@ -342,8 +413,8 @@ export class MyComponent {
         for (const item of data) {
             const node = {
                 id: item.pid,
-                // type: 'primary',
                 props: [],
+                category: 'non_attribute'
             };
             pidList.push(item.pid);
             nodes.push(node);
@@ -362,9 +433,10 @@ export class MyComponent {
                     {
                         source: item.pid,
                         target: propValue,
-                        type: propKey
+                        type: propKey,
+                        category: 'non_attribute'
                     }
-                    if (this.showPrimaryLinks) { contionalLinks.push(link); }
+                    if (this.showPrimaryLinks) { conditionalLinks.push(link); }
                     linkList.push(link);
                     // links.push(link);
                 }
@@ -375,28 +447,29 @@ export class MyComponent {
                         {
                             id: `secondary_${item.pid}_${propKey}`,
                             [propKey]: propValue,
-                            // type: 'secondary'
+                            category: 'attribute'
                         }
                         nodes.push(secondaryNode);
                         const link =
                         {
                             source: item.pid,
                             target: secondaryNode.id,
-                            // type: 'secondary'
+                            category: 'attribute'
                         }
-                        contionalLinks.push(link);
+                        conditionalLinks.push(link);
                         linkList.push(link);
                     }
 
                 }
             }
             // Create the links based on showPrimaryLinks flag
-            links = this.showPrimaryLinks ? linkList : contionalLinks;
+            links = this.showPrimaryLinks ? linkList : conditionalLinks;
 
         }
 
         return { nodes, links, pidList };
     }
+
     /**
      * The first name
      */
