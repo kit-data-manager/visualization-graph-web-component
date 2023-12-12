@@ -2,24 +2,27 @@
 import { Component, Prop, h, Element, Watch } from '@stencil/core';
 import * as d3 from 'd3';  // Import D3.js for data visualisation
 
-// Define the Stencil component
+
 @Component({
     tag: 'my-component',
     styleUrl: 'my-component.css',
     shadow: true, // Enable shadow DOM to encapsulate the component
 })
+/**
+ * MyComponent is a custom web component that creates an interactive, force-directed graph
+ * using D3.js. It visualizes nodes and links based on provided JSON data.
+ */
 export class MyComponent {
-    // Define component properties and variables
     @Element() hostElement: HTMLElement;
-    @Prop() showAttributes: boolean = true; // accesible from outside the component, used to show/hide properties 
-    @Prop() showPrimaryLinks: boolean = false;
+    @Prop() showAttributes: boolean = true; // Show/hide attributes in the graph.
+    @Prop() showPrimaryLinks: boolean = false;// Show/hide primary links in the graph.
     @Prop() data: string = "[]"; // Input data in JSON format
     @Prop() excludedProperties: string = ''; // the properties which are excluded from outside the component
     public chartData: any; //
     constructor() {
         // Parse the input data when the component is initialized
         try {
-            if (this.data! == '') {
+            if (this.data != '') {
                 this.chartData = JSON.parse(this.data)
             }
             else {
@@ -64,21 +67,84 @@ export class MyComponent {
         if (!Array.isArray(componentData) || componentData.length === 0) {
             componentData = [
                 {
-                    "pid": "1",
-                    "properties": {
-                        "profile": "KIP",
-                        "hasMetada": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3"
+                    pid: "21.11152/ba06424b",
+                    properties: {
+                        profile: "KIP",
+                        hasMetadata: "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
+                        digitalObjectType: 'object',
+                        digitalObjectLocation: 'github',
+                        license: 'cc4',
+                        checksum: 'md5sum',
+                        dateCreated:'24-04-2010',
+                        dataModified:'24-04-2020'
                     }
                 },
                 {
-                    "pid": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
-                    "properties": {
-                        "profile": "KIP",
-                        "Licence": "cc4"
+                    pid: "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
+                    properties: {
+                        profile: "HMCProfile",
+                        licence: "cc4",
+                        digitalObjectType: 'object',
+                        digitalObjectLocation: 'github',
+                        checksum: 'md5sum',
+                        dateCreated:'24-04-2010',
+                        dataModified:'24-04-2020'
+                    }
+                },
+                {
+                    pid: "21.11152/ba06424b-17c7-4e3f",
+                    properties: {
+                        profile: "AachenProfile",
+                        hasMetadata: "21.11152/dd01234b-22f8-4b2f-b66e-9a34df554a4f",
+                        digitalObjectType: 'object',
+                        digitalObjectLocation: 'github',
+                        license: 'cc4',
+                        checksum: 'md5sum',
+                        dateCreated:'24-04-2010',
+                        dataModified:'24-04-2020'
+                    }
+                },
+                {
+                    pid: "21.11152/dd01234b-22f8-4b2f-b66e-9a34df554a4f",
+                    properties: {
+                        profile: "Data Analysis",
+                        licence: "cc4",
+                        digitalObjectType: 'object',
+                        digitalObjectLocation: 'github',
+                        checksum: 'md5sum',
+                        dateCreated:'24-04-2010',
+                        dataModified:'24-04-2020'
+                    }
+                },
+                {
+                    pid: "21.11152/ee05678b-33c9",
+                    properties: {
+                        profile: "AachenProfile",
+                        hasMetadata: "21.11152/ee05678b-33c9-4b1f-a99f-1d62ef657abc",
+                        digitalObjectType: 'object',
+                        digitalObjectLocation: 'github',
+                        license: 'cc4',
+                        checksum: 'md5sum',
+                        dateCreated:'24-04-2010',
+                        dataModified:'24-04-2020'
+                    }
+                },
+                {
+                    pid: "21.11152/ee05678b-33c9-4b1f-a99f-1d62ef657abc",
+                    properties: {
+                        profile: "HMCProfile",
+                        licence: "MIT",
+                        digitalObjectType: 'object',
+                        digitalObjectLocation: 'github',
+                        license: 'cc4',
+                        checksum: 'md5sum',
+                        dateCreated:'24-04-2010',
+                        dataModified:'24-04-2020'
                     }
                 }
             ];
         }
+
         let currentlyClicked = null;
         const updateVisualization = (excludedProperties, pidList) => {
             const svg = d3.select(this.hostElement.shadowRoot.querySelector(".graph"));
@@ -103,7 +169,7 @@ export class MyComponent {
 
             const colorType = d3.scaleOrdinal() // Define a scale for relationType to colors
                 .domain(["solid", "dashed", /* add more relationType values here */])
-                .range(["#FF5733", "#33FF57", /* add corresponding colors here */]);
+                .range(["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]);
 
             // Create the links
             const links = svg.selectAll(".link")
@@ -113,7 +179,7 @@ export class MyComponent {
                 .attr("stroke-opacity", 1)
                 .attr("opacity", "1")
                 .attr("category", d => d.castegory)  // Add a category attribute to identify link type
-                .attr("stroke", d => colorType(d.type)) // Set stroke color based on relationType
+                .attr("stroke", '#d3d3d3');// Set stroke color based on relationType
 
             const nodes = svg.selectAll(".node")
                 .data(data.nodes)
@@ -399,15 +465,14 @@ export class MyComponent {
             // Run the simulation
             simulation.on("tick", ticked);
         }
-        const { pidList } = this.prepareDataWithClusters(componentData, excludedProperties);
-        updateVisualization(excludedProperties, pidList);
+        const { primaryNodeIds } = this.prepareDataWithClusters(componentData, excludedProperties);
+        updateVisualization(excludedProperties, primaryNodeIds);
 
     }
     prepareDataWithClusters(data: any[], excludedProperties: string[]) {
         const nodes = [];
-        const conditionalLinks = [];
-        const pidList = [];
-        const linkList = [];
+        const primaryNodeIds = [];
+        const allLinks = [];
         let links = [];
         //Primary nodes creation
         for (const item of data) {
@@ -416,31 +481,24 @@ export class MyComponent {
                 props: [],
                 category: 'non_attribute'
             };
-            pidList.push(item.pid);
+            primaryNodeIds.push(item.pid);
             nodes.push(node);
         }
-        console.log('data', data);
-        console.log('pidList', pidList);
-        //iterate over all properties
-        //check if property value is in pidlist-- link source: item.id, target: propertyValue, type : propkey
-        //else create secondary node
-        //link secondary: item.id , , type: for color
         for (const item of data) {
             for (const [propKey, propValue] of Object.entries(item.properties)) {
                 //Primary links (between FDOs) as pidList has FDOs and if propvalue is among those pids that means it is a primary link.
-                if (pidList.includes(propValue)) {
+                if (primaryNodeIds.includes(propValue)) {
                     const link =
                     {
                         source: item.pid,
                         target: propValue,
                         type: propKey,
-                        category: 'non_attribute'
+                        category: 'non_attribute',
+                        visible: this.showPrimaryLinks
                     }
-                    if (this.showPrimaryLinks) { conditionalLinks.push(link); }
-                    linkList.push(link);
-                    // links.push(link);
+                    allLinks.push(link);
                 }
-                //if it is not in the property value it should be an ordinary node
+                //Attribute nodes and links (if it is not in the property value it should be an ordinary node)
                 else {
                     if (!excludedProperties.includes(propKey) && this.showAttributes) {
                         const secondaryNode =
@@ -454,20 +512,18 @@ export class MyComponent {
                         {
                             source: item.pid,
                             target: secondaryNode.id,
-                            category: 'attribute'
+                            category: 'attribute',
+                            visible: true
                         }
-                        conditionalLinks.push(link);
-                        linkList.push(link);
+                        allLinks.push(link);
                     }
 
                 }
             }
-            // Create the links based on showPrimaryLinks flag
-            links = this.showPrimaryLinks ? linkList : conditionalLinks;
-
+            links = allLinks.filter(link => link.visible);
         }
 
-        return { nodes, links, pidList };
+        return { nodes, links, primaryNodeIds };
     }
 
     /**
