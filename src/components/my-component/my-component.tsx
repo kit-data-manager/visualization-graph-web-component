@@ -14,6 +14,7 @@ import * as d3 from 'd3';  // Import D3.js for data visualisation
  */
 export class MyComponent {
     @Element() hostElement: HTMLElement;
+    @Prop() size: string = '1350px,650px';
     @Prop() showAttributes: boolean = true; // Show/hide attributes in the graph.
     @Prop() showPrimaryLinks: boolean = false;// Show/hide primary links in the graph.
     @Prop() data: string = "[]"; // Input data in JSON format
@@ -41,7 +42,7 @@ export class MyComponent {
         try {
             this.data = newData;
             this.chartData = JSON.parse(newData);
-            this.setupD3Graph(this.chartData);
+            this.setupD3Graph(this.chartData, this.size);
 
         }
         catch (error) {
@@ -54,14 +55,14 @@ export class MyComponent {
     componentDidLoad() {
         // Initialize and set up the D3.js graph when the component is loaded
         try {
-            this.setupD3Graph(this.chartData);
+            this.setupD3Graph(this.chartData, this.size);
         }
         catch (error) {
             console.error('Error in input data', error);
         }
     }
     // Set up the D3.js graph visualization based on the input data
-    setupD3Graph(data: any[]) {
+    setupD3Graph(data: any[], size) {
         const excludedProperties = this.excludedProperties.split(',');
         var componentData = data;
         if (!Array.isArray(componentData) || componentData.length === 0) {
@@ -71,12 +72,12 @@ export class MyComponent {
                     properties: {
                         profile: "KIP",
                         hasMetadata: "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
-                        digitalObjectType: 'object',
-                        digitalObjectLocation: 'github',
-                        license: 'cc4',
-                        checksum: 'md5sum',
-                        dateCreated:'24-04-2010',
-                        dataModified:'24-04-2020'
+                        digitalObjectType: "object",
+                        digitalObjectLocation: "github",
+                        license: "cc4",
+                        checksum: "md5sum",
+                        dateCreated: "24-04-2010",
+                        dataModified: "24-04-2020"
                     }
                 },
                 {
@@ -87,8 +88,8 @@ export class MyComponent {
                         digitalObjectType: 'object',
                         digitalObjectLocation: 'github',
                         checksum: 'md5sum',
-                        dateCreated:'24-04-2010',
-                        dataModified:'24-04-2020'
+                        dateCreated: '24-04-2010',
+                        dataModified: '24-04-2020'
                     }
                 },
                 {
@@ -100,8 +101,8 @@ export class MyComponent {
                         digitalObjectLocation: 'github',
                         license: 'cc4',
                         checksum: 'md5sum',
-                        dateCreated:'24-04-2010',
-                        dataModified:'24-04-2020'
+                        dateCreated: '24-04-2010',
+                        dataModified: '24-04-2020'
                     }
                 },
                 {
@@ -112,8 +113,8 @@ export class MyComponent {
                         digitalObjectType: 'object',
                         digitalObjectLocation: 'github',
                         checksum: 'md5sum',
-                        dateCreated:'24-04-2010',
-                        dataModified:'24-04-2020'
+                        dateCreated: '24-04-2010',
+                        dataModified: '24-04-2020'
                     }
                 },
                 {
@@ -125,8 +126,8 @@ export class MyComponent {
                         digitalObjectLocation: 'github',
                         license: 'cc4',
                         checksum: 'md5sum',
-                        dateCreated:'24-04-2010',
-                        dataModified:'24-04-2020'
+                        dateCreated: '24-04-2010',
+                        dataModified: '24-04-2020'
                     }
                 },
                 {
@@ -138,8 +139,8 @@ export class MyComponent {
                         digitalObjectLocation: 'github',
                         license: 'cc4',
                         checksum: 'md5sum',
-                        dateCreated:'24-04-2010',
-                        dataModified:'24-04-2020'
+                        dateCreated: '24-04-2010',
+                        dataModified: '24-04-2020'
                     }
                 }
             ];
@@ -147,13 +148,18 @@ export class MyComponent {
 
         let currentlyClicked = null;
         const updateVisualization = (excludedProperties, pidList) => {
-            const svg = d3.select(this.hostElement.shadowRoot.querySelector(".graph"));
+            const svg = d3.select(this.hostElement.shadowRoot.querySelector("#graph"));
+
+            // Extracting width and height from the size property
+            const [width, height] = this.size.split(',').map(s => s.trim());
             svg
-                .attr("width", '780px')
-                .attr("height", '780px')
+                .attr("width", width)
+                .attr("height", height)
                 .attr('marker-end', 'url(#arrow)');
-            const width = +svg.style('width').replace('px', '');
-            const height = +svg.style('height').replace('px', '');
+
+            // Convert width and height to numerical values for further use
+            const numericWidth = parseInt(width, 10);
+            const numericHeight = parseInt(height, 10);
             // Create a color scale for node groups
             const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -164,8 +170,8 @@ export class MyComponent {
             const simulation = d3.forceSimulation(data.nodes)
                 .force("link", d3.forceLink(data.links).id(d => d.id).distance(70)) // Ensure the id accessor is correct
                 .force("charge", d3.forceManyBody().strength(-90))
-                .force("x", d3.forceX(width / 2))
-                .force("y", d3.forceY(height / 2));
+                .force("x", d3.forceX(numericWidth / 2))
+                .force("y", d3.forceY(numericHeight / 2));
 
             const colorType = d3.scaleOrdinal() // Define a scale for relationType to colors
                 .domain(["solid", "dashed", /* add more relationType values here */])
@@ -541,11 +547,13 @@ export class MyComponent {
      */
     @Prop() last: string;
     render() {
+        const [width, height] = this.size.split(',').map(s => s.trim());
         return (
             <div>
-                <svg class="graph"></svg>
+                <svg id="graph" style={{ width: width, height: height }}></svg>
             </div>
         );
     }
+
 }
 
