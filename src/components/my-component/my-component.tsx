@@ -2,6 +2,7 @@
 import { Component, Prop, h, Element, Watch } from '@stencil/core';
 import * as d3 from 'd3';  // Import D3.js for data visualisation
 import { PrepareData } from './dataUtil';
+import { GraphSetup } from './d3GraphSetup'
 
 @Component({
     tag: 'my-component',
@@ -19,10 +20,12 @@ export class MyComponent {
     @Prop() showPrimaryLinks: boolean = false;// Show/hide primary links in the graph.
     @Prop() data: string = "[]"; // Input data in JSON format
     @Prop() excludedProperties: string = ''; // the properties which are excluded from outside the component
-    public chartData: any; //
+    public chartData: any;
     private dataUtil: PrepareData;
+    private d3GraphSetup: GraphSetup;
     constructor() {
         this.dataUtil = new PrepareData(this.showPrimaryLinks, this.showAttributes);
+        this.d3GraphSetup = new GraphSetup(this.hostElement);
         // Parse the input data when the component is initialized
         try {
             if (this.data != '') {
@@ -44,7 +47,7 @@ export class MyComponent {
         try {
             this.data = newData;
             this.chartData = JSON.parse(newData);
-            this.setupD3Graph(this.chartData);
+            this.generateD3Graph(this.chartData);
 
         }
         catch (error) {
@@ -57,152 +60,229 @@ export class MyComponent {
     componentDidLoad() {
         // Initialize and set up the D3.js graph when the component is loaded
         try {
-            this.setupD3Graph(this.chartData);
+            this.generateD3Graph(this.chartData);
         }
         catch (error) {
             console.error('Error in input data', error);
         }
     }
+    // getDefaultComponentData() {
+    //     return [
+    //         {
+    //             pid: "21.11152/ba06424b",
+    //             properties: {
+    //                 profile: "KIP",
+    //                 hasMetadata: "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
+    //                 digitalObjectType: "object",
+    //                 digitalObjectLocation: "github",
+    //                 license: "cc4",
+    //                 checksum: "md5sum",
+    //                 dateCreated: "24-04-2010",
+    //                 dataModified: "24-04-2020"
+    //             }
+    //         },
+    //         {
+    //             pid: "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
+    //             properties: {
+    //                 profile: "HMCProfile",
+    //                 licence: "cc4",
+    //                 digitalObjectType: 'object',
+    //                 digitalObjectLocation: 'github',
+    //                 checksum: 'md5sum',
+    //                 dateCreated: '24-04-2010',
+    //                 dataModified: '24-04-2020'
+    //             }
+    //         },
+    //         {
+    //             pid: "21.11152/ba06424b-17c7-4e3f",
+    //             properties: {
+    //                 profile: "AachenProfile",
+    //                 hasMetadata: "21.11152/dd01234b-22f8-4b2f-b66e-9a34df554a4f",
+    //                 digitalObjectType: 'object',
+    //                 digitalObjectLocation: 'github',
+    //                 license: 'cc4',
+    //                 checksum: 'md5sum',
+    //                 dateCreated: '24-04-2010',
+    //                 dataModified: '24-04-2020'
+    //             }
+    //         },
+    //         {
+    //             pid: "21.11152/dd01234b-22f8-4b2f-b66e-9a34df554a4f",
+    //             properties: {
+    //                 profile: "Data Analysis",
+    //                 licence: "cc4",
+    //                 digitalObjectType: 'object',
+    //                 digitalObjectLocation: 'github',
+    //                 checksum: 'md5sum',
+    //                 dateCreated: '24-04-2010',
+    //                 dataModified: '24-04-2020'
+    //             }
+    //         },
+    //         {
+    //             pid: "21.11152/ee05678b-33c9",
+    //             properties: {
+    //                 profile: "AachenProfile",
+    //                 hasMetadata: "21.11152/ee05678b-33c9-4b1f-a99f-1d62ef657abc",
+    //                 digitalObjectType: 'object',
+    //                 digitalObjectLocation: 'github',
+    //                 license: 'cc4',
+    //                 checksum: 'md5sum',
+    //                 dateCreated: '24-04-2010',
+    //                 dataModified: '24-04-2020'
+    //             }
+    //         },
+    //         {
+    //             pid: "21.11152/ee05678b-33c9-4b1f-a99f-1d62ef657abc",
+    //             properties: {
+    //                 profile: "HMCProfile",
+    //                 licence: "MIT",
+    //                 digitalObjectType: 'object',
+    //                 digitalObjectLocation: 'github',
+    //                 license: 'cc4',
+    //                 checksum: 'md5sum',
+    //                 dateCreated: '24-04-2010',
+    //                 dataModified: '24-04-2020'
+    //             }
+    //         }
+    //     ];
+    // }
+    // initializeSVG() {
+    //     const svg = d3.select(this.hostElement.shadowRoot.querySelector("#graph"));
+    //     // Extracting width and height from the size property
+    //     const [width, height] = this.size.split(',').map(s => s.trim());
+    //     svg
+    //         .attr("width", width)
+    //         .attr("height", height)
+    //         .attr('marker-end', 'url(#arrow)');
+
+    //     // Convert width and height to numerical values for further use
+    //     const numericWidth = parseInt(width, 10);
+    //     const numericHeight = parseInt(height, 10);
+    //     return { svg, numericWidth, numericHeight };
+
+    // }
+    // createForceSimulation(nodes, links, numericWidth, numericHeight) {
+    //     return d3.forceSimulation(nodes)
+    //         .force("link", d3.forceLink(links).id(d => d.id).distance(70))
+    //         .force("charge", d3.forceManyBody().strength(-90))
+    //         .force("x", d3.forceX(numericWidth / 2))
+    //         .force("y", d3.forceY(numericHeight / 2));
+    // }
+    // createLinks(svg, links) {
+    //     return svg.selectAll(".link")
+    //         .data(links)
+    //         .enter()
+    //         .append("line")
+    //         .attr("stroke-opacity", 1)
+    //         .attr("opacity", "1")
+    //         .attr("category", d => d.category)  // Add a category attribute to identify link type
+    //         .attr("stroke", '#d3d3d3');// Set stroke color based on relationType
+    // }
+    // createNodes(svg, nodes, colorScale, simulation) {
+    //     return svg.selectAll(".node")
+    //         .data(nodes)
+    //         .enter()
+    //         .append("circle")
+    //         .attr("class", "node")
+    //         .attr("r", 10)
+    //         .attr("fill", d => colorScale(d.id))
+    //         .attr("stroke", "#fff")
+    //         .attr("stroke-width", 1.5)
+    // }
     // Set up the D3.js graph visualization based on the input data
-    setupD3Graph(setupData: any[]) {
+    generateD3Graph(setupData: any[]) {
+        // Setting Default data if nothing is provided from outside the component
+        let defaultComponentData = Array.isArray(setupData) && setupData.length > 0
+            ? setupData
+            : this.d3GraphSetup.getDefaultComponentData();
         const excludedProperties = this.excludedProperties.split(',');
-        var componentData = setupData;
-        if (!Array.isArray(componentData) || componentData.length === 0) {
-            componentData = [
-                {
-                    pid: "21.11152/ba06424b",
-                    properties: {
-                        profile: "KIP",
-                        hasMetadata: "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
-                        digitalObjectType: "object",
-                        digitalObjectLocation: "github",
-                        license: "cc4",
-                        checksum: "md5sum",
-                        dateCreated: "24-04-2010",
-                        dataModified: "24-04-2020"
-                    }
-                },
-                {
-                    pid: "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
-                    properties: {
-                        profile: "HMCProfile",
-                        licence: "cc4",
-                        digitalObjectType: 'object',
-                        digitalObjectLocation: 'github',
-                        checksum: 'md5sum',
-                        dateCreated: '24-04-2010',
-                        dataModified: '24-04-2020'
-                    }
-                },
-                {
-                    pid: "21.11152/ba06424b-17c7-4e3f",
-                    properties: {
-                        profile: "AachenProfile",
-                        hasMetadata: "21.11152/dd01234b-22f8-4b2f-b66e-9a34df554a4f",
-                        digitalObjectType: 'object',
-                        digitalObjectLocation: 'github',
-                        license: 'cc4',
-                        checksum: 'md5sum',
-                        dateCreated: '24-04-2010',
-                        dataModified: '24-04-2020'
-                    }
-                },
-                {
-                    pid: "21.11152/dd01234b-22f8-4b2f-b66e-9a34df554a4f",
-                    properties: {
-                        profile: "Data Analysis",
-                        licence: "cc4",
-                        digitalObjectType: 'object',
-                        digitalObjectLocation: 'github',
-                        checksum: 'md5sum',
-                        dateCreated: '24-04-2010',
-                        dataModified: '24-04-2020'
-                    }
-                },
-                {
-                    pid: "21.11152/ee05678b-33c9",
-                    properties: {
-                        profile: "AachenProfile",
-                        hasMetadata: "21.11152/ee05678b-33c9-4b1f-a99f-1d62ef657abc",
-                        digitalObjectType: 'object',
-                        digitalObjectLocation: 'github',
-                        license: 'cc4',
-                        checksum: 'md5sum',
-                        dateCreated: '24-04-2010',
-                        dataModified: '24-04-2020'
-                    }
-                },
-                {
-                    pid: "21.11152/ee05678b-33c9-4b1f-a99f-1d62ef657abc",
-                    properties: {
-                        profile: "HMCProfile",
-                        licence: "MIT",
-                        digitalObjectType: 'object',
-                        digitalObjectLocation: 'github',
-                        license: 'cc4',
-                        checksum: 'md5sum',
-                        dateCreated: '24-04-2010',
-                        dataModified: '24-04-2020'
-                    }
-                }
-            ];
-        }
-        let data = this.dataUtil.transformData(componentData, excludedProperties);
-        let pidList = data.primaryNodeIds;
-        let currentlyClicked = null;
-        // const updateVisualization = (excludedProperties, pidList) => {
-        const svg = d3.select(this.hostElement.shadowRoot.querySelector("#graph"));
-        // Extracting width and height from the size property
-        const [width, height] = this.size.split(',').map(s => s.trim());
-        svg
-            .attr("width", width)
-            .attr("height", height)
-            .attr('marker-end', 'url(#arrow)');
-
-        // Convert width and height to numerical values for further use
-        const numericWidth = parseInt(width, 10);
-        const numericHeight = parseInt(height, 10);
-        // Create a color scale for node groups
-        const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
-
+        //Transform data into nodes, links
+        let transformedData = this.dataUtil.transformData(defaultComponentData, excludedProperties);
+        //Extraccting list of Primary node IDs
+        let primaryNodeIds = transformedData.primaryNodeIds;
+        // Initializing SVG with given dimensions and creating force simulation
+        const { svg, numericWidth, numericHeight } = this.d3GraphSetup.initializeSVG();
         // Clear the existing SVG content
         svg.selectAll("*").remove();
-        // Create a force simulation
-        const simulation = d3.forceSimulation(data.nodes)
-            .force("link", d3.forceLink(data.links).id(d => d.id).distance(70)) // Ensure the id accessor is correct
-            .force("charge", d3.forceManyBody().strength(-90))
-            .force("x", d3.forceX(numericWidth / 2))
-            .force("y", d3.forceY(numericHeight / 2));
-
+        const simulation = this.d3GraphSetup.createForceSimulation(transformedData.nodes, transformedData.links, numericWidth, numericHeight);
+        const links = this.d3GraphSetup.createLinks(svg, transformedData.links);
+        const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
         const colorType = d3.scaleOrdinal() // Define a scale for relationType to colors
-            .domain(["solid", "dashed", /* add more relationType values here */])
-            .range(["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]);
+        // .domain(["solid", "dashed", /* add more relationType values here */])
+        // .range(["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]);
+        let currentlyClicked = null;
 
-        // Create the links
-        const links = svg.selectAll(".link")
-            .data(data.links)
-            .enter()
-            .append("line")
-            .attr("stroke-opacity", 1)
-            .attr("opacity", "1")
-            .attr("category", d => d.castegory)  // Add a category attribute to identify link type
-            .attr("stroke", '#d3d3d3');// Set stroke color based on relationType
+        const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, colorScale, simulation);
 
-        const nodes = svg.selectAll(".node")
-            .data(data.nodes)
-            .enter()
-            .append("circle")
-            .attr("class", "node")
-            .attr("r", 10)
-            .attr("fill", d => colorScale(d.id))
-            .attr("stroke", "#fff")
-            .attr("stroke-width", 1.5)
-            .attr("cx", d => d.x)
-            .attr("cy", d => d.y)
-            .attr("class", d => `node ${d.type}`) // Use the "type" for class
-            .attr("id", d => d.id) // Set the "id" as the node's ID
+
+        mouseover();
+        mouseout();
+        onclick()
+        nodes
             .call(drag(simulation))
-            .on("mouseover", function (event, d) {
+        function unHighlight() {
+            nodes.classed("primary", false);
+            nodes.classed("secondary", false);
+            links.classed("primary", false);
+            links.classed("secondary", false);
+        }
+
+        function highlightConnectedPrimaryNodes(event, d) {
+            d3.select(`.node[id="${d.id}"]`).classed("primary", true);
+            d3.select(event.currentTarget).classed("primary", true);
+            links.each(function (l) {
+                if (l.type === 'primary' && (l.source.id === d.id || l.target.id === d.id)) {
+                    d3.select(this).classed("primary", true);
+                    nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
+                    d3.select(this).attr("opacity", "1");
+                }
+            });
+
+        }
+        function highlightConnectedNodesAndLinks(event, clickedNode) {
+            // Highlight the clicked node
+            d3.select(`.node[id="${clickedNode.id}"]`).classed("primary", true);
+
+            // Find the links connected to the clicked node
+            const connectedLinks = transformedData.links.filter(link =>
+                link.source.id === clickedNode.id || link.target.id === clickedNode.id
+            );
+
+            // Highlight the connected links and nodes
+            connectedLinks.forEach(link => {
+                d3.select(`.link[source="${link.source.id}"][target="${link.target.id}"]`).classed("primary", true);
+                d3.select(`.link[source="${link.target.id}"][target="${link.source.id}"]`).classed("primary", true);
+                d3.select(`.node[id="${link.source.id}"]`).classed("secondary", true);
+                d3.select(`.node[id="${link.target.id}"]`).classed("secondary", true);
+            });
+
+            d3.select(event.currentTarget).classed("primary", true);
+            links.each(function (l) {
+                if (l.type === 'primary' && (l.source.id === clickedNode.id || l.target.id === clickedNode.id)) {
+                    d3.select(this).classed("primary", true);
+                    nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
+                    d3.select(this).attr("opacity", "1");
+                }
+            });
+        }
+        function unHighlightOtherThanSelected() {
+            nodes.classed("primary", false);
+            // nodes.classed("secondary", false);
+            // links.classed("primary", false);
+            links.classed("secondary", false);
+        }
+        function highlightConnected(event, d) {
+            d3.select(event.currentTarget).classed("primary", true);
+            links.each(function (l) {
+                if (l.category === 'non_attribute' && (l.source.id === d.id || l.target.id === d.id)) {
+                    d3.select(this).classed("primary", true);
+                    nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
+                    d3.select(this).attr("opacity", "1");
+                }
+            });
+        }
+        function mouseover() {
+            nodes.on("mouseover", function (event, d) {
                 showTooltip(event, d);
                 // highlightConnected(event, d);
                 // if (!currentlyClicked) {
@@ -247,7 +327,9 @@ export class MyComponent {
                 // });
 
             })
-            .on("mouseout", function (event, d) {
+        }
+        function mouseout() {
+            nodes.on("mouseout", function (event, d) {
 
                 if (currentlyClicked) return;
                 unHighlight();
@@ -270,11 +352,12 @@ export class MyComponent {
                 //     unHighlight();
                 // }
             })
-            //On click increase the size of the nodes connected
-            .on("click", function (event, d) {
+        }
+        function onclick() {
+            nodes.on("click", function (event, d) {
                 currentlyClicked = d;
                 this.selectedNode = d;
-                if (pidList.includes(d.id)) {
+                if (primaryNodeIds.includes(d.id)) {
                     const node = d3.select(this);
                     if (!d.highlighted) {
                         // Highlight the clicked node with a transition
@@ -284,7 +367,7 @@ export class MyComponent {
                         // Find the connected primary nodes within pidList
                         const connectedNode = svg.selectAll(".node")
                             .filter(node => {
-                                const isConnected = pidList.includes(node.id) && data.links.some(link =>
+                                const isConnected = primaryNodeIds.includes(node.id) && transformedData.links.some(link =>
                                 ((link.source.id === d.id && link.target.id === node.id) ||
                                     (link.target.id === d.id && link.source.id === node.id))
                                 );
@@ -298,7 +381,7 @@ export class MyComponent {
                         // Find and highlight the connected primary links
                         svg.selectAll(".link")
                             .filter(link => {
-                                return data.links.some(link => link.source.id === d.id && pidList.includes(link.target.id));
+                                return transformedData.links.some(link => link.source.id === d.id && primaryNodeIds.includes(link.target.id));
                             })
                             .transition()
                             .attr("stroke", "red");
@@ -310,7 +393,7 @@ export class MyComponent {
                         // Revert the connected primary nodes within pidList
                         const connectedNode = svg.selectAll(".node")
                             .filter(node => {
-                                const isConnected = pidList.includes(node.id) && data.links.some(link =>
+                                const isConnected = primaryNodeIds.includes(node.id) && transformedData.links.some(link =>
                                 ((link.source.id === d.id && link.target.id === node.id) ||
                                     (link.target.id === d.id && link.source.id === node.id))
                                 ); return isConnected;
@@ -321,7 +404,7 @@ export class MyComponent {
                         // Revert the connected primary links
                         svg.selectAll(".link")
                             .filter(link => {
-                                return data.links.some(link => link.source.id === d.id);
+                                return transformedData.links.some(link => link.source.id === d.id);
                             })
                             .transition()
                             .attr("stroke", d => colorType(d.type));
@@ -339,68 +422,7 @@ export class MyComponent {
                 // currentlyClicked = d;
 
             })
-        function unHighlight() {
-            nodes.classed("primary", false);
-            nodes.classed("secondary", false);
-            links.classed("primary", false);
-            links.classed("secondary", false);
         }
-
-        function highlightConnectedPrimaryNodes(event, d) {
-            d3.select(`.node[id="${d.id}"]`).classed("primary", true);
-            d3.select(event.currentTarget).classed("primary", true);
-            links.each(function (l) {
-                if (l.type === 'primary' && (l.source.id === d.id || l.target.id === d.id)) {
-                    d3.select(this).classed("primary", true);
-                    nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
-                    d3.select(this).attr("opacity", "1");
-                }
-            });
-
-        }
-        function highlightConnectedNodesAndLinks(event, clickedNode) {
-            // Highlight the clicked node
-            d3.select(`.node[id="${clickedNode.id}"]`).classed("primary", true);
-
-            // Find the links connected to the clicked node
-            const connectedLinks = data.links.filter(link =>
-                link.source.id === clickedNode.id || link.target.id === clickedNode.id
-            );
-
-            // Highlight the connected links and nodes
-            connectedLinks.forEach(link => {
-                d3.select(`.link[source="${link.source.id}"][target="${link.target.id}"]`).classed("primary", true);
-                d3.select(`.link[source="${link.target.id}"][target="${link.source.id}"]`).classed("primary", true);
-                d3.select(`.node[id="${link.source.id}"]`).classed("secondary", true);
-                d3.select(`.node[id="${link.target.id}"]`).classed("secondary", true);
-            });
-
-            d3.select(event.currentTarget).classed("primary", true);
-            links.each(function (l) {
-                if (l.type === 'primary' && (l.source.id === clickedNode.id || l.target.id === clickedNode.id)) {
-                    d3.select(this).classed("primary", true);
-                    nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
-                    d3.select(this).attr("opacity", "1");
-                }
-            });
-        }
-        function unHighlightOtherThanSelected() {
-            nodes.classed("primary", false);
-            // nodes.classed("secondary", false);
-            // links.classed("primary", false);
-            links.classed("secondary", false);
-        }
-        function highlightConnected(event, d) {
-            d3.select(event.currentTarget).classed("primary", true);
-            links.each(function (l) {
-                if (l.category === 'non_attribute' && (l.source.id === d.id || l.target.id === d.id)) {
-                    d3.select(this).classed("primary", true);
-                    nodes.filter(n => n.id === l.source.id || n.id === l.target.id).classed("secondary", true);
-                    d3.select(this).attr("opacity", "1");
-                }
-            });
-        }
-
         // Tooltip functions
         const tooltip = d3.select("body")
             .append("div")
@@ -470,21 +492,6 @@ export class MyComponent {
         // Run the simulation
         simulation.on("tick", ticked);
     }
-
-    /**
-     * The first name
-     */
-    @Prop() first: string;
-
-    /**
-     * The middle name
-     */
-    @Prop() middle: string;
-
-    /**
-     * The last name
-     */
-    @Prop() last: string;
     render() {
         const [width, height] = this.size.split(',').map(s => s.trim());
         return (
