@@ -5,6 +5,86 @@ export class PrepareData {
         this.showPrimaryLinks = showPrimaryLinks;
         this.showAttributes = showAttributes;
     }
+    getDefaultComponentData() {
+        return [
+            {
+                pid: "21.11152/ba06424b",
+                properties: {
+                    profile: "KIP",
+                    hasMetadata: "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
+                    digitalObjectType: "object",
+                    digitalObjectLocation: "github",
+                    license: "cc4",
+                    checksum: "md5sum",
+                    dateCreated: "24-04-2010",
+                    dataModified: "24-04-2020"
+                }
+            },
+            {
+                pid: "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
+                properties: {
+                    profile: "HMCProfile",
+                    licence: "cc4",
+                    digitalObjectType: 'object',
+                    digitalObjectLocation: 'github',
+                    checksum: 'md5sum',
+                    dateCreated: '24-04-2010',
+                    dataModified: '24-04-2020'
+                }
+            },
+            {
+                pid: "21.11152/ba06424b-17c7-4e3f",
+                properties: {
+                    profile: "AachenProfile",
+                    hasMetadata: "21.11152/dd01234b-22f8-4b2f-b66e-9a34df554a4f",
+                    digitalObjectType: 'object',
+                    digitalObjectLocation: 'github',
+                    license: 'cc4',
+                    checksum: 'md5sum',
+                    dateCreated: '24-04-2010',
+                    dataModified: '24-04-2020'
+                }
+            },
+            {
+                pid: "21.11152/dd01234b-22f8-4b2f-b66e-9a34df554a4f",
+                properties: {
+                    profile: "Data Analysis",
+                    licence: "cc4",
+                    digitalObjectType: 'object',
+                    digitalObjectLocation: 'github',
+                    checksum: 'md5sum',
+                    dateCreated: '24-04-2010',
+                    dataModified: '24-04-2020'
+                }
+            },
+            {
+                pid: "21.11152/ee05678b-33c9",
+                properties: {
+                    profile: "AachenProfile",
+                    hasMetadata: "21.11152/ee05678b-33c9-4b1f-a99f-1d62ef657abc",
+                    digitalObjectType: 'object',
+                    digitalObjectLocation: 'github',
+                    license: 'cc4',
+                    checksum: 'md5sum',
+                    dateCreated: '24-04-2010',
+                    dataModified: '24-04-2020'
+                }
+            },
+            {
+                pid: "21.11152/ee05678b-33c9-4b1f-a99f-1d62ef657abc",
+                properties: {
+                    profile: "HMCProfile",
+                    licence: "MIT",
+                    digitalObjectType: 'object',
+                    digitalObjectLocation: 'github',
+                    license: 'cc4',
+                    checksum: 'md5sum',
+                    dateCreated: '24-04-2010',
+                    dataModified: '24-04-2020'
+                }
+            }
+        ];
+    }
 
     public transformData(data: any[], excludedProperties: string[]) {
         const nodes = [];
