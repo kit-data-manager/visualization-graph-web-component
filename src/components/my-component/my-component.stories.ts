@@ -4,20 +4,30 @@ export default
 {
 
     title: 'Components/MyComponent',
+    component: 'my-component',
+    argTypes: {
+        showAttributes: { control: 'radio', options: [true, false] },
+      }
+
 };
 
 
-const Template = () => '<my-component first="${args.first)" middle="${args.middle)" last="${args.last)"></my-component>';
+const Template = () => '<my-component .show-attributes = "${showAttributes}"></my-component>';
 
 export const Example =Template.bind({});
 Example.args ={
          includedProperties : 'KIP,SIP,TIP,KIT,SAP,RWTH,BIRLA,KPMG,IIT',
      visualizationMode : 'all',
-    first: 'Ajay',
-    middle: 'Singh',
-    last: 'Kirar'
 
 }
+export const ShowAttributesTrue = Template.bind({});
+ShowAttributesTrue.args = {
+  showAttributes: true,
+};
+export const ShowAttributesFalse = Template.bind({});
+ShowAttributesFalse.args = {
+  showAttributes: false,
+};
 
 // // import { h } from '@stencil/core';
 // // import { storiesOf } from '@storybook/web-components';
