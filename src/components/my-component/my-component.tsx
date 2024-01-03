@@ -86,7 +86,7 @@ export class MyComponent {
         const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
         // const colorType = d3.scaleOrdinal() // Define a scale for relationType to colors
         const links = this.d3GraphSetup.createLinks(svg, transformedData.links);
-        const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, colorScale, simulation);
+        const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, colorScale);
 
         // Initialize details container
         // this.handleEvents.initializeDetailsContainer();

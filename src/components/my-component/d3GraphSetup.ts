@@ -42,7 +42,7 @@ export class GraphSetup {
             .attr("category", d => d.category)  // Add a category attribute to identify link type
             .attr("stroke", '#d3d3d3');// Set stroke color based on relationType
     }
-    createNodes(svg, nodes, colorScale, simulation) {
+    createNodes(svg, nodes, colorScale) {
         return svg.selectAll(".node")
             .data(nodes)
             .enter()

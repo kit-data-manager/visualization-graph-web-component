@@ -16,6 +16,7 @@ export class HandleEvents {
     constructor(hostElement) {
         this.hostElement = hostElement;
         this.initializeTooltip();
+        console.log(this.tooltip,this.currentlyClicked)
         // Attach click event to the shadow root
         const shadowRoot = this.hostElement.shadowRoot;
         shadowRoot.addEventListener("click", function (event) {
@@ -64,7 +65,7 @@ export class HandleEvents {
     //     });
     // }
     // Add this method to handle mouseout event
-    applyMouseout(nodes, links) {
+    applyMouseout(nodes) {
         nodes.on("mouseout", () => {
             // Hide details container on mouseout
             this.detailsContainer.transition()
