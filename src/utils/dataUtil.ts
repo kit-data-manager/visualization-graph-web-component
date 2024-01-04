@@ -1,10 +1,27 @@
+/**
+ * Class responsible for preparing and transforming data for graph visualization.
+ */
 export class PrepareData {
     private showPrimaryLinks: boolean;
     private showAttributes: boolean;
+
+    /**
+     * Creates an instance of PrepareData.
+     *
+     * @constructor
+     * @param {boolean} showPrimaryLinks - Whether to show primary links in the graph.
+     * @param {boolean} showAttributes - Whether to show attributes in the graph.
+     */
     constructor(showPrimaryLinks: boolean, showAttributes: boolean) {
         this.showPrimaryLinks = showPrimaryLinks;
         this.showAttributes = showAttributes;
     }
+
+    /**
+     * Retrieves default data for the component.
+     *
+     * @return {any[]} Default data for the component.
+     */
     getDefaultComponentData() {
         return [
             {
@@ -85,11 +102,22 @@ export class PrepareData {
             }
         ];
     }
-    setShowAttributes(value: boolean)
-    {
+    /**
+     * Sets the value of 'showAttributes'.
+     *
+     * @param {boolean} value 
+     */
+    setShowAttributes(value: boolean) {
         this.showAttributes = value;
     }
 
+    /**
+     * Transforms input data into nodes and links for graph visualization.
+     *
+     * @param {any[]} data - Input data in JSON format.
+     * @param {string[]} excludedProperties - Properties to be excluded from the transformation.
+     * @return {{ nodes: any[], links: any[], primaryNodeIds: string[] }} Transformed nodes and links.
+     */
     public transformData(data: any[], excludedProperties: string[]) {
         const nodes = [];
         const primaryNodeIds = [];
@@ -141,6 +169,7 @@ export class PrepareData {
 
                 }
             }
+            // Filter links based on visibility
             links = allLinks.filter(link => link.visible);
         }
         return { nodes, links, primaryNodeIds };

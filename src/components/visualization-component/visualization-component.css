@@ -30,19 +30,14 @@
 
 .node.primary {
   stroke: #FF0000;
-  /* Change color according to your needs */
 }
 
 .link.primary {
   stroke: #FF0000;
-  /* stroke: blue;  /* Change the color of primary links */
-  /* stroke-width: 2; */
-  /* Change color according to your needs */
 }
 
 .node.secondary {
   stroke: #FF0000;
-  /* Change color according to your needs */
 }
 
 .link.secondary {
@@ -57,8 +52,3 @@
 .link-highlighted {
   stroke: red;
 }
-  /* Change the stroke color for highlighted state
-}
-
-/* .node-highlighted {
-  fill: red; /* Change the fill color for highlighted state }*/
