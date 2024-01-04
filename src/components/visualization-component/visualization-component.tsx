@@ -8,10 +8,10 @@ import { HandleEvents } from '../../utils/eventHandler';
     styleUrl: 'visualization-component.css',
     shadow: true,
 })
-    /**
-     * MyComponent is a custom web component that creates an interactive, force-directed graph
-     * using D3.js. It visualizes nodes and links based on provided JSON data.
-     */
+/**
+ * MyComponent is a custom web component that creates an interactive, force-directed graph
+ * using D3.js. It visualizes nodes and links based on provided JSON data.
+ */
 export class VisualizationComponent {
     @Element() hostElement: HTMLElement;
 
@@ -166,21 +166,35 @@ export class VisualizationComponent {
      */
     generateD3Graph(setupData: any[]) {
         this.dataUtil.setShowAttributes(this.showAttributes);
+
+        // Prepare data
         let defaultComponentData = Array.isArray(setupData) && setupData.length > 0
             ? setupData
             : this.dataUtil.getDefaultComponentData();
         const excludedProperties = this.excludedProperties.split(',');
         let transformedData = this.dataUtil.transformData(defaultComponentData, excludedProperties);
+
+        // Initialize SVG and graph setup
         const { svg, numericWidth, numericHeight } = this.d3GraphSetup.initializeSVG();
         this.d3GraphSetup.clearSVG(svg);
+
+        // Create force simulation
         const simulation = this.d3GraphSetup.createForceSimulation(transformedData.nodes, transformedData.links, numericWidth, numericHeight);
+
+        // Set up color scale
         const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+        // Create links and nodes
         const links = this.d3GraphSetup.createLinks(svg, transformedData.links);
         const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, colorScale);
+
+        // Apply event handlers
         this.handleEvents.onClick(nodes, links);
         if (this.showHover) this.handleEvents.applyMouseover(nodes);
         this.handleEvents.applyDragToNodes(nodes, simulation)
         this.handleEvents.applyClickHandler();
+
+        // Apply simulation
         this.d3GraphSetup.applySimulation(nodes, links, simulation);
 
     }
