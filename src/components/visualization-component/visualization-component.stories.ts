@@ -3,8 +3,8 @@
 export default
 {
 
-    title: 'Components/MyComponent',
-    component: 'my-component',
+    title: 'Components/VisualizationComponent',
+    component: 'visualization-component',
     argTypes: {
         showAttributes: { control: 'radio', options: [true, false] },
       }
@@ -12,7 +12,7 @@ export default
 };
 
 
-const Template = () => '<my-component .show-attributes = "${showAttributes}"></my-component>';
+const Template = () => '<visualization-component show-attributes = "${showAttributes}"></visualization-component>';
 
 export const Example =Template.bind({});
 Example.args ={

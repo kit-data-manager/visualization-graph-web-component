@@ -16,7 +16,7 @@ export class HandleEvents {
     constructor(hostElement) {
         this.hostElement = hostElement;
         this.initializeTooltip();
-        console.log(this.tooltip,this.currentlyClicked)
+        console.log(this.tooltip, this.currentlyClicked)
         // Attach click event to the shadow root
         const shadowRoot = this.hostElement.shadowRoot;
         shadowRoot.addEventListener("click", function (event) {

@@ -6,42 +6,44 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface MyComponent {
+    interface VisualizationComponent {
         "data": string;
         "excludedProperties": string;
         "showAttributes": boolean;
+        "showHover": boolean;
         "showPrimaryLinks": boolean;
         "size": string;
     }
 }
 declare global {
-    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+    interface HTMLVisualizationComponentElement extends Components.VisualizationComponent, HTMLStencilElement {
     }
-    var HTMLMyComponentElement: {
-        prototype: HTMLMyComponentElement;
-        new (): HTMLMyComponentElement;
+    var HTMLVisualizationComponentElement: {
+        prototype: HTMLVisualizationComponentElement;
+        new (): HTMLVisualizationComponentElement;
     };
     interface HTMLElementTagNameMap {
-        "my-component": HTMLMyComponentElement;
+        "visualization-component": HTMLVisualizationComponentElement;
     }
 }
 declare namespace LocalJSX {
-    interface MyComponent {
+    interface VisualizationComponent {
         "data"?: string;
         "excludedProperties"?: string;
         "showAttributes"?: boolean;
+        "showHover"?: boolean;
         "showPrimaryLinks"?: boolean;
         "size"?: string;
     }
     interface IntrinsicElements {
-        "my-component": MyComponent;
+        "visualization-component": VisualizationComponent;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            "visualization-component": LocalJSX.VisualizationComponent & JSXBase.HTMLAttributes<HTMLVisualizationComponentElement>;
         }
     }
 }

@@ -1,19 +1,19 @@
 // Import necessary modules and libraries
 import { Component, Prop, h, Element, Watch } from '@stencil/core';
 import * as d3 from 'd3';  // Import D3.js for data visualisation
-import { PrepareData } from './dataUtil';
-import { GraphSetup } from './d3GraphSetup';
-import { HandleEvents } from './eventHandler';
+import { PrepareData } from '../../utils/dataUtil';
+import { GraphSetup } from '../../utils/d3GraphSetup';
+import { HandleEvents } from '../../utils/eventHandler';
 @Component({
-    tag: 'my-component',
-    styleUrl: 'my-component.css',
+    tag: 'visualization-component',
+    styleUrl: 'visualization-component.css',
     shadow: true, // Enable shadow DOM to encapsulate the component
 })
 /**
  * MyComponent is a custom web component that creates an interactive, force-directed graph
  * using D3.js. It visualizes nodes and links based on provided JSON data.
  */
-export class MyComponent {
+export class VisualizationComponent {
     @Element() hostElement: HTMLElement;
     @Prop() size: string = '1350px,650px';
     @Prop() showAttributes: boolean = true; // Show/hide attributes in the graph.
@@ -25,7 +25,7 @@ export class MyComponent {
     private dataUtil: PrepareData;
     private d3GraphSetup: GraphSetup;
     private handleEvents: HandleEvents;
-    constructor() {
+    connectedCallback() {
         this.dataUtil = new PrepareData(this.showPrimaryLinks, this.showAttributes);
         this.d3GraphSetup = new GraphSetup(this.hostElement);
         this.handleEvents = new HandleEvents(this.hostElement);
