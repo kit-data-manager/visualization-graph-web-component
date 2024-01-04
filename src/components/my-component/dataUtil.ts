@@ -85,6 +85,10 @@ export class PrepareData {
             }
         ];
     }
+    setShowAttributes(value: boolean)
+    {
+        this.showAttributes = value;
+    }
 
     public transformData(data: any[], excludedProperties: string[]) {
         const nodes = [];

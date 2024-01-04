@@ -59,6 +59,11 @@ export class MyComponent {
         }
 
     }
+    @Watch('showAttributes')
+    showAttributesChanged(newValue: boolean){
+        this.dataUtil = new  PrepareData(this.showPrimaryLinks, newValue);
+        this.generateD3Graph(this.chartData);
+     }
 
     componentDidLoad() {
         // Initialize and set up the D3.js graph when the component is loaded
@@ -72,6 +77,7 @@ export class MyComponent {
     // Set up the D3.js graph visualization based on the input data
     generateD3Graph(setupData: any[]) {
         // Setting Default data if nothing is provided from outside the component
+        this.dataUtil.setShowAttributes(this.showAttributes);
         let defaultComponentData = Array.isArray(setupData) && setupData.length > 0
             ? setupData
             : this.dataUtil.getDefaultComponentData();
@@ -100,8 +106,8 @@ export class MyComponent {
         // this.handleEvents.applyOnclick(event, d, transformedData)
         // this.clickEvent.applyClick(simulation, nodes, links);
         // this.clickEvent.onClick(nodes, links);
-        this.handleEvents.onClick(nodes,links);
-        if (this.showHover)this.handleEvents.applyMouseover(nodes);
+        this.handleEvents.onClick(nodes, links);
+        if (this.showHover) this.handleEvents.applyMouseover(nodes);
         this.handleEvents.applyDragToNodes(nodes, simulation)
         // //When clicking outside nodes or links unhighlight everything
         this.handleEvents.applyClickHandler();
@@ -118,31 +124,3 @@ export class MyComponent {
     }
 
 }
-
-// my-component.stories.tsx
-// import { html } from 'lit-html';
-// import { Meta, Story } from '@storybook/web-components';
-// import './my-component';
-
-// export default {
-//   title: 'My Component',
-//   component: 'my-component',
-// } as Meta;
-
-// const Template: Story = ({ size, showAttributes, showPrimaryLinks, excludedProperties, data }) =>
-//   html`<my-component
-//     size="${size}"
-//     show-attributes="${showAttributes}"
-//     show-primary-links="${showPrimaryLinks}"
-//     excluded-properties="${excludedProperties}"
-//     data="${data}"
-//   ></my-component>`;
-
-// export const Default = Template.bind({});
-// Default.args = {
-//   size: '1350px,650px',
-//   showAttributes: true,
-//   showPrimaryLinks: true,
-//   excludedProperties: '',
-//   data: '[your sample data here]',
-// };

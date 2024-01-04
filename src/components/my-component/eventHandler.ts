@@ -35,7 +35,7 @@ export class HandleEvents {
             .attr("class", "node-details")
             .style("opacity", 0);
     }
-    // Inside the GraphSetup class
+
     // applyMouseover(nodes, links) {
     //     nodes.on("mouseover", (event, d) => {
     //         // Calculate the position based on the SVG coordinates
