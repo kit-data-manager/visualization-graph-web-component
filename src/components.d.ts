@@ -9,20 +9,9 @@ export namespace Components {
     interface MyComponent {
         "data": string;
         "excludedProperties": string;
-        /**
-          * The first name
-         */
-        "first": string;
-        /**
-          * The last name
-         */
-        "last": string;
-        /**
-          * The middle name
-         */
-        "middle": string;
         "showAttributes": boolean;
         "showPrimaryLinks": boolean;
+        "size": string;
     }
 }
 declare global {
@@ -40,20 +29,9 @@ declare namespace LocalJSX {
     interface MyComponent {
         "data"?: string;
         "excludedProperties"?: string;
-        /**
-          * The first name
-         */
-        "first"?: string;
-        /**
-          * The last name
-         */
-        "last"?: string;
-        /**
-          * The middle name
-         */
-        "middle"?: string;
         "showAttributes"?: boolean;
         "showPrimaryLinks"?: boolean;
+        "size"?: string;
     }
     interface IntrinsicElements {
         "my-component": MyComponent;
