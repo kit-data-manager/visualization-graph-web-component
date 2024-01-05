@@ -23,7 +23,6 @@ export class HandleEvents {
      * @param {any} nodes - D3 selection of graph nodes.
      */
     applyMouseover(nodes, tooltip) {
-        const padding = 10;
         nodes.on('mouseover', (event, d) => {
             tooltip.transition()
                 .duration(200)
@@ -33,16 +32,18 @@ export class HandleEvents {
             const tooltipContent = `${d.id}`;
             const textLength = tooltipContent.length * 7.3;
 
-            const rectWidth = textLength + 2 * padding;; // Additional padding
+            const rectWidth = textLength + 20; // Additional padding
 
-            const tooltipContentHtml = `<rect width="${rectWidth}" height="40" fill="#fff" stroke="#ccc" rx="5" ry="5"></rect>
-                            <text x="${padding}" y="25" fill="#000">${d.id}</text>`;
+            const tooltipContentHtml = `<rect width="${rectWidth}" height="40" fill="#fff" stroke="#ccc" rx="15" ry="15"></rect>
+            <text x="10" y="25" fill="#000">${d.id}</text>`;
+
             tooltip.html(tooltipContentHtml)
-                .style('transform', `translate(${event.pageX + 10}px, ${event.pageY - 20}px)`);
+                .style('transform', `translate(${event.pageX -100}px, ${event.pageY - 40}px)`); 
+
         });
 
         nodes.on('mousemove', (event) => {
-            tooltip.style('transform', `translate(${event.pageX + 10}px, ${event.pageY - 20}px)`);
+            tooltip.style('transform', `translate(${event.pageX - 40}px, ${event.pageY - 40}px)`);
         });
 
         // Handle mouseout event for nodes
@@ -52,9 +53,6 @@ export class HandleEvents {
                 .style('opacity', 0);
         });
     }
-
-
-
 
     /**
      * Handles the onClick event for nodes, updating their sizes and related links.

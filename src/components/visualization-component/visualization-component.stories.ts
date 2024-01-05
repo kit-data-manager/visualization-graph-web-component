@@ -36,7 +36,7 @@ const Template = (args) => `<div style="display: flex; justify-content: center; 
   show-attributes="${args.showAttributes}" 
   show-primary-links="${args.showPrimaryLinks}"
   display-hovered="${args.displayHovered}"
-  size ="1500px,650px"
+  size ="1350px,650px"
 ></visualization-component>`;
 
 
