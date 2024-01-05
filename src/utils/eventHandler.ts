@@ -6,7 +6,6 @@ import * as d3 from 'd3';
 export class HandleEvents {
     private currentlyClicked = null;
     private hostElement;
-
     /**
      * Creates an instance of HandleEvents.
      *
@@ -15,6 +14,7 @@ export class HandleEvents {
      */
     constructor(hostElement) {
         this.hostElement = hostElement;
+        console.log(this.currentlyClicked, this.hostElement);
     }
 
     /**
@@ -31,9 +31,9 @@ export class HandleEvents {
         nodes.on('mouseover', (event, d) => {
             tooltip.transition()
                 .duration(200)
-                .style('opacity', .9);
-            tooltip.html(`Node ID: ${d.id}`)
-                .style('left', (event.pageX + 10) + 'px')
+                .style('opacity', 1);
+            tooltip.html(`PID : ${d.id}`)
+                .style('left', (event.pageX + 100) + 'px')
                 .style('top', (event.pageY - 20) + 'px');
         });
 
@@ -45,7 +45,7 @@ export class HandleEvents {
         // Handle mouseout event for nodes
         nodes.on('mouseout', () => {
             tooltip.transition()
-                .duration(500)
+                .duration(200)
                 .style('opacity', 0);
         });
     }
@@ -59,23 +59,27 @@ export class HandleEvents {
     onClick(nodes, links) {
         const handleNodeClick = (event, d) => {
             // Reset the size for all nodes
-            nodes.attr("r", 10);
+            nodes.attr("r", 10).attr("opacity", 0.88);
+            links.attr("stroke-opacity", 0.88);
 
             // Increase the size of the clicked primary node
             const selectedNode = d3.select(event.currentTarget)
             if (selectedNode.category === 'non_attribute') {
-                selectedNode.attr("r", 15);
+                selectedNode.attr("r", 15).attr("opacity", 1);
             }
 
             // Iterate through links and update size
             links.each(function (l) {
                 if (l.category === 'non_attribute' && (l.source.id === d.id || l.target.id === d.id)) {
-                    d3.select(this)
+                    d3.select(this).attr("stroke-opacity", 1);
                     nodes.filter(n => n.id === l.source.id || n.id === l.target.id)
-                        .attr("r", 20);
+                        .attr("r", 20)
+                        .attr("opacity", 1);;
                 }
             });
+            
         };
+        
 
         nodes.on('click', (event, d) => handleNodeClick(event, d));
     }
