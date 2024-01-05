@@ -58,7 +58,7 @@ export class VisualizationComponent {
      * @prop
      * @type {string}
      */
-    @Prop() excludedProperties: string = '';
+    @Prop() excludeProperties: string = '';
 
     /**
     * Whether to show hover effects on the graph nodes. Defaults to true.
@@ -66,9 +66,9 @@ export class VisualizationComponent {
     * @prop
     * @type {boolean}
     */
-    @Prop() showHover: boolean = true;
+    @Prop() displayHovered: boolean = true;
 
-
+    private tooltip; 
     public chartData: any;
     /**
     * Declare a private instance variable of the 'PrepareData' class.
@@ -119,7 +119,14 @@ export class VisualizationComponent {
      */
     @Watch('showAttributes')
     showAttributesChanged(newValue: boolean) {
+        console.log('showAttributesChanged called with:', newValue);
         this.dataUtil = new PrepareData(this.showPrimaryLinks, newValue);
+        this.generateD3Graph(this.chartData);
+    }
+
+    @Watch('showPrimaryLinks')
+    showPrimaryLinksChanged(newValue: boolean) {
+        this.dataUtil = new PrepareData(newValue, this.showAttributes);
         this.generateD3Graph(this.chartData);
     }
 
@@ -171,8 +178,8 @@ export class VisualizationComponent {
         let defaultComponentData = Array.isArray(setupData) && setupData.length > 0
             ? setupData
             : this.dataUtil.getDefaultComponentData();
-        const excludedProperties = this.excludedProperties.split(',');
-        let transformedData = this.dataUtil.transformData(defaultComponentData, excludedProperties);
+        const excludeProperties = this.excludeProperties.split(',');
+        let transformedData = this.dataUtil.transformData(defaultComponentData, excludeProperties);
 
         // Initialize SVG and graph setup
         const { svg, numericWidth, numericHeight } = this.d3GraphSetup.initializeSVG();
@@ -188,9 +195,14 @@ export class VisualizationComponent {
         const links = this.d3GraphSetup.createLinks(svg, transformedData.links);
         const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, colorScale);
 
+        this.tooltip = svg.append('g')
+        .attr('class', 'tooltip')
+        .style('opacity', 0)
+        .style('position', 'absolute');
+
         // Apply event handlers
         this.handleEvents.onClick(nodes, links);
-        if (this.showHover) this.handleEvents.applyMouseover(nodes);
+        if (this.displayHovered) this.handleEvents.applyMouseover(nodes,this.tooltip);
         this.handleEvents.applyDragToNodes(nodes, simulation)
         this.handleEvents.applyClickHandler();
 

@@ -115,10 +115,10 @@ export class PrepareData {
      * Transforms input data into nodes and links for graph visualization.
      *
      * @param {any[]} data - Input data in JSON format.
-     * @param {string[]} excludedProperties - Properties to be excluded from the transformation.
+     * @param {string[]} excludeProperties - Properties to be excluded from the transformation.
      * @return {{ nodes: any[], links: any[], primaryNodeIds: string[] }} Transformed nodes and links.
      */
-    public transformData(data: any[], excludedProperties: string[]) {
+    public transformData(data: any[], excludeProperties: string[]) {
         const nodes = [];
         const primaryNodeIds = [];
         const allLinks = [];
@@ -149,7 +149,7 @@ export class PrepareData {
                 }
                 //Attribute nodes and links (if it is not in the property value it should be an ordinary node)
                 else {
-                    if (!excludedProperties.includes(propKey) && this.showAttributes) {
+                    if (!excludeProperties.includes(propKey) && this.showAttributes) {
                         const secondaryNode =
                         {
                             id: `secondary_${item.pid}_${propKey}`,

@@ -14,23 +14,23 @@ export namespace Components {
          */
         "data": string;
         /**
+          * Whether to show hover effects on the graph nodes. Defaults to true.
+          * @prop 
+          * @type {boolean}
+         */
+        "displayHovered": boolean;
+        /**
           * Properties to be excluded from outside the component. Defaults to an empty string.
           * @prop 
           * @type {string}
          */
-        "excludedProperties": string;
+        "excludeProperties": string;
         /**
           * Whether to show attributes in the graph. Defaults to true. If true it will show all the attributes/properties  If false it wont show any attributes Default value : true
           * @prop 
           * @type {boolean}
          */
         "showAttributes": boolean;
-        /**
-          * Whether to show hover effects on the graph nodes. Defaults to true.
-          * @prop 
-          * @type {boolean}
-         */
-        "showHover": boolean;
         /**
           * Whether to show primary links in the graph.  If true it will show all the links between primary nodes Defaults to true.
           * @prop 
@@ -65,23 +65,23 @@ declare namespace LocalJSX {
          */
         "data"?: string;
         /**
+          * Whether to show hover effects on the graph nodes. Defaults to true.
+          * @prop 
+          * @type {boolean}
+         */
+        "displayHovered"?: boolean;
+        /**
           * Properties to be excluded from outside the component. Defaults to an empty string.
           * @prop 
           * @type {string}
          */
-        "excludedProperties"?: string;
+        "excludeProperties"?: string;
         /**
           * Whether to show attributes in the graph. Defaults to true. If true it will show all the attributes/properties  If false it wont show any attributes Default value : true
           * @prop 
           * @type {boolean}
          */
         "showAttributes"?: boolean;
-        /**
-          * Whether to show hover effects on the graph nodes. Defaults to true.
-          * @prop 
-          * @type {boolean}
-         */
-        "showHover"?: boolean;
         /**
           * Whether to show primary links in the graph.  If true it will show all the links between primary nodes Defaults to true.
           * @prop 

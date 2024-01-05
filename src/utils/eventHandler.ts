@@ -14,7 +14,7 @@ export class HandleEvents {
      */
     constructor(hostElement) {
         this.hostElement = hostElement;
-        console.log(this.currentlyClicked, this.hostElement);
+        // console.log(this.currentlyClicked, this.hostElement);
     }
 
     /**
@@ -22,24 +22,27 @@ export class HandleEvents {
      *
      * @param {any} nodes - D3 selection of graph nodes.
      */
-    applyMouseover(nodes) {
-        const tooltip = d3.select('body').append('div')
-            .attr('class', 'tooltip')
-            .style('opacity', 0)
-            .style('position', 'absolute');
-
+    applyMouseover(nodes, tooltip) {
+        const padding = 10;
         nodes.on('mouseover', (event, d) => {
             tooltip.transition()
                 .duration(200)
                 .style('opacity', 1);
-            tooltip.html(`PID : ${d.id}`)
-                .style('left', (event.pageX + 100) + 'px')
-                .style('top', (event.pageY - 20) + 'px');
+
+            // Get the length of the tooltip content
+            const tooltipContent = `${d.id}`;
+            const textLength = tooltipContent.length * 7.3;
+
+            const rectWidth = textLength + 2 * padding;; // Additional padding
+
+            const tooltipContentHtml = `<rect width="${rectWidth}" height="40" fill="#fff" stroke="#ccc" rx="5" ry="5"></rect>
+                            <text x="${padding}" y="25" fill="#000">${d.id}</text>`;
+            tooltip.html(tooltipContentHtml)
+                .style('transform', `translate(${event.pageX + 10}px, ${event.pageY - 20}px)`);
         });
 
         nodes.on('mousemove', (event) => {
-            tooltip.style('left', (event.pageX + 10) + 'px')
-                .style('top', (event.pageY - 20) + 'px');
+            tooltip.style('transform', `translate(${event.pageX + 10}px, ${event.pageY - 20}px)`);
         });
 
         // Handle mouseout event for nodes
@@ -50,6 +53,9 @@ export class HandleEvents {
         });
     }
 
+
+
+
     /**
      * Handles the onClick event for nodes, updating their sizes and related links.
      *
@@ -59,8 +65,7 @@ export class HandleEvents {
     onClick(nodes, links) {
         const handleNodeClick = (event, d) => {
             // Reset the size for all nodes
-            nodes.attr("r", 10).attr("opacity", 0.88);
-            links.attr("stroke-opacity", 0.88);
+            nodes.attr("r", 10)
 
             // Increase the size of the clicked primary node
             const selectedNode = d3.select(event.currentTarget)
@@ -77,9 +82,9 @@ export class HandleEvents {
                         .attr("opacity", 1);;
                 }
             });
-            
+
         };
-        
+
 
         nodes.on('click', (event, d) => handleNodeClick(event, d));
     }
