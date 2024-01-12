@@ -44,6 +44,7 @@ export class PrepareData {
                     licence: "cc4",
                     digitalObjectType: 'object',
                     digitalObjectLocation: 'github',
+                    isMetada:'21.11152/ba06424b',
                     checksum: 'md5sum',
                     dateCreated: '24-04-2010',
                     dataModified: '24-04-2020'
@@ -53,7 +54,7 @@ export class PrepareData {
                 pid: "21.11152/ba06424b-17c7-4e3f",
                 properties: {
                     profile: "AachenProfile",
-                    hasMetadata: "21.11152/dd01234b-22f8-4b2f-b66e-9a34df554a4f",
+                    // hasMetadata: "21.11152/dd01234b-22f8-4b2f-b66e-9a34df554a4f",
                     digitalObjectType: 'object',
                     digitalObjectLocation: 'github',
                     license: 'cc4',
@@ -141,7 +142,7 @@ export class PrepareData {
                     {
                         source: item.pid,
                         target: propValue,
-                        type: propKey,
+                        relationType: propKey,
                         category: 'non_attribute',
                         visible: this.showPrimaryLinks
                     }
@@ -152,7 +153,7 @@ export class PrepareData {
                     if (!excludeProperties.includes(propKey) && this.showAttributes) {
                         const secondaryNode =
                         {
-                            id: `secondary_${item.pid}_${propKey}`,
+                            id: `${item.pid}_${propValue}`,
                             [propKey]: propValue,
                             category: 'attribute'
                         }
@@ -162,6 +163,7 @@ export class PrepareData {
                             source: item.pid,
                             target: secondaryNode.id,
                             category: 'attribute',
+                            relationType: propKey,
                             visible: true
                         }
                         allLinks.push(link);
