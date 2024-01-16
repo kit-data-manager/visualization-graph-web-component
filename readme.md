@@ -43,8 +43,8 @@ npm run storybook
 
 Attention: Do NOT run npm run start. It will cause the storybook to not work properly. If you did run npm run start, delete the following folders and run npm install again:
 
-node_modules
-www
-dist
-loader
-.stencil
+- node_modules
+- www
+- dist
+- loader
+- .stencil
