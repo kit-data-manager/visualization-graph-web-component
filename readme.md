@@ -15,7 +15,7 @@ Users can easily customize the web component by setting various properties:
 - `excludeProperties`: Specify any properties to exclude from the visualization.
 - `displayHovered`: Enable or disable hover effects on graph nodes.
 
-These properties allow for flexible configuration, catering to different data sets and visualization requirements, making the Visualization Graph Web Component a versatile tool for data analysis and presentation.
+These properties allow for flexible configuration, catering to different data sets and visualization requirements, making the Visualization Component a versatile tool for data analysis and presentation.
 
 Currently, in its [development/beta/stable] phase, is an evolving project, open to contributions and feedback from the community. Dive into the world of seamless data visualization with
 
