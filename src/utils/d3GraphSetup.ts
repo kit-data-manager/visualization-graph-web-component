@@ -90,8 +90,10 @@ export class GraphSetup {
       .attr('opacity', '1')
       .attr('category', d => d.category)
       .attr('stroke', d => (d.category === 'non_attribute' ? colorType(d.relationType) : '#d3d3d3'))
-      .attr('stroke-dasharray', d => (d.category === 'non_attribute' ? '10, 10' : '1'));
-    // .attr("stroke", d => colorType(d.relationType));
+      .attr('stroke-dasharray', d => (d.category === 'non_attribute' ? '10, 10' : '1'))
+      .attr('marker-end', 'url(#triangle)')
+      .attr('marker-start', 'url(#arrow)')
+      .attr('orient', 'auto');
   }
 
   /**
@@ -128,15 +130,27 @@ export class GraphSetup {
   createCustomMarkers(svg, links, colorType) {
     let defs = svg.append('defs');
     let set = [...new Set(links.filter(d => d.category === 'non_attribute').map(d => d.relationType))];
-    console.log('set', set);
-    for (let i = 0; i < set.length; i++) {
-      let elem = set[i];
-      defs
-        .append('svg:marker')
-        .attr('id', 'marker_' + elem)
-        .append('path')
-        .style('fill', colorType(elem)); // Color the marker
-    }
+    set.forEach(elem => {
+      // Marker for line end (arrowhead)
+      this.createMarker(defs, `marker-end-${elem}`, colorType(elem));
+      // Marker for line start (reverse arrowhead)
+      this.createMarker(defs, `marker-start-${elem}`, colorType(elem));
+    });
+  }
+
+  createMarker(defs, id, color) {
+    defs
+      .append('svg:marker')
+      .attr('id', id)
+      .attr('refX', 20)
+      .attr('refY', 20)
+      .attr('markerWidth', 40)
+      .attr('markerHeight', 40)
+      .attr('markerUnits', 'userSpaceOnUse')
+      .attr('orient', 'auto')
+      .append('path')
+      .attr('d', 'M0,0Q15,0,20,10,15,20,0,20A1,1,0,000,0') //d3.line()([[0, 0], [0, 20], [20, 10]]))
+      .style('fill', color);
   }
 
   /**
