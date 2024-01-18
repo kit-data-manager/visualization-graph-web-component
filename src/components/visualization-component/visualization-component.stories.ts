@@ -35,6 +35,7 @@ export default {
  */
 const Template = args => `<div style="display: flex; justify-content: center; align-items: center; height: 90vh;">
 <visualization-component 
+  data='${args.data}'
   show-attributes="${args.showAttributes}" 
   show-primary-links="${args.showPrimaryLinks}"
   display-hovered="${args.displayHovered}"
@@ -87,6 +88,28 @@ ExcludeProperties.args = {
   displayHovered: true,
   size: '1350px,650px',
   excludeProperties: '', //
+};
+
+/**
+ * Story for the 'visualization-component' with dynamic data input.
+ *
+ * @story
+ * @type {Object}
+ */
+export const DynamicData = Template.bind({});
+DynamicData.args = {
+  showAttributes: true,
+  showPrimaryLinks: true,
+  displayHovered: true,
+  excludeProperties: '',
+  data: '[]', // Start with empty data or a default dataset
+};
+DynamicData.argTypes = {
+  ...Default.argTypes,
+  data: {
+    control: 'text',
+    description: 'JSON data for the visualization',
+  },
 };
 
 // export const size = Template.bind({});
