@@ -13,7 +13,7 @@ The component accepts an array of objects, where each object represents an entit
 ```json
 [
   {
-    "pid": "Unique Identifier",
+    "id": "Unique Identifier",
     "properties": {
       "propertyName": "propertyValue",
 
@@ -23,7 +23,7 @@ The component accepts an array of objects, where each object represents an entit
 ```
 **Key Elements**
 
-- `pid`:  This unique identifier is crucial for linking entities.
+- `id`:  This unique identifier is crucial for linking entities.
 
 - `properties`: A collection of key-value pairs representing various attributes of the entity. Certain properties can be used to establish connections to other entities.
 
@@ -41,7 +41,7 @@ Consider a scenario where you have two entities: a research paper and a dataset.
 ```
 [
   {
-    "pid": "paper-12345",
+    "id": "paper-12345",
     "properties": {
       "title": "Analysis of Data Patterns",
       "author": "Dr. Jane Smith",
@@ -51,7 +51,7 @@ Consider a scenario where you have two entities: a research paper and a dataset.
     }
   },
   {
-    "pid": "dataset-98765",
+    "id": "dataset-98765",
     "properties": {
       "title": "Global Data Set on Patterns",
       "creator": "Data Institute",
@@ -67,9 +67,9 @@ Consider a scenario where you have two entities: a research paper and a dataset.
 Understanding the Relationships
 
 In this example,  
-- `The research paper` (with pid "paper-12345") cites the dataset (with pid "dataset-98765").  
-- `The property` citesDataset in the paper's properties links to the pid of the dataset, establishing a connection.  
-- Conversely, the dataset includes a relatedPaper property that references back to the paper's pid. We call it primary link.  
+- `The research paper` (with id "paper-12345") cites the dataset (with id "dataset-98765").  
+- `The property` citesDataset in the paper's properties links to the id of the dataset, establishing a connection.  
+- Conversely, the dataset includes a relatedPaper property that references back to the paper's id. We call it primary link.  
 - When visualized, these properties can create a one-way/two-way link between the paper and the dataset, illustrating their relationship
 
 
