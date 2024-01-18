@@ -117,6 +117,7 @@ export class PrepareData {
       const node = {
         id: item.id,
         props: [],
+        name: item.id,
         category: 'non_attribute',
       };
       primaryNodeIds.push(item.id);
@@ -141,6 +142,7 @@ export class PrepareData {
             const secondaryNode = {
               id: `${item.id}_${propValue}`,
               [propKey]: propValue,
+              name: propValue,
               category: 'attribute',
             };
             nodes.push(secondaryNode);

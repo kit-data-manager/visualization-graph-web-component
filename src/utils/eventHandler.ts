@@ -14,7 +14,7 @@ export class HandleEvents {
    */
   constructor(hostElement) {
     this.hostElement = hostElement;
-    // console.log(this.currentlyClicked, this.hostElement);
+    console.log(this.currentlyClicked, this.hostElement);
   }
 
   /**
@@ -27,13 +27,13 @@ export class HandleEvents {
       tooltip.transition().duration(200).style('opacity', 1);
 
       // Get the length of the tooltip content
-      const tooltipContent = `${d.id}`;
+      const tooltipContent = `${d.name}`;
       const textLength = tooltipContent.length * 7.3;
 
       const rectWidth = textLength + 20; // Additional padding
 
       const tooltipContentHtml = `<rect width="${rectWidth}" height="40" fill="#fff" stroke="#ccc" rx="15" ry="15"></rect>
-            <text x="10" y="25" fill="#000">${d.id}</text>`;
+            <text x="10" y="25" fill="#000">${d.name}</text>`;
 
       tooltip.html(tooltipContentHtml).style('transform', `translate(${event.pageX - 100}px, ${event.pageY - 40}px)`);
     });
