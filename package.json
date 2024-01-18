@@ -1,5 +1,5 @@
 {
-  "name": "visualization-component",
+  "name": "@kit-data-manager/visualization-component",
   "version": "0.0.1",
   "description": "Stencil Component Starter",
   "main": "dist/index.cjs.js",
@@ -12,8 +12,20 @@
   "unpkg": "dist/visualization-component/visualization-component.esm.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ionic-team/stencil-component-starter.git"
+    "url": "https://github.com/kit-data-manager/visualization-graph-web-component/"
   },
+  "homepage": "https://kit-data-manager.github.io/visualization-graph-web-component",
+  "keywords": [
+    "stencil",
+    "webcomponent",
+    "webcomponents",
+    "visualization",
+    "graph",
+    "identifier",
+    "kit-data-manager",
+    "typescript",
+    "storybook"
+  ],
   "files": [
     "dist/",
     "loader/"
