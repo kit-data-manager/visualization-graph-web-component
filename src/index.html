@@ -15,51 +15,43 @@
   <!-- <my-component included-properties="K1" excluded-properties="k1,p1,k2" visualization-mode="all"></my-component> -->
   <visualization-component data='[
   {
-    "pid": "21.T11148/b9b76f887845e32d29f7",
+    "id": "defect-001",
     "properties": {
-      "profile": "KIP",
-      "hasMetada": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
-      "isMetada": "21.11152/ba06424b-17c7",
-      "digitalObjectType":"object",
-      "digitalObjectLocation":"github",
-      "digitalObjectLocationAccessProtocol":"digitalObjectLocationAccessProtocol",
-      "license":"cc4",
-      "checksum":"md5sum",
-      "dateCreated":"24-04-2010",
-      "dataModified":"24-04-2020"
+      "type": "Vacancy",
+      "characteristic": "Missing atoms in the crystal lattice",
+      "impact": "Alters electrical and thermal properties",
+      "studiedIn": "paper-101"
     }
   },
   {
-    "pid": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
+    "id": "defect-002",
     "properties": {
-      "profile": "KIP",
-      "Licence": "cc4",
-      "digitalObjectType":"object",
-      "digitalObjectLocation":"github",
-      "digitalObjectLocationAccessProtocol":"digitalObjectLocationAccessProtocol",
-      "checksum":"md5sum",
-      "hasMetada": "21.11152/ba0",
-      "isMetada": "21.11152/ba0",
-      "dateCreated":"24-04-2010",
-      "dataModified":"24-04-2020"
+      "type": "Interstitial",
+      "characteristic": "Extra atoms positioned in the lattice",
+      "impact": "Affects mechanical strength",
+      "studiedIn": "paper-102"
     }
   },
   {
-    "pid": "21.T11148/b9b76f887845e32d29f7-8d09cf797be3",
+    "id": "paper-101"
     "properties": {
-      "profile": "KIP",
-      "Licence": "cc4",
-      "digitalObjectType":"object",
-      "digitalObjectLocation":"github",
-      "digitalObjectLocationAccessProtocol":"digitalObjectLocationAccessProtocol",
-      "checksum":"md5sum",
-      "hasMetada": "21.11152/ba06424b",
-      "isMetada": "21.11152/ba06",
-      "dateCreated":"24-04-2010",
-      "dataModified":"24-04-2020"
+      "title": "Vacancies in Silicon Crystals",
+      "author": "Dr. Emily Stone",
+      "focus": "Impact of vacancies on semiconductor behavior",
+      "relatedDefect": "defect-001"
+    }
+  },
+  {
+    "id": "paper-102",
+    "properties": {
+      "title": "Interstitial Defects in Metallic Alloys",
+      "author": "Dr. John Doe",
+      "focus": "Influence of interstitial defects on alloy strength",
+      "relatedDefect": "defect-002"
     }
   }
 ]
+
 ' size="1350px,650px" exclude-properties="" show-attributes="true" show-primary-links="true">></visualization-component>
   <script>
   </script>
