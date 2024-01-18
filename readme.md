@@ -1,8 +1,77 @@
-[![Built With Stencil](https://img.shields.io/badge/-Built%20With%20Stencil-16161d.svg?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE5LjIuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1MTIgNTEyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI%2BCjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI%2BCgkuc3Qwe2ZpbGw6I0ZGRkZGRjt9Cjwvc3R5bGU%2BCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik00MjQuNywzNzMuOWMwLDM3LjYtNTUuMSw2OC42LTkyLjcsNjguNkgxODAuNGMtMzcuOSwwLTkyLjctMzAuNy05Mi43LTY4LjZ2LTMuNmgzMzYuOVYzNzMuOXoiLz4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTQyNC43LDI5Mi4xSDE4MC40Yy0zNy42LDAtOTIuNy0zMS05Mi43LTY4LjZ2LTMuNkgzMzJjMzcuNiwwLDkyLjcsMzEsOTIuNyw2OC42VjI5Mi4xeiIvPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNDI0LjcsMTQxLjdIODcuN3YtMy42YzAtMzcuNiw1NC44LTY4LjYsOTIuNy02OC42SDMzMmMzNy45LDAsOTIuNywzMC43LDkyLjcsNjguNlYxNDEuN3oiLz4KPC9zdmc%2BCg%3D%3D&colorA=16161d&style=flat-square)](https://stenciljs.com)
-
 # Visualization Component
 
 The visualization-component is a dynamic, interactive graph component built using D3.js. It is designed to render graphs based on provided JSON data, making it ideal for visualizing complex relationships and networks in an intuitive manner. The component supports various interactive features like hover effects, node dragging, and click events to reveal connections between entities. This makes it an excellent tool for exploring and understanding intricate data relationships.
+
+## Data Format and Connection Representation
+
+The `visualization-component` requires a specific JSON data format to accurately represent and visualize relationships between entities. Here's an overview of the data format and how connections are established:
+
+### JSON Data Structure
+
+The component accepts an array of objects, where each object represents an entity with a unique identifier and a set of properties. The structure is as follows:
+
+```json
+[
+  {
+    "pid": "Unique Identifier",
+    "properties": {
+      "propertyName": "propertyValue",
+
+    }
+  },
+]
+```
+**Key Elements**
+
+- `pid`:  This unique identifier is crucial for linking entities.
+
+- `properties`: A collection of key-value pairs representing various attributes of the entity. Certain properties can be used to establish connections to other entities.
+
+
+### Example : Research Paper and Dataset
+Consider a scenario where you have two entities: a research paper and a dataset. The research paper references the dataset. Below is an example of how these entities and their relationship can be represented in JSON format for the visualization-component.
+
+**Entities**
+
+-`Research Paper`: An academic paper that cites a specific dataset.
+
+-`Dataset`: The dataset that is cited by the research paper.
+
+**JSON Data Representation**
+```
+[
+  {
+    "pid": "paper-12345",
+    "properties": {
+      "title": "Analysis of Data Patterns",
+      "author": "Dr. Jane Smith",
+      "citesDataset": "dataset-98765",
+      "publishedDate": "2021-06-15",
+      "topic": "Data Science"
+    }
+  },
+  {
+    "pid": "dataset-98765",
+    "properties": {
+      "title": "Global Data Set on Patterns",
+      "creator": "Data Institute",
+      "relatedPaper": "paper-12345",
+      "releaseDate": "2021-01-10",
+      "subject": "Data Patterns"
+    }
+  }
+]
+
+```
+
+Understanding the Relationships
+
+In this example,  
+- `The research paper` (with pid "paper-12345") cites the dataset (with pid "dataset-98765").  
+- `The property` citesDataset in the paper's properties links to the pid of the dataset, establishing a connection.  
+- Conversely, the dataset includes a relatedPaper property that references back to the paper's pid. We call it primary link.  
+- When visualized, these properties can create a one-way/two-way link between the paper and the dataset, illustrating their relationship
+
 
 ### Customization Options
 
@@ -10,8 +79,8 @@ Users can easily customize the web component by setting various properties:
 
 - `data`: Input your JSON data for graph visualization.
 - `size`: Adjust the size of the graph (default is '1350px,650px').
-- `showAttributes`: Choose to show or hide attributes in the graph. Defaults to true.
-- `showPrimaryLinks`: Choose to show primary links in the graph. If true it will show all the links between primary nodes. Defaults to true.
+- `showAttributes`: Choose to show or hide attributes(in above case properties any entity) in the graph. Defaults to true.
+- `showPrimaryLinks`: Choose to show primary links(relation between two entities). If true it will show all the links between primary nodes. Defaults to true.
 - `excludeProperties`: Specify any properties to exclude from the visualization.
 - `displayHovered`: Enable or disable hover effects on graph nodes.
 
