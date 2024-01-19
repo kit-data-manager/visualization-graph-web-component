@@ -1,8 +1,7 @@
 name: Deploy Storybook to GitHub Pages
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
 
 jobs:
   build-component:
