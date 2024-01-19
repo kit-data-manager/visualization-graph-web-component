@@ -1,3 +1,4 @@
+import { StoriesData } from '../../utils/storiesData';
 /**
  * Storybook configuration for the 'visualization-component' web component.
  * Defines different stories and their corresponding parameters.
@@ -102,7 +103,7 @@ DynamicData.args = {
   showPrimaryLinks: true,
   displayHovered: true,
   excludeProperties: '',
-  data: '[]', // Start with empty data or a default dataset
+  data: '[]', 
 };
 DynamicData.argTypes = {
   ...Default.argTypes,
@@ -112,7 +113,13 @@ DynamicData.argTypes = {
   },
 };
 
-// export const size = Template.bind({});
-// size.args = {
-//   size: "1350px,650px"
-// };
+const entityNetwork = new StoriesData();
+const entityNetworkData = entityNetwork.getData();
+// Usage example for Storybook:
+export const EntityNetworkData = Template.bind({});
+EntityNetworkData.args = {
+  showAttributes: false,
+  showPrimaryLinks: true,
+  displayHovered: true,
+  data: JSON.stringify(entityNetworkData),
+};
