@@ -26,13 +26,13 @@ export namespace Components {
          */
         "excludeProperties": string;
         /**
-          * Whether to show attributes in the graph. Defaults to true. If true it will show all the attributes/properties  If false it wont show any attributes Default value : true
+          * Whether to show attributes in the graph. Defaults to true. If true it will show all the attributes/properties If false it wont show any attributes Default value : true
           * @prop 
           * @type {boolean}
          */
         "showAttributes": boolean;
         /**
-          * Whether to show primary links in the graph.  If true it will show all the links between primary nodes Defaults to true.
+          * Whether to show primary links in the graph. If true it will show all the links between primary nodes Defaults to true.
           * @prop 
           * @type {boolean}
          */
@@ -77,13 +77,13 @@ declare namespace LocalJSX {
          */
         "excludeProperties"?: string;
         /**
-          * Whether to show attributes in the graph. Defaults to true. If true it will show all the attributes/properties  If false it wont show any attributes Default value : true
+          * Whether to show attributes in the graph. Defaults to true. If true it will show all the attributes/properties If false it wont show any attributes Default value : true
           * @prop 
           * @type {boolean}
          */
         "showAttributes"?: boolean;
         /**
-          * Whether to show primary links in the graph.  If true it will show all the links between primary nodes Defaults to true.
+          * Whether to show primary links in the graph. If true it will show all the links between primary nodes Defaults to true.
           * @prop 
           * @type {boolean}
          */
