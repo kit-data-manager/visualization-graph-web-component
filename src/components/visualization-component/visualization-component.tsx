@@ -116,7 +116,7 @@ export class VisualizationComponent {
    */
   @Watch('showAttributes')
   showAttributesChanged(newValue: boolean) {
-    console.log('showAttributesChanged called with:', newValue);
+    // console.log('showAttributesChanged called with:', newValue);
     this.dataUtil = new PrepareData(this.showPrimaryLinks, newValue);
     this.generateD3Graph(this.chartData);
   }
@@ -187,11 +187,16 @@ export class VisualizationComponent {
     const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
     const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes);
 
-    this.tooltip = svg.append('g').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute');
-
+    // this.tooltip = svg.append('g').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute');
+    this.tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0)
+    .style("position", "absolute")
+    .style("pointer-events", "none"); 
+    
     // Apply event handlers
     this.handleEvents.onClick(nodes, links);
-    if (this.displayHovered) this.handleEvents.applyMouseover(nodes, this.tooltip);
+    if (this.displayHovered) this.handleEvents.applyMouseover(nodes, links,this.tooltip);
     this.handleEvents.applyDragToNodes(nodes, simulation);
     this.handleEvents.applyClickHandler();
 

@@ -90,7 +90,7 @@ export class GraphSetup {
       .attr('opacity', '1')
       .attr('category', d => d.category)
       .attr('stroke', d => (d.category === 'non_attribute' ? colorType(d.relationType) : '#d3d3d3'))
-      .attr('stroke-dasharray', d => (d.category === 'non_attribute' ? '10, 10' : '1'))
+      // .attr('stroke-dasharray', d => (d.category === 'non_attribute' ? '10, 10' : '1'))
       .attr('marker-end', 'url(#triangle)')
       .attr('marker-start', 'url(#arrow)')
       .attr('orient', 'auto');
