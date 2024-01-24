@@ -180,6 +180,23 @@ export class VisualizationComponent {
     this.d3GraphSetup.clearSVG(svg);
 
     this.d3GraphSetup.createCustomMarkers(svg, transformedData.links, colorType);
+
+    this.d3GraphSetup.updateForceProperties({
+      center: {
+        x: 0.5, // Center position on the x-axis (0.5 for the middle of the SVG)
+        y: 0.5, // Center position on the y-axis (0.5 for the middle of the SVG)
+      },
+      charge: {
+        enabled: true,
+        strength: -10,
+        distanceMin: 40,
+        distanceMax: 2000
+      },
+      link: {
+        distance: 90, // Adjust link distance as needed
+      },
+      // Add or update additional force properties as needed
+    });
     // Create force simulation
     const simulation = this.d3GraphSetup.createForceSimulation(transformedData.nodes, transformedData.links, numericWidth, numericHeight);
 
@@ -188,15 +205,11 @@ export class VisualizationComponent {
     const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes);
 
     // this.tooltip = svg.append('g').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute');
-    this.tooltip = d3.select("body").append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0)
-    .style("position", "absolute")
-    .style("pointer-events", "none"); 
-    
+    this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
+
     // Apply event handlers
     this.handleEvents.onClick(nodes, links);
-    if (this.displayHovered) this.handleEvents.applyMouseover(nodes, links,this.tooltip);
+    if (this.displayHovered) this.handleEvents.applyMouseover(nodes, links, this.tooltip);
     this.handleEvents.applyDragToNodes(nodes, simulation);
     this.handleEvents.applyClickHandler();
 

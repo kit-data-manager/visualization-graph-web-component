@@ -22,6 +22,23 @@ export class GraphSetup {
    */
   private size: string = '1350px,650px';
 
+  private forceProperties = {
+    center: {
+      x: 0.5,
+      y: 0.5,
+    },
+    charge: {
+      enabled: true,
+      strength: -70,
+      distanceMin: 40,
+      distanceMax: 2000,
+    },
+    link: {
+      distance: 70,
+    },
+    // You can add more properties for other forces like collision if needed
+  };
+
   constructor(hostElement) {
     this.hostElement = hostElement;
   }
@@ -59,18 +76,31 @@ export class GraphSetup {
    * @returns {d3.Simulation<any, any>} - The configured force simulation.
    */
   createForceSimulation(nodes, links, numericWidth, numericHeight) {
-    return d3
+    const simulation = d3
       .forceSimulation(nodes)
       .force(
         'link',
         d3
           .forceLink(links)
-          .id(d => d.id)
-          .distance(70),
+          .id((d: any) => d.id)
+          .distance(this.forceProperties.link.distance),
       )
-      .force('charge', d3.forceManyBody().strength(-90))
-      .force('x', d3.forceX(numericWidth / 2))
-      .force('y', d3.forceY(numericHeight / 2));
+      .force(
+        'charge',
+        d3.forceManyBody().strength(this.forceProperties.charge.strength).distanceMin(this.forceProperties.charge.distanceMin).distanceMax(this.forceProperties.charge.distanceMax),
+      )
+      .force('center', d3.forceCenter(numericWidth * this.forceProperties.center.x, numericHeight * this.forceProperties.center.y));
+    return simulation;
+  }
+  updateForceProperties(newProps: { [forceName: string]: { [propName: string]: any } }) {
+    // Iterate over the object to update force properties
+    for (const forceName of Object.keys(newProps)) {
+      for (const propName of Object.keys(newProps[forceName])) {
+        if (this.forceProperties[forceName]) {
+          this.forceProperties[forceName][propName] = newProps[forceName][propName];
+        }
+      }
+    }
   }
 
   /**
@@ -81,19 +111,21 @@ export class GraphSetup {
    * @returns {d3.Selection} - The created link elements.
    */
   createLinks(svg, links, colorType) {
-    return svg
-      .selectAll('.link')
-      .data(links)
-      .enter()
-      .append('line')
-      .attr('stroke-opacity', 1)
-      .attr('opacity', '1')
-      .attr('category', d => d.category)
-      .attr('stroke', d => (d.category === 'non_attribute' ? colorType(d.relationType) : '#d3d3d3'))
-      // .attr('stroke-dasharray', d => (d.category === 'non_attribute' ? '10, 10' : '1'))
-      .attr('marker-end', 'url(#triangle)')
-      .attr('marker-start', 'url(#arrow)')
-      .attr('orient', 'auto');
+    return (
+      svg
+        .selectAll('.link')
+        .data(links)
+        .enter()
+        .append('line')
+        .attr('stroke-opacity', 1)
+        .attr('opacity', '1')
+        .attr('category', d => d.category)
+        .attr('stroke', d => (d.category === 'non_attribute' ? colorType(d.relationType) : '#d3d3d3'))
+        // .attr('stroke-dasharray', d => (d.category === 'non_attribute' ? '10, 10' : '1'))
+        .attr('marker-end', 'url(#triangle)')
+        .attr('marker-start', 'url(#arrow)')
+        .attr('orient', 'auto')
+    );
   }
 
   /**
