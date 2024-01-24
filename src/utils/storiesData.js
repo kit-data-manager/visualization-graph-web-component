@@ -1,6 +1,6 @@
 export class StoriesData {
     constructor() {
-      this.data = [
+      this.networkData = [
         {
           id: 'Michael Jackson',
           properties: {
@@ -61,8 +61,8 @@ export class StoriesData {
       
     }
   
-    getData() {
-      return this.data;
+    getNetworkData() {
+      return this.networkData;
     }
   }
   

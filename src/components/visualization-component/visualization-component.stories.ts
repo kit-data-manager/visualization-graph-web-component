@@ -114,7 +114,7 @@ DynamicData.argTypes = {
 };
 
 const entityNetwork = new StoriesData();
-const entityNetworkData = entityNetwork.getData();
+const entityNetworkData = entityNetwork.getNetworkData();
 // Usage example for Storybook:
 export const EntityNetworkData = Template.bind({});
 EntityNetworkData.args = {
