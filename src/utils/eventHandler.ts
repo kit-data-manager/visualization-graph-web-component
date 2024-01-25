@@ -66,7 +66,7 @@ export class HandleEvents {
 
       // tooltip.html(tooltipContentHtml).style('transform', `translate(${event.pageX - 100}px, ${event.pageY - 40}px)`);
 
-      this.currentlyClicked = hoveredNode.node();
+      // this.currentlyClicked = hoveredNode.node();
     };
 
     const handleNodeMouseout = () => {
@@ -87,8 +87,8 @@ export class HandleEvents {
   }
   clearSelection() {
     if (!this.currentlyClicked) {
-      d3.selectAll('.node').attr('opacity', 1).attr('stroke', null);
-      d3.selectAll('.link').attr('stroke-opacity', 0.2);
+      d3.selectAll('.node').attr('opacity', 1).attr('stroke', null).classed('selected', false);
+      d3.selectAll('.link').attr('stroke-opacity', 0.2).classed('connected', false);
     }
   }
 
@@ -107,17 +107,19 @@ export class HandleEvents {
     }
 
     this.currentlyClicked = event.currentTarget; // Store clicked node reference
-
+    // Mark the clicked node
+    d3.select(this.currentlyClicked).classed('selected', true);
     // Logic to highlight the clicked node and its connected nodes
     d3.select(this.currentlyClicked).attr('stroke', '#FFA500').attr('opacity', 1);
     links.each(function (l) {
       const isConnected = (l.source.id === d.id || l.target.id === d.id) && l.category === 'non_attribute';
       if (isConnected) {
-        d3.select(this).attr('stroke-opacity', 1);
+        d3.select(this).attr('stroke-opacity', 1).classed('connected', true);
         nodes
           .filter(n => n.id === l.source.id || n.id === l.target.id)
           .attr('opacity', 1)
-          .attr('stroke', '#FFA500');
+          .attr('stroke', '#FFA500')
+          .classed('connected', true);
       }
     });
   }
