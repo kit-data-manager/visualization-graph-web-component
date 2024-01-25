@@ -204,4 +204,102 @@ export class GraphSetup {
     };
     simulation.on('tick', ticked);
   }
+
+  //Legend stationary attemp
+  /**
+   * Creates a legend for the node colors in the graph.
+   *
+   * @param {d3.Selection} svg - The SVG element to which the legend will be appended.
+   * @param {d3.ScaleOrdinal<string, string>} attributeColorScale - The color scale for attribute nodes.
+   * @param {string[]} uniqueAttributeNames - The unique attribute names used in the color scale.
+   * @param {string} primaryNodeColor - The color used for primary nodes.
+   */
+  // createNodeLegend(svg, attributeColorScale, uniqueAttributeNames, primaryNodeColor) {
+    
+  //   const legend = svg.append('g')
+  //     .attr('class', 'legend')
+  //     .attr('transform', 'translate(1220,320)'); // Adjust the position as needed
+
+  //   // Adding primary node color to the legend
+  //   legend.append('circle')
+  //     .attr('cx', 0)
+  //     .attr('cy', 0)
+  //     .attr('r', 5)
+  //     .style('fill', primaryNodeColor);
+  //   legend.append('text')
+  //     .attr('x', 20)
+  //     .attr('y', 0)
+  //     .attr('dy', '0.35em')
+  //     .text('Primary Node');
+
+  //   // Adding attribute colors to the legend
+  //   uniqueAttributeNames.forEach((attr, index) => {
+  //     const color = attributeColorScale(attr);
+  //     const yPosition = (index + 1) * 20; // Adjust spacing
+
+  //     legend.append('circle')
+  //       .attr('cx', 0)
+  //       .attr('cy', yPosition)
+  //       .attr('r', 5)
+  //       .style('fill', color);
+
+  //     legend.append('text')
+  //       .attr('x', 20)
+  //       .attr('y', yPosition)
+  //       .attr('dy', '0.35em')
+  //       .text(attr);
+  //   });
+  // }
+
+  //Scrollable legend attempt
+  createNodeLegend(svg, attributeColorScale, uniqueAttributeNames, primaryNodeColor) {
+    const svgWidth = parseInt(svg.style('width'));
+    const rightOffset = 50;
+    const legendX = svgWidth - rightOffset;
+    
+    // Set a fixed size for the legend area and make it scrollable
+    const legendHeight = 200; // Adjust as needed
+    const legendWidth = 250;  // Adjust as needed
+
+    // Create a container for the scrollable legend
+    const legendContainer = svg.append('foreignObject')
+      .attr('x', legendX - legendWidth)
+      .attr('y', 420)
+      .attr('width', legendWidth)
+      .attr('height', legendHeight)
+      .append('xhtml:div')
+      .style('overflow', 'auto')
+      .style('height', `${legendHeight}px`);
+
+    const legend = legendContainer.append('div')
+      .style('cursor', 'pointer');
+
+    // Add primary node color to the legend
+    this.addLegendItem(legend, primaryNodeColor, 'Primary Node');
+
+    // Add attribute colors to the legend
+    uniqueAttributeNames.forEach(attr => {
+      const color = attributeColorScale(attr);
+      this.addLegendItem(legend, color, attr);
+    });
+  }
+
+  // Helper method to add items to the legend
+  addLegendItem(legend, color, label) {
+    const item = legend.append('div').style('display', 'flex').style('align-items', 'center').style('margin-bottom', '5px');
+    
+    item.append('svg')
+      .attr('width', 20)
+      .attr('height',20)
+      .append('circle')
+      .attr('cx', 5)
+      .attr('cy', 5)
+      .attr('r', 5)
+      .style('fill', color);
+
+    item.append('span')
+      .style('margin-left', '10px')
+      .text(label);
+  }
+  
 }

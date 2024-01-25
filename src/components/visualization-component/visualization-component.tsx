@@ -181,6 +181,18 @@ export class VisualizationComponent {
 
     this.d3GraphSetup.createCustomMarkers(svg, transformedData.links, colorType);
 
+    //Legend:
+    // Extract unique attribute names
+    const uniqueAttributeNames = Array.from(new Set(transformedData.nodes.filter(node => node.category === 'attribute').map(node => Object.keys(node)[1])));
+    const attributeColorScale = d3.scaleOrdinal(uniqueAttributeNames, d3.schemeCategory10);
+
+    // The color for primary nodes
+    const primaryNodeColor = '#006400'; // Or any other color you use for primary nodes
+    // Create the node legend
+    this.d3GraphSetup.createNodeLegend(svg, attributeColorScale, uniqueAttributeNames, primaryNodeColor);
+
+    //
+
     this.d3GraphSetup.updateForceProperties({
       center: {
         x: 0.5, // Center position on the x-axis (0.5 for the middle of the SVG)
@@ -190,7 +202,7 @@ export class VisualizationComponent {
         enabled: true,
         strength: -10,
         distanceMin: 40,
-        distanceMax: 2000
+        distanceMax: 2000,
       },
       link: {
         distance: 90, // Adjust link distance as needed
