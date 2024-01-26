@@ -15,44 +15,51 @@
   <!-- <my-component included-properties="K1" excluded-properties="k1,p1,k2" visualization-mode="all"></my-component> -->
   <visualization-component data='[
   {
-    "id": "defect-001",
+    "id": "AtomicScaleSample",
     "properties": {
-      "type": "Vacancy",
-      "characteristic": "Missing atoms in the crystal lattice",
-      "impact": "Alters electrical and thermal properties",
-      "studiedIn": "paper-101"
+      "hasNumberofAtoms": "Total Atoms: 123",
+      "subclassOf": "SubclassOf: NanoscaleSample"
     }
   },
   {
-    "id": "defect-002",
+    "id": "SimulationCell",
     "properties": {
-      "type": "Interstitial",
-      "characteristic": "Extra atoms positioned in the lattice",
-      "impact": "Affects mechanical strength",
-      "studiedIn": "paper-102"
+      "hasAttribute": "AtomicScaleSample",
+      "hasVolume": "Volume= 250.5",
+      "hasRepetition_x": "RepetitionX= 5"
     }
   },
   {
-    "id": "paper-101"
+    "id": "Atom",
     "properties": {
-      "title": "Vacancies in Silicon Crystals",
-      "author": "Dr. Emily Stone",
-      "focus": "Impact of vacancies on semiconductor behavior",
-      "relatedDefect": "defect-001"
+      "hasPath": "path/to/data",
+      "subclassOf": "Subclass of: AtomicScaleSample"
     }
   },
   {
-    "id": "paper-102",
+    "id": "Element",
     "properties": {
-      "title": "Interstitial Defects in Metallic Alloys",
-      "author": "Dr. John Doe",
-      "focus": "Influence of interstitial defects on alloy strength",
-      "relatedDefect": "defect-002"
+      "hasSymbol": "Symbol: He",
+      "hasElementRatio": "ElementRation= 0.982"
+    }
+  },
+  {
+    "id": "UnitCell",
+    "properties": {
+      "hasBravaisLattice": "FCC",
+      "hasLength_x": "XLength= 2.5"
+    }
+  },
+  {
+    "id": "LatticeParameter",
+    "properties": {
+      "hasLength_x": "XLength= 2.5",
+      "subclassOf": "Subclass of: UnitCell"
     }
   }
 ]
 
-' size="1350px,650px" exclude-properties="" show-attributes="true" show-primary-links="true">></visualization-component>
+' size="1350px,650px" exclude-properties="hasLength_x" show-attributes="true" show-primary-links="true">></visualization-component>
   <script>
   </script>
 </body>
