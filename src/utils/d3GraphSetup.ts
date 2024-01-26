@@ -111,21 +111,30 @@ export class GraphSetup {
    * @returns {d3.Selection} - The created link elements.
    */
   createLinks(svg, links, colorType) {
-    return (
-      svg
-        .selectAll('.link')
-        .data(links)
-        .enter()
-        .append('line')
-        .attr('stroke-opacity', 1)
-        .attr('opacity', '1')
-        .attr('category', d => d.category)
-        .attr('stroke', d => (d.category === 'non_attribute' ? colorType(d.relationType) : '#d3d3d3'))
-        // .attr('stroke-dasharray', d => (d.category === 'non_attribute' ? '10, 10' : '1'))
-        .attr('marker-end', 'url(#triangle)')
-        .attr('marker-start', 'url(#arrow)')
-        .attr('orient', 'auto')
-    );
+    // Create a group for each link
+    const linkGroup = svg.selectAll('.link').data(links).enter().append('g').attr('class', 'link');
+
+    // Append the line to each group
+    linkGroup
+      .append('line')
+      .attr('stroke-opacity', 1)
+      .attr('opacity', '1')
+      .attr('stroke', d => (d.category === 'non_attribute' ? colorType(d.relationType) : '#d3d3d3'))
+      .attr('marker-end', d => `url(#arrowhead-${d.relationType})`) // Add arrow marker
+      .attr('marker-start', d => `url(#arrowtail-${d.relationType})`)
+      .attr('stroke-dasharray', d => d.relationType === 'someType' ? '0, 5' : 'none') // Adjust condition as per your data
+
+
+    // Append the text to each group
+    linkGroup
+      .append('text')
+      .text(d => d.relationType) // Replace 'type' with the name of the property in your data
+      .attr('fill', 'black') // Style as needed
+      .attr('font-size', 3)
+      .attr('text-anchor', 'middle')
+      .attr('dy', -5); // Offset from the line
+
+    return linkGroup;
   }
 
   /**
@@ -162,11 +171,35 @@ export class GraphSetup {
   createCustomMarkers(svg, links, colorType) {
     let defs = svg.append('defs');
     let set = [...new Set(links.filter(d => d.category === 'non_attribute').map(d => d.relationType))];
+
     set.forEach(elem => {
-      // Marker for line end (arrowhead)
-      this.createMarker(defs, `marker-end-${elem}`, colorType(elem));
-      // Marker for line start (reverse arrowhead)
-      this.createMarker(defs, `marker-start-${elem}`, colorType(elem));
+      // Marker for the end of the link (arrowhead)
+      defs
+        .append('svg:marker')
+        .attr('id', `arrowhead-${elem}`)
+        .attr('viewBox', '0 -5 10 10')
+        .attr('refX', 28)
+        .attr('refY', 0)
+        .attr('markerWidth', 6)
+        .attr('markerHeight', 6)
+        .attr('orient', 'auto')
+        .append('path')
+        .attr('d', 'M0,-5L10,0L0,5')
+        .attr('fill', colorType(elem));
+
+      // Marker for the start of the link (reverse arrowhead)
+      defs
+        .append('svg:marker')
+        .attr('id', `arrowtail-${elem}`)
+        .attr('viewBox', '0 -5 10 10')
+        .attr('refX', -18) // Adjust for positioning the tail
+        .attr('refY', 0)
+        .attr('markerWidth', 6)
+        .attr('markerHeight', 6)
+        .attr('orient', 'auto')
+        .append('path')
+        .attr('d', 'M10,-5L0,0L10,5')
+        .attr('fill', colorType(elem));
     });
   }
 
@@ -195,13 +228,20 @@ export class GraphSetup {
   applySimulation(nodes, links, simulation) {
     const ticked = () => {
       links
+        .select('line')
         .attr('x1', d => d.source.x)
         .attr('y1', d => d.source.y)
         .attr('x2', d => d.target.x)
         .attr('y2', d => d.target.y);
 
+      links
+        .select('text')
+        .attr('x', d => (d.source.x + d.target.x) / 2)
+        .attr('y', d => (d.source.y + d.target.y) / 2);
+
       nodes.attr('cx', d => d.x).attr('cy', d => d.y);
     };
+
     simulation.on('tick', ticked);
   }
 
@@ -215,7 +255,7 @@ export class GraphSetup {
    * @param {string} primaryNodeColor - The color used for primary nodes.
    */
   // createNodeLegend(svg, attributeColorScale, uniqueAttributeNames, primaryNodeColor) {
-    
+
   //   const legend = svg.append('g')
   //     .attr('class', 'legend')
   //     .attr('transform', 'translate(1220,320)'); // Adjust the position as needed
@@ -256,13 +296,14 @@ export class GraphSetup {
     const svgWidth = parseInt(svg.style('width'));
     const rightOffset = 50;
     const legendX = svgWidth - rightOffset;
-    
+
     // Set a fixed size for the legend area and make it scrollable
     const legendHeight = 200; // Adjust as needed
-    const legendWidth = 250;  // Adjust as needed
+    const legendWidth = 250; // Adjust as needed
 
     // Create a container for the scrollable legend
-    const legendContainer = svg.append('foreignObject')
+    const legendContainer = svg
+      .append('foreignObject')
       .attr('x', legendX - legendWidth)
       .attr('y', 420)
       .attr('width', legendWidth)
@@ -271,8 +312,7 @@ export class GraphSetup {
       .style('overflow', 'auto')
       .style('height', `${legendHeight}px`);
 
-    const legend = legendContainer.append('div')
-      .style('cursor', 'pointer');
+    const legend = legendContainer.append('div').style('cursor', 'pointer');
 
     // Add primary node color to the legend
     this.addLegendItem(legend, primaryNodeColor, 'Primary Node');
@@ -287,19 +327,11 @@ export class GraphSetup {
   // Helper method to add items to the legend
   addLegendItem(legend, color, label) {
     const item = legend.append('div').style('display', 'flex').style('align-items', 'center').style('margin-bottom', '5px');
-    
-    item.append('svg')
-      .attr('width', 20)
-      .attr('height',20)
-      .append('circle')
-      .attr('cx', 5)
-      .attr('cy', 5)
-      .attr('r', 5)
-      .style('fill', color);
 
-    item.append('span')
-      .style('margin-left', '10px')
-      .text(label);
+    item.append('svg').attr('width', 20).attr('height', 20).append('circle').attr('cx', 5).attr('cy', 5).attr('r', 5).style('fill', color);
+
+    item.append('span').style('margin-left', '10px').text(label);
   }
-  
+
+  //link type texxt to be didsplayed :
 }

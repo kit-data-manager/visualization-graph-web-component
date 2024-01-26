@@ -172,7 +172,7 @@ export class VisualizationComponent {
     const excludeProperties = this.excludeProperties.split(',');
     let transformedData = this.dataUtil.transformData(defaultComponentData, excludeProperties);
 
-    // Set up color scale
+    // Set up color scale for links
     const colorType = d3.scaleOrdinal(transformedData.links.map(d => d.relationType).sort(d3.ascending), d3.schemeCategory10);
 
     // Initialize SVG and graph setup
