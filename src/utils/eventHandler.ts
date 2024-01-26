@@ -28,8 +28,8 @@ export class HandleEvents {
       if (this.currentlyClicked === event.currentTarget) return; // Ignore if this node is clicked
       this.clearSelection();
 
-      // Reduce the visibility of all nodes and links
-      links.attr('stroke-opacity', 0.25);
+      // Reduce the visibility of all nodes and links except the text on the links
+      links.selectAll('line').attr('stroke-opacity', 0.25); // Affect only the line part of the link
       nodes.attr('opacity', 0.25);
       const hoveredNode = d3.select(event.currentTarget);
       hoveredNode.attr('stroke', '#FFA500').attr('opacity', 1);
@@ -37,7 +37,8 @@ export class HandleEvents {
       links.each(function (l) {
         const isConnected = (l.source.id === d.id || l.target.id === d.id) && l.category === 'non_attribute';
         if (isConnected) {
-          d3.select(this).attr('stroke-opacity', 1);
+          d3.select(this).select('line').attr('stroke-opacity', 1); // Affect only the line part of the link
+          d3.select(this).select('text').attr('opacity', 1); // Keep text fully opaque
           nodes
             .filter(n => n.id === l.source.id || n.id === l.target.id)
             .attr('opacity', 1)
@@ -115,6 +116,8 @@ export class HandleEvents {
       const isConnected = (l.source.id === d.id || l.target.id === d.id) && l.category === 'non_attribute';
       if (isConnected) {
         d3.select(this).attr('stroke-opacity', 1).classed('connected', true);
+        d3.select(this).select('line').attr('stroke-opacity', 1); // Affect only the line part of the link
+        d3.select(this).select('text').attr('opacity', 1); // Keep text fully opaque
         nodes
           .filter(n => n.id === l.source.id || n.id === l.target.id)
           .attr('opacity', 1)
