@@ -97,7 +97,7 @@ git clone https://github.com/kit-data-manager/visualization-graph-web-component.
 
 ```
 
-and run:
+and run:(Before running below command make sure node.js is installed in your system. You can check if it is there is your system or not by command: node -v or node --version (dependending on the operating system you are using) in your command prompt.
 
 ```bash
 npm install
