@@ -63,6 +63,19 @@ export class GraphSetup {
     svg.attr('width', width).attr('height', height).attr('marker-end', 'url(#arrow)');
     const numericWidth = parseInt(width, 10);
     const numericHeight = parseInt(height, 10);
+
+    // Create a container group for all graph elements
+    const container = svg.append('g').attr('class', 'zoom-container');
+
+    // Set up zoom behavior
+    const zoom = d3
+      .zoom()
+      .scaleExtent([0.5, 10]) // Adjust scale extent as needed
+      .on('zoom', event => {
+        container.attr('transform', event.transform);
+      });
+
+    svg.call(zoom);
     return { svg, numericWidth, numericHeight };
   }
 
@@ -122,8 +135,7 @@ export class GraphSetup {
       .attr('stroke', d => (d.category === 'non_attribute' ? colorType(d.relationType) : '#d3d3d3'))
       .attr('marker-end', d => `url(#arrowhead-${d.relationType})`) // Add arrow marker
       .attr('marker-start', d => `url(#arrowtail-${d.relationType})`)
-      .attr('stroke-dasharray', d => d.relationType === 'someType' ? '0, 5' : 'none') // Adjust condition as per your data
-
+      .attr('stroke-dasharray', d => (d.relationType === 'someType' ? '0, 5' : 'none')); // Adjust condition as per your data
 
     // Append the text to each group
     linkGroup
