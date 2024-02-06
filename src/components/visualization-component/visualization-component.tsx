@@ -68,6 +68,8 @@ export class VisualizationComponent {
    */
   @Prop() displayHovered: boolean = true;
 
+  @Prop() showLegend: boolean= true;
+
   private tooltip;
   public chartData: any;
   /**
@@ -189,7 +191,7 @@ export class VisualizationComponent {
     // The color for primary nodes
     const primaryNodeColor = '#008080'; // Or any other color you use for primary nodes
     // Create the node legend
-    this.d3GraphSetup.createNodeLegend(svg, attributeColorScale, uniqueAttributeNames, primaryNodeColor);
+    this.d3GraphSetup.createNodeLegend(svg, attributeColorScale, uniqueAttributeNames, primaryNodeColor,this.showLegend);
 
     //
 

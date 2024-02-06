@@ -306,7 +306,10 @@ export class GraphSetup {
   // }
 
   //Scrollable legend attempt
-  createNodeLegend(svg, attributeColorScale, uniqueAttributeNames, primaryNodeColor) {
+  createNodeLegend(svg, attributeColorScale, uniqueAttributeNames, primaryNodeColor, showLegend) {
+    if (!showLegend) {
+      return; // Do not create the legend if showLegend is false
+    }
     const svgWidth = parseInt(svg.style('width'));
     const rightOffset = 50;
     const legendX = svgWidth - rightOffset;
