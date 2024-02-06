@@ -187,7 +187,7 @@ export class VisualizationComponent {
     const attributeColorScale = d3.scaleOrdinal(uniqueAttributeNames, d3.schemeCategory10);
 
     // The color for primary nodes
-    const primaryNodeColor = '#006400'; // Or any other color you use for primary nodes
+    const primaryNodeColor = '#008080'; // Or any other color you use for primary nodes
     // Create the node legend
     this.d3GraphSetup.createNodeLegend(svg, attributeColorScale, uniqueAttributeNames, primaryNodeColor);
 
@@ -214,7 +214,7 @@ export class VisualizationComponent {
 
     // Create links and nodes
     const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
-    const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes);
+    const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, primaryNodeColor);
 
     // this.tooltip = svg.append('g').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute');
     this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
