@@ -53,21 +53,6 @@ export class HandleEvents {
         .style('opacity', 1) // Make tooltip visible
         .style('left', `${event.pageX + 10}px`) // Position right of the cursor
         .style('top', `${event.pageY - 10}px`); // Position above the cursor
-
-      // tooltip.transition().duration(200).style('opacity', 1);
-
-      // Get the length of the tooltip content
-      // const tooltipContent = `${d.name}`;
-      // const textLength = tooltipContent.length * 7.3;
-
-      // const rectWidth = textLength + 20; // Additional padding
-
-      // const tooltipContentHtml = `<rect width="${rectWidth}" height="40" fill="#fff" stroke="#ccc" rx="15" ry="15"></rect>
-      //       <text x="10" y="25" fill="#000">${d.name}</text>`;
-
-      // tooltip.html(tooltipContentHtml).style('transform', `translate(${event.pageX - 100}px, ${event.pageY - 40}px)`);
-
-      // this.currentlyClicked = hoveredNode.node();
     };
 
     const handleNodeMouseout = () => {
@@ -84,8 +69,10 @@ export class HandleEvents {
 
     nodes.on('mouseover', (event, d) => handleNodeMouseover(event, d));
     nodes.on('mouseout', handleNodeMouseout);
-    // nodes.on('click', (event, d) => handleNodeClick(event, d));
   }
+  /**
+   * Clears the current selection by resetting node and link styles.
+   */
   clearSelection() {
     if (!this.currentlyClicked) {
       d3.selectAll('.node').attr('opacity', 1).attr('stroke', null).classed('selected', false);

@@ -22,6 +22,16 @@ export class GraphSetup {
    */
   private size: string = '1350px,650px';
 
+  /**
+ * Default force properties for the graph simulation.
+ *
+ * @private
+ * @type {{
+ *   center: { x: number, y: number },
+  *   charge: { enabled: boolean, strength: number, distanceMin: number, distanceMax: number },
+  *   link: { distance: number }
+  * }}
+  */ 
   private forceProperties = {
     center: {
       x: 0.5,
@@ -36,7 +46,6 @@ export class GraphSetup {
     link: {
       distance: 70,
     },
-    // You can add more properties for other forces like collision if needed
   };
 
   constructor(hostElement) {
@@ -105,6 +114,12 @@ export class GraphSetup {
       .force('center', d3.forceCenter(numericWidth * this.forceProperties.center.x, numericHeight * this.forceProperties.center.y));
     return simulation;
   }
+
+/**
+ * Updates the force simulation properties.
+ *
+ * @param {{ [forceName: string]: { [propName: string]: any } }} newProps - The new properties to update.
+ */
   updateForceProperties(newProps: { [forceName: string]: { [propName: string]: any } }) {
     // Iterate over the object to update force properties
     for (const forceName of Object.keys(newProps)) {
@@ -115,6 +130,14 @@ export class GraphSetup {
       }
     }
   }
+
+/**
+ * Sets up attribute color mapping based on provided configurations if not provided then default colors.
+ *
+ * @param {string[]} uniqueAttributeNames - The unique attribute names.
+ * @param {any[]} parsedConfig - The parsed configuration data.
+ * @returns {{ attributeColorMap: Map<string, string>, attributeColorScale: d3.ScaleOrdinal<string, string> }} - The attribute color map and scale.
+ */
   attributeColorSetup(uniqueAttributeNames,parsedConfig){
     // Prepare attribute color mapping based on config
     let attributeColorMap = new Map();
@@ -199,7 +222,13 @@ export class GraphSetup {
       .attr('stroke', '#fff')
       .attr('stroke-width', 1.5);
   }
-
+  /**
+ * Creates custom markers for links based on their types.
+ *
+ * @param {d3.Selection} svg - The SVG element.
+ * @param {any[]} links - The array of link data.
+ * @param {(type: string) => string} colorType - Function to retrieve color based on link type.
+ */
   createCustomMarkers(svg, links, colorType) {
     let defs = svg.append('defs');
     let set = [...new Set(links.filter(d => d.category === 'non_attribute').map(d => d.relationType))];
@@ -234,7 +263,13 @@ export class GraphSetup {
         .attr('fill', colorType(elem));
     });
   }
-
+/**
+ * Creates a custom marker for use in SVG definitions.
+ *
+ * @param {SVGDefsElement} defs - The SVG definitions element.
+ * @param {string} id - The ID of the marker.
+ * @param {string} color - The color of the marker.
+ */
   createMarker(defs, id, color) {
     defs
       .append('svg:marker')
@@ -276,22 +311,16 @@ export class GraphSetup {
 
     simulation.on('tick', ticked);
   }
-
-  //Legend stationary attemp
-  /**
-   * Creates a legend for the node colors in the graph.
-   *
-   * @param {d3.Selection} svg - The SVG element to which the legend will be appended.
-   * @param {d3.ScaleOrdinal<string, string>} attributeColorScale - The color scale for attribute nodes.
-   * @param {string[]} uniqueAttributeNames - The unique attribute names used in the color scale.
-   * @param {string} primaryNodeColor - The color used for primary nodes.
-   */
-
+/**
+ * Prepares legend data based on provided configurationsif not provided then by defualt colors.
+ *
+ * @param {string[]} uniqueAttributeNames - The unique attribute names.
+ * @param {any[]} config - The legend configuration data.
+ * @param {d3.ScaleOrdinal<string, string>} attributeColorScale - The attribute color scale.
+ * @returns {any[]} - The prepared legend data.
+ */
   prepareLegend(uniqueAttributeNames, config, attributeColorScale) {
-    // Add a check to ensure legendConfig is an array; if not, default to an empty array
     const userConfigs = Array.isArray(config) ? config : [];
-
-    // Check if config is empty; if so, use uniqueAttributeNames directly
     if (userConfigs.length === 0) {
       return uniqueAttributeNames.map(attributeName => ({
         label: attributeName,
@@ -300,9 +329,7 @@ export class GraphSetup {
       }));
     }
     return uniqueAttributeNames.map(attributeName => {
-      // console.log('attributeName', attributeName)
       const customConfig = userConfigs.find(config => config.attributeKey === attributeName);
-      // console.log('customConfig', customConfig)
       return {
         label: customConfig ? customConfig.label : attributeName,
         color: customConfig ? customConfig.color : attributeColorScale(attributeName) || '#defaultColor',
@@ -310,7 +337,15 @@ export class GraphSetup {
       };
     });
   }
-
+/**
+ * Creates a legend for nodes in the graph.
+ *
+ * @param {d3.Selection} svg - The SVG element.
+ * @param {string} primaryNodeColor - The color for primary nodes.
+ * @param {boolean} showLegend - Whether to display the legend.
+ * @param {any[]} legendConfigurations - The legend configurations.
+ * @param {Map<string, string>} attributeColorMap - The attribute color map.
+ */
   createNodeLegend(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap) {
     if (!showLegend) {
       return; // Do not create the legend if showLegend is false
@@ -320,8 +355,8 @@ export class GraphSetup {
     const legendX = svgWidth - rightOffset;
 
     // Set a fixed size for the legend area and make it scrollable
-    const legendHeight = 200; // Adjust as needed
-    const legendWidth = 250; // Adjust as needed
+    const legendHeight = 200; 
+    const legendWidth = 250; 
 
     // Create a container for the scrollable legend
     const legendContainer = svg
@@ -345,8 +380,14 @@ export class GraphSetup {
     });
   }
 
-  // Helper method to add items to the legend
-  // Adjust the method to include a size parameter
+/**
+ * Adds an item to the legend with the specified color, label, and size.
+ *
+ * @param {HTMLElement} legend - The legend container element.
+ * @param {string} color - The color of the legend item.
+ * @param {string} label - The label for the legend item.
+ * @param {number} size - The size of the legend item.
+ */
   addLegendItem(legend, color, label, size) {
     const item = legend.append('div').style('display', 'flex').style('align-items', 'center').style('margin-bottom', '10px'); // Increase spacing if needed
 
@@ -361,7 +402,6 @@ export class GraphSetup {
       .attr('r', size) // Use the dynamic size for the circle
       .style('fill', color);
 
-    // Adjust text to include information about the node
     item.append('span').style('margin-left', '10px').text(label); // The label already describes the node
   }
 }

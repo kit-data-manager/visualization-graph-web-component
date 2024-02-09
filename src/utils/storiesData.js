@@ -1,4 +1,10 @@
+/**
+ * Class responsible for providing data for stories.
+ */ 
 export class StoriesData {
+  /**
+   * Initializes an instance of StoriesData with pre-defined network data.
+   */  
     constructor() {
       this.networkData = [
         {

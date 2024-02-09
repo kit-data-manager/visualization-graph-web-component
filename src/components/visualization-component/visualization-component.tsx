@@ -9,7 +9,7 @@ import { HandleEvents } from '../../utils/eventHandler';
   shadow: true,
 })
 /**
- * MyComponent is a custom web component that creates an interactive, force-directed graph
+ * VisualizationComponent is a custom web component that creates an interactive, force-directed graph
  * using D3.js. It visualizes nodes and links based on provided JSON data.
  */
 export class VisualizationComponent {
@@ -68,13 +68,27 @@ export class VisualizationComponent {
    */
   @Prop() displayHovered: boolean = true;
 
+  /**
+   * Whether to show the legend in the graph. Defaults to true.
+   *
+   * @prop
+   * @type {boolean}
+   */
   @Prop() showLegend: boolean = true;
-
+   
+   /**
+   * The configuration object for customizing the graph color, and legend.
+   *
+   * @prop
+   * @type {any}
+   */
   @Prop() config: any;
 
   private tooltip;
   public chartData: any;
   public parsedConfig: any;
+  public primaryNodeColor = '#008080';
+
   /**
    * Declare a private instance variable of the 'PrepareData' class.
    * It is used for preparing or processing data for the chart.
@@ -126,6 +140,13 @@ export class VisualizationComponent {
     this.generateD3Graph(this.chartData);
   }
 
+  /**
+   * Callback invoked when the 'showPrimaryLinks' property changes.
+   * Updates the data utility and regenerates the D3 graph.
+   *
+   * @watch
+   * @param {boolean} newValue - The new value of 'showPrimaryLinks'.
+   */
   @Watch('showPrimaryLinks')
   showPrimaryLinksChanged(newValue: boolean) {
     this.dataUtil = new PrepareData(newValue, this.showAttributes);
@@ -200,10 +221,9 @@ export class VisualizationComponent {
     const { attributeColorMap, attributeColorScale } = this.d3GraphSetup.attributeColorSetup(uniqueAttributeNames, this.parsedConfig);
 
     // The color for primary nodes
-    const primaryNodeColor = '#008080';
     const legendConfigurations = this.d3GraphSetup.prepareLegend(uniqueAttributeNames, this.parsedConfig, attributeColorScale);
     // Create the node legend
-    this.d3GraphSetup.createNodeLegend(svg, primaryNodeColor, this.showLegend, legendConfigurations, attributeColorMap);
+    this.d3GraphSetup.createNodeLegend(svg, this.primaryNodeColor, this.showLegend, legendConfigurations, attributeColorMap);
     this.d3GraphSetup.updateForceProperties({
       center: {
         x: 0.5, // Center position on the x-axis (0.5 for the middle of the SVG)
@@ -225,7 +245,7 @@ export class VisualizationComponent {
 
     // Create links and nodes
     const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
-    const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, primaryNodeColor, attributeColorMap);
+    const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, this.primaryNodeColor, attributeColorMap);
 
     // this.tooltip = svg.append('g').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute');
     this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
