@@ -7,6 +7,7 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface VisualizationComponent {
+        "config": any;
         /**
           * Input data in JSON format for the graph.
           * @prop 
@@ -31,6 +32,7 @@ export namespace Components {
           * @type {boolean}
          */
         "showAttributes": boolean;
+        "showLegend": boolean;
         /**
           * Whether to show primary links in the graph. If true it will show all the links between primary nodes Defaults to true.
           * @prop 
@@ -58,6 +60,7 @@ declare global {
 }
 declare namespace LocalJSX {
     interface VisualizationComponent {
+        "config"?: any;
         /**
           * Input data in JSON format for the graph.
           * @prop 
@@ -82,6 +85,7 @@ declare namespace LocalJSX {
           * @type {boolean}
          */
         "showAttributes"?: boolean;
+        "showLegend"?: boolean;
         /**
           * Whether to show primary links in the graph. If true it will show all the links between primary nodes Defaults to true.
           * @prop 

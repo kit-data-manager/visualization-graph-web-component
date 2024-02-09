@@ -115,7 +115,26 @@ export class GraphSetup {
       }
     }
   }
+  attributeColorSetup(uniqueAttributeNames,parsedConfig){
+    // Prepare attribute color mapping based on config
+    let attributeColorMap = new Map();
+    const defaultColorScale = d3.scaleOrdinal(d3.schemeCategory10);
+    uniqueAttributeNames.forEach(attributeName => {
+      const configItem = parsedConfig.find(item => item.attributeKey === attributeName);
+      if (configItem && configItem.color) {
+        // Use color from config if available
+        attributeColorMap.set(attributeName, configItem.color);
+      } else {
+        // Directly assign a color using the attribute name
+        // Here, defaultColorScale is used to assign a color based on the attribute name
+        const color = defaultColorScale(attributeName);
+        attributeColorMap.set(attributeName, color);
+      }
+    });
+    const attributeColorScale = d3.scaleOrdinal(uniqueAttributeNames, d3.schemeCategory10);
+    return {attributeColorMap, attributeColorScale}
 
+  }
   /**
    * Creates and appends link elements to the graph SVG.
    *
