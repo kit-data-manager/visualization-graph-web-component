@@ -60,7 +60,7 @@ export class GraphSetup {
   initializeSVG() {
     const svg = d3.select(this.hostElement.shadowRoot.querySelector('#graph'));
     const [width, height] = this.size.split(',').map(s => s.trim());
-    svg.attr('width', width).attr('height', height).attr('marker-end', 'url(#arrow)');
+    svg.attr('viewBox', `0 0 ${parseInt(width, 10)} ${parseInt(height, 10)}`).attr('preserveAspectRatio', 'xMidYMid meet');
     const numericWidth = parseInt(width, 10);
     const numericHeight = parseInt(height, 10);
 
@@ -76,7 +76,7 @@ export class GraphSetup {
       });
 
     svg.call(zoom);
-    return { svg, numericWidth, numericHeight };
+    return { svg, container, numericWidth, numericHeight };
   }
 
   /**
@@ -96,9 +96,7 @@ export class GraphSetup {
         d3
           .forceLink(links)
           .id((d: any) => d.id)
-          .distance(d => d.category === 'attribute' ? 50 : 70), // Shorter distance for attribute links
-
-          // .distance(this.forceProperties.link.distance),
+          .distance(d => (d.category === 'attribute' ? 50 : 70)), // Shorter distance for attribute links
       )
       .force(
         'charge',
@@ -159,25 +157,26 @@ export class GraphSetup {
    * @param {d3.ScaleOrdinal<string, string>} colorScale - The color scale for node colors.
    * @returns {d3.Selection} - The created node elements.
    */
-  createNodes(svg, nodes, primaryNodeColor) {
+  createNodes(svg, nodes, primaryNodeColor, attributeColorMap) {
     // Extract unique attribute names from attribute nodes
-    const attributeNames = nodes.filter(node => node.category === 'attribute').map(node => Object.keys(node)[1]); // Assuming the attribute name is the second key
-    const uniqueAttributeNames = [...new Set(attributeNames)];
-
     // Create a color scale for attribute nodes
-    const attributeColorScale = d3.scaleOrdinal(uniqueAttributeNames, d3.schemeCategory10);
-
-    // Separate color scale for primary nodes
-    // const primaryNodeColor = '#4682B4'; 
-
     return svg
       .selectAll('.node')
       .data(nodes)
       .enter()
       .append('circle')
       .attr('class', 'node')
-      .attr('r', d => d.category === 'attribute' ? 6 : 10) // Smaller radius for attribute nodes
-      .attr('fill', d => (d.category === 'attribute' ? attributeColorScale(Object.keys(d)[1]) : primaryNodeColor))
+      .attr('r', d => (d.category === 'attribute' ? 6 : 10)) // Smaller radius for attribute nodes
+      .attr('fill', d => {
+        if (d.category === 'attribute') {
+          // Assuming the attribute name is the second key of the node object
+          const attributeName = Object.keys(d)[1];
+          console.log('attributeName', attributeName);
+          return attributeColorMap.get(attributeName); // Directly use color from attributeColorMap
+        } else {
+          return primaryNodeColor; // Use primaryNodeColor for non-attribute nodes
+        }
+      })
       .attr('stroke', '#fff')
       .attr('stroke-width', 1.5);
   }
@@ -268,45 +267,32 @@ export class GraphSetup {
    * @param {string[]} uniqueAttributeNames - The unique attribute names used in the color scale.
    * @param {string} primaryNodeColor - The color used for primary nodes.
    */
-  // createNodeLegend(svg, attributeColorScale, uniqueAttributeNames, primaryNodeColor) {
 
-  //   const legend = svg.append('g')
-  //     .attr('class', 'legend')
-  //     .attr('transform', 'translate(1220,320)'); // Adjust the position as needed
+  prepareLegend(uniqueAttributeNames, config, attributeColorScale) {
+    // Add a check to ensure legendConfig is an array; if not, default to an empty array
+    const userConfigs = Array.isArray(config) ? config : [];
 
-  //   // Adding primary node color to the legend
-  //   legend.append('circle')
-  //     .attr('cx', 0)
-  //     .attr('cy', 0)
-  //     .attr('r', 5)
-  //     .style('fill', primaryNodeColor);
-  //   legend.append('text')
-  //     .attr('x', 20)
-  //     .attr('y', 0)
-  //     .attr('dy', '0.35em')
-  //     .text('Primary Node');
+    // Check if config is empty; if so, use uniqueAttributeNames directly
+    if (userConfigs.length === 0) {
+      return uniqueAttributeNames.map(attributeName => ({
+        label: attributeName,
+        color: attributeColorScale(attributeName) || '#defaultColor',
+        attributeKey: attributeName,
+      }));
+    }
+    return uniqueAttributeNames.map(attributeName => {
+      // console.log('attributeName', attributeName)
+      const customConfig = userConfigs.find(config => config.attributeKey === attributeName);
+      // console.log('customConfig', customConfig)
+      return {
+        label: customConfig ? customConfig.label : attributeName,
+        color: customConfig ? customConfig.color : attributeColorScale(attributeName) || '#defaultColor',
+        attributeKey: attributeName,
+      };
+    });
+  }
 
-  //   // Adding attribute colors to the legend
-  //   uniqueAttributeNames.forEach((attr, index) => {
-  //     const color = attributeColorScale(attr);
-  //     const yPosition = (index + 1) * 20; // Adjust spacing
-
-  //     legend.append('circle')
-  //       .attr('cx', 0)
-  //       .attr('cy', yPosition)
-  //       .attr('r', 5)
-  //       .style('fill', color);
-
-  //     legend.append('text')
-  //       .attr('x', 20)
-  //       .attr('y', yPosition)
-  //       .attr('dy', '0.35em')
-  //       .text(attr);
-  //   });
-  // }
-
-  //Scrollable legend attempt
-  createNodeLegend(svg, attributeColorScale, uniqueAttributeNames, primaryNodeColor, showLegend) {
+  createNodeLegend(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap) {
     if (!showLegend) {
       return; // Do not create the legend if showLegend is false
     }
@@ -333,38 +319,30 @@ export class GraphSetup {
 
     // Add primary node color to the legend
     this.addLegendItem(legend, primaryNodeColor, 'Primary Node', 10); // Size 10 for primary nodes
-
-    // Add attribute colors to the legend
-    uniqueAttributeNames.forEach(attr => {
-      const color = attributeColorScale(attr);
-      this.addLegendItem(legend, color, `${attr} `, 6); // Size 6 for secondary nodes, adjust as per your setup
+    // Create legend items from the configurations or directly from attributeColorMap
+    legendConfigurations.forEach(({ attributeKey, label }) => {
+      const color = attributeColorMap.get(attributeKey) || primaryNodeColor; // Fallback to primaryNodeColor if not found
+      this.addLegendItem(legend, color, label || attributeKey, 6); // Use label or attributeKey if label not provided
     });
   }
 
   // Helper method to add items to the legend
- // Adjust the method to include a size parameter
-addLegendItem(legend, color, label, size) {
-  const item = legend.append('div')
-    .style('display', 'flex')
-    .style('align-items', 'center')
-    .style('margin-bottom', '10px'); // Increase spacing if needed
+  // Adjust the method to include a size parameter
+  addLegendItem(legend, color, label, size) {
+    const item = legend.append('div').style('display', 'flex').style('align-items', 'center').style('margin-bottom', '10px'); // Increase spacing if needed
 
-  // Adjust the circle to reflect the node size
-  item.append('svg')
-    .attr('width', 24) // Adjust width and height as needed
-    .attr('height', 24)
-    .append('circle')
-    .attr('cx', 12) // Center the circle in the SVG
-    .attr('cy', 12) // Adjust cy to vertically center, considering the SVG's height
-    .attr('r', size) // Use the dynamic size for the circle
-    .style('fill', color);
+    // Adjust the circle to reflect the node size
+    item
+      .append('svg')
+      .attr('width', 24)
+      .attr('height', 24)
+      .append('circle')
+      .attr('cx', 12) // Center the circle in the SVG
+      .attr('cy', 12) // Adjust cy to vertically center, considering the SVG's height
+      .attr('r', size) // Use the dynamic size for the circle
+      .style('fill', color);
 
-  // Adjust text to include information about the node
-  item.append('span')
-    .style('margin-left', '10px')
-    .text(label); // The label already describes the node
-}
-
-
-  //link type texxt to be didsplayed :
+    // Adjust text to include information about the node
+    item.append('span').style('margin-left', '10px').text(label); // The label already describes the node
+  }
 }

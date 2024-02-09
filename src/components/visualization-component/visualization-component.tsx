@@ -68,10 +68,13 @@ export class VisualizationComponent {
    */
   @Prop() displayHovered: boolean = true;
 
-  @Prop() showLegend: boolean= true;
+  @Prop() showLegend: boolean = true;
+
+  @Prop() config: any;
 
   private tooltip;
   public chartData: any;
+  public parsedConfig: any;
   /**
    * Declare a private instance variable of the 'PrepareData' class.
    * It is used for preparing or processing data for the chart.
@@ -145,8 +148,20 @@ export class VisualizationComponent {
         this.chartData = [];
       }
     } catch (error) {
-      console.error('Input data is incorrect', error);
+      console.error('Error parsing input data:', error);
       this.chartData = [];
+    }
+
+    try {
+      if (this.config && Object.keys(this.config).length > 0) {
+        // Check if config is provided and not empty
+        this.parsedConfig = JSON.parse(this.config); // Parse legendConfig
+      } else {
+        this.parsedConfig = [];
+      }
+    } catch (error) {
+      console.error('Error parsing legendConfig:', error);
+      this.parsedConfig = [];
     }
   }
   /**
@@ -168,7 +183,6 @@ export class VisualizationComponent {
    */
   generateD3Graph(setupData: any[]) {
     this.dataUtil.setShowAttributes(this.showAttributes);
-
     // Prepare data
     let defaultComponentData = Array.isArray(setupData) && setupData.length > 0 ? setupData : this.dataUtil.getDefaultComponentData();
     const excludeProperties = this.excludeProperties.split(',');
@@ -186,49 +200,68 @@ export class VisualizationComponent {
     //Legend:
     // Extract unique attribute names
     const uniqueAttributeNames = Array.from(new Set(transformedData.nodes.filter(node => node.category === 'attribute').map(node => Object.keys(node)[1])));
-    const attributeColorScale = d3.scaleOrdinal(uniqueAttributeNames, d3.schemeCategory10);
+    // Prepare attribute color mapping based on config
+    try {
+      let attributeColorMap = new Map();
+      const defaultColorScale = d3.scaleOrdinal(d3.schemeCategory10);
+      uniqueAttributeNames.forEach(attributeName => {
+        const configItem = this.parsedConfig.find(item => item.attributeKey === attributeName);
+        if (configItem && configItem.color) {
+          // Use color from config if available
+          attributeColorMap.set(attributeName, configItem.color);
+        } else {
+          // Directly assign a color using the attribute name
+          // Here, defaultColorScale is used to assign a color based on the attribute name
+          const color = defaultColorScale(attributeName);
+          attributeColorMap.set(attributeName, color);
+        }
+      });
+      const attributeColorScale = d3.scaleOrdinal(uniqueAttributeNames, d3.schemeCategory10);
+      // The color for primary nodes
+      const primaryNodeColor = '#008080'; 
+      const legendConfigurations = this.d3GraphSetup.prepareLegend(uniqueAttributeNames, this.parsedConfig, attributeColorScale);
+      // Create the node legend
+      this.d3GraphSetup.createNodeLegend(svg, primaryNodeColor, this.showLegend, legendConfigurations, attributeColorMap);
 
-    // The color for primary nodes
-    const primaryNodeColor = '#008080'; // Or any other color you use for primary nodes
-    // Create the node legend
-    this.d3GraphSetup.createNodeLegend(svg, attributeColorScale, uniqueAttributeNames, primaryNodeColor,this.showLegend);
+      //
 
-    //
+      this.d3GraphSetup.updateForceProperties({
+        center: {
+          x: 0.5, // Center position on the x-axis (0.5 for the middle of the SVG)
+          y: 0.5, // Center position on the y-axis (0.5 for the middle of the SVG)
+        },
+        charge: {
+          enabled: true,
+          strength: -10,
+          distanceMin: 40,
+          distanceMax: 2000,
+        },
+        link: {
+          distance: 90, // Adjust link distance as needed
+        },
+        // Add or update additional force properties as needed
+      });
+      // Create force simulation
+      const simulation = this.d3GraphSetup.createForceSimulation(transformedData.nodes, transformedData.links, numericWidth, numericHeight);
 
-    this.d3GraphSetup.updateForceProperties({
-      center: {
-        x: 0.5, // Center position on the x-axis (0.5 for the middle of the SVG)
-        y: 0.5, // Center position on the y-axis (0.5 for the middle of the SVG)
-      },
-      charge: {
-        enabled: true,
-        strength: -10,
-        distanceMin: 40,
-        distanceMax: 2000,
-      },
-      link: {
-        distance: 90, // Adjust link distance as needed
-      },
-      // Add or update additional force properties as needed
-    });
-    // Create force simulation
-    const simulation = this.d3GraphSetup.createForceSimulation(transformedData.nodes, transformedData.links, numericWidth, numericHeight);
+      // Create links and nodes
+      const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
+      const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, primaryNodeColor, attributeColorMap);
 
-    // Create links and nodes
-    const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
-    const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, primaryNodeColor);
+      // this.tooltip = svg.append('g').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute');
+      this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
 
-    // this.tooltip = svg.append('g').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute');
-    this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
+      // Apply event handlers
+      this.handleEvents.onClick(nodes, links);
+      if (this.displayHovered) this.handleEvents.applyMouseover(nodes, links, this.tooltip);
+      this.handleEvents.applyDragToNodes(nodes, simulation);
+      this.handleEvents.applyClickHandler();
 
-    // Apply event handlers
-    this.handleEvents.onClick(nodes, links);
-    if (this.displayHovered) this.handleEvents.applyMouseover(nodes, links, this.tooltip);
-    this.handleEvents.applyDragToNodes(nodes, simulation);
-    this.handleEvents.applyClickHandler();
-
-    // Apply simulation
-    this.d3GraphSetup.applySimulation(nodes, links, simulation);
+      // Apply simulation
+      this.d3GraphSetup.applySimulation(nodes, links, simulation);
+    } catch (error) {
+      console.error('Error in generateD3Graph:', error);
+    }
   }
 
   /**
