@@ -61,19 +61,30 @@
 
 ' size="1350px,650px" show-legend="true" exclude-properties="hasLength_x" show-attributes="true" 
 show-primary-links="true"  
-config='[
-{
-  "attributeKey": "hasNumberofAtoms",
-  "label": "Number of Atoms",
-  "color": "#FF0000"
-},
-{
-  "attributeKey": "subclassO",
-  "label": "Sub class of",
-  "color": "#00FF00"
-}
-]
-'></visualization-component>
+config='
+[
+  {
+    "label":"test",
+    "color":"",
+    "description":"Long Text",
+    "properties":
+        [
+        {
+          "hasAttribute":
+          {
+            "label":"test",
+            "color":"#FF0000",
+            "description":"Long Text"
+          },
+          "subclassOf":
+          {"label":"test",
+          "color":"#00FF00",
+          "description":"Long Text"
+          }
+        }
+        ]
+  }
+]'></visualization-component>
   <script>
   </script>
 </body>

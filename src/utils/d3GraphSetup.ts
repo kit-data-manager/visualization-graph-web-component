@@ -23,15 +23,15 @@ export class GraphSetup {
   private size: string = '1350px,650px';
 
   /**
- * Default force properties for the graph simulation.
- *
- * @private
- * @type {{
- *   center: { x: number, y: number },
-  *   charge: { enabled: boolean, strength: number, distanceMin: number, distanceMax: number },
-  *   link: { distance: number }
-  * }}
-  */ 
+   * Default force properties for the graph simulation.
+   *
+   * @private
+   * @type {{
+   *   center: { x: number, y: number },
+   *   charge: { enabled: boolean, strength: number, distanceMin: number, distanceMax: number },
+   *   link: { distance: number }
+   * }}
+   */
   private forceProperties = {
     center: {
       x: 0.5,
@@ -115,11 +115,11 @@ export class GraphSetup {
     return simulation;
   }
 
-/**
- * Updates the force simulation properties.
- *
- * @param {{ [forceName: string]: { [propName: string]: any } }} newProps - The new properties to update.
- */
+  /**
+   * Updates the force simulation properties.
+   *
+   * @param {{ [forceName: string]: { [propName: string]: any } }} newProps - The new properties to update.
+   */
   updateForceProperties(newProps: { [forceName: string]: { [propName: string]: any } }) {
     // Iterate over the object to update force properties
     for (const forceName of Object.keys(newProps)) {
@@ -131,32 +131,49 @@ export class GraphSetup {
     }
   }
 
-/**
- * Sets up attribute color mapping based on provided configurations if not provided then default colors.
- *
- * @param {string[]} uniqueAttributeNames - The unique attribute names.
- * @param {any[]} parsedConfig - The parsed configuration data.
- * @returns {{ attributeColorMap: Map<string, string>, attributeColorScale: d3.ScaleOrdinal<string, string> }} - The attribute color map and scale.
- */
-  attributeColorSetup(uniqueAttributeNames,parsedConfig){
+  /**
+   * Sets up attribute color mapping based on provided configurations if not provided then used default colors.
+   *
+   * @param {string[]} uniqueAttributeNames - The unique attribute names.
+   * @param {any[]} parsedConfig - The parsed configuration data.
+   * @returns {{ attributeColorMap: Map<string, string>, attributeColorScale: d3.ScaleOrdinal<string, string> }} - The attribute color map and scale.
+   */
+  attributeColorSetup(uniqueAttributeNames, parsedConfig) {
     // Prepare attribute color mapping based on config
     let attributeColorMap = new Map();
     const defaultColorScale = d3.scaleOrdinal(d3.schemeCategory10);
     uniqueAttributeNames.forEach(attributeName => {
-      const configItem = parsedConfig.find(item => item.attributeKey === attributeName);
-      if (configItem && configItem.color) {
-        // Use color from config if available
-        attributeColorMap.set(attributeName, configItem.color);
+      // Initialize an array to store properties for each matching attribute
+      let color;
+
+      // Search for the attribute in properties of each config item
+      parsedConfig.forEach(item => {
+        if (item.properties) {
+          item.properties.forEach(propertyObj => {
+            // Iterate over keys of each property object
+            Object.keys(propertyObj).forEach(key => {
+              // Check if the attributeName matches the key and if the property object has a color
+              if (key === attributeName && propertyObj[key].color) {
+                // Add property object to the properties array
+                color = propertyObj[key].color;
+              }
+            });
+          });
+        }
+      });
+
+      if (color && color.length > 0) {
+        console.log('properties,', color);
+        // Use properties from matching attributes if available
+        attributeColorMap.set(attributeName, color);
       } else {
-        // Directly assign a color using the attribute name
-        // Here, defaultColorScale is used to assign a color based on the attribute name
+        // Directly assign a color using the attribute name from default scale
         const color = defaultColorScale(attributeName);
         attributeColorMap.set(attributeName, color);
       }
     });
     const attributeColorScale = d3.scaleOrdinal(uniqueAttributeNames, d3.schemeCategory10);
-    return {attributeColorMap, attributeColorScale}
-
+    return { attributeColorMap, attributeColorScale };
   }
   /**
    * Creates and appends link elements to the graph SVG.
@@ -213,7 +230,6 @@ export class GraphSetup {
         if (d.category === 'attribute') {
           // Assuming the attribute name is the second key of the node object
           const attributeName = Object.keys(d)[1];
-          console.log('attributeName', attributeName);
           return attributeColorMap.get(attributeName); // Directly use color from attributeColorMap
         } else {
           return primaryNodeColor; // Use primaryNodeColor for non-attribute nodes
@@ -223,12 +239,12 @@ export class GraphSetup {
       .attr('stroke-width', 1.5);
   }
   /**
- * Creates custom markers for links based on their types.
- *
- * @param {d3.Selection} svg - The SVG element.
- * @param {any[]} links - The array of link data.
- * @param {(type: string) => string} colorType - Function to retrieve color based on link type.
- */
+   * Creates custom markers for links based on their types.
+   *
+   * @param {d3.Selection} svg - The SVG element.
+   * @param {any[]} links - The array of link data.
+   * @param {(type: string) => string} colorType - Function to retrieve color based on link type.
+   */
   createCustomMarkers(svg, links, colorType) {
     let defs = svg.append('defs');
     let set = [...new Set(links.filter(d => d.category === 'non_attribute').map(d => d.relationType))];
@@ -263,13 +279,13 @@ export class GraphSetup {
         .attr('fill', colorType(elem));
     });
   }
-/**
- * Creates a custom marker for use in SVG definitions.
- *
- * @param {SVGDefsElement} defs - The SVG definitions element.
- * @param {string} id - The ID of the marker.
- * @param {string} color - The color of the marker.
- */
+  /**
+   * Creates a custom marker for use in SVG definitions.
+   *
+   * @param {SVGDefsElement} defs - The SVG definitions element.
+   * @param {string} id - The ID of the marker.
+   * @param {string} color - The color of the marker.
+   */
   createMarker(defs, id, color) {
     defs
       .append('svg:marker')
@@ -311,14 +327,14 @@ export class GraphSetup {
 
     simulation.on('tick', ticked);
   }
-/**
- * Prepares legend data based on provided configurationsif not provided then by defualt colors.
- *
- * @param {string[]} uniqueAttributeNames - The unique attribute names.
- * @param {any[]} config - The legend configuration data.
- * @param {d3.ScaleOrdinal<string, string>} attributeColorScale - The attribute color scale.
- * @returns {any[]} - The prepared legend data.
- */
+  /**
+   * Prepares legend data based on provided configurationsif not provided then by defualt colors.
+   *
+   * @param {string[]} uniqueAttributeNames - The unique attribute names.
+   * @param {any[]} config - The legend configuration data.
+   * @param {d3.ScaleOrdinal<string, string>} attributeColorScale - The attribute color scale.
+   * @returns {any[]} - The prepared legend data.
+   */
   prepareLegend(uniqueAttributeNames, config, attributeColorScale) {
     const userConfigs = Array.isArray(config) ? config : [];
     if (userConfigs.length === 0) {
@@ -337,15 +353,15 @@ export class GraphSetup {
       };
     });
   }
-/**
- * Creates a legend for nodes in the graph.
- *
- * @param {d3.Selection} svg - The SVG element.
- * @param {string} primaryNodeColor - The color for primary nodes.
- * @param {boolean} showLegend - Whether to display the legend.
- * @param {any[]} legendConfigurations - The legend configurations.
- * @param {Map<string, string>} attributeColorMap - The attribute color map.
- */
+  /**
+   * Creates a legend for nodes in the graph.
+   *
+   * @param {d3.Selection} svg - The SVG element.
+   * @param {string} primaryNodeColor - The color for primary nodes.
+   * @param {boolean} showLegend - Whether to display the legend.
+   * @param {any[]} legendConfigurations - The legend configurations.
+   * @param {Map<string, string>} attributeColorMap - The attribute color map.
+   */
   createNodeLegend(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap) {
     if (!showLegend) {
       return; // Do not create the legend if showLegend is false
@@ -355,8 +371,8 @@ export class GraphSetup {
     const legendX = svgWidth - rightOffset;
 
     // Set a fixed size for the legend area and make it scrollable
-    const legendHeight = 200; 
-    const legendWidth = 250; 
+    const legendHeight = 200;
+    const legendWidth = 250;
 
     // Create a container for the scrollable legend
     const legendContainer = svg
@@ -380,14 +396,14 @@ export class GraphSetup {
     });
   }
 
-/**
- * Adds an item to the legend with the specified color, label, and size.
- *
- * @param {HTMLElement} legend - The legend container element.
- * @param {string} color - The color of the legend item.
- * @param {string} label - The label for the legend item.
- * @param {number} size - The size of the legend item.
- */
+  /**
+   * Adds an item to the legend with the specified color, label, and size.
+   *
+   * @param {HTMLElement} legend - The legend container element.
+   * @param {string} color - The color of the legend item.
+   * @param {string} label - The label for the legend item.
+   * @param {number} size - The size of the legend item.
+   */
   addLegendItem(legend, color, label, size) {
     const item = legend.append('div').style('display', 'flex').style('align-items', 'center').style('margin-bottom', '10px'); // Increase spacing if needed
 

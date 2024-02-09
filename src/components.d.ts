@@ -7,6 +7,11 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface VisualizationComponent {
+        /**
+          * The configuration object for customizing the graph color, and legend.
+          * @prop 
+          * @type {any}
+         */
         "config": any;
         /**
           * Input data in JSON format for the graph.
@@ -32,6 +37,11 @@ export namespace Components {
           * @type {boolean}
          */
         "showAttributes": boolean;
+        /**
+          * Whether to show the legend in the graph. Defaults to true.
+          * @prop 
+          * @type {boolean}
+         */
         "showLegend": boolean;
         /**
           * Whether to show primary links in the graph. If true it will show all the links between primary nodes Defaults to true.
@@ -60,6 +70,11 @@ declare global {
 }
 declare namespace LocalJSX {
     interface VisualizationComponent {
+        /**
+          * The configuration object for customizing the graph color, and legend.
+          * @prop 
+          * @type {any}
+         */
         "config"?: any;
         /**
           * Input data in JSON format for the graph.
@@ -85,6 +100,11 @@ declare namespace LocalJSX {
           * @type {boolean}
          */
         "showAttributes"?: boolean;
+        /**
+          * Whether to show the legend in the graph. Defaults to true.
+          * @prop 
+          * @type {boolean}
+         */
         "showLegend"?: boolean;
         /**
           * Whether to show primary links in the graph. If true it will show all the links between primary nodes Defaults to true.
