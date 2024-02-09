@@ -17,7 +17,7 @@
   {
     "id": "AtomicScaleSample",
     "properties": {
-      "hasNumberofAtoms": "Total Atoms: 123",
+      "hasNumberofAtoms": "123",
       "subclassOf": "SubclassOf: NanoscaleSample"
     }
   },
@@ -33,7 +33,7 @@
     "id": "Atom",
     "properties": {
       "hasPath": "path/to/data",
-      "subclassOf": "Subclass of: AtomicScaleSample"
+      "subclassOf": "AtomicScaleSample"
     }
   },
   {
@@ -59,7 +59,21 @@
   }
 ]
 
-' size="1350px,650px" show-legend="true" exclude-properties="hasLength_x" show-attributes="true" show-primary-links="true">></visualization-component>
+' size="1350px,650px" show-legend="true" exclude-properties="hasLength_x" show-attributes="true" 
+show-primary-links="true"  
+config='[
+{
+  "attributeKey": "hasNumberofAtoms",
+  "label": "Number of Atoms",
+  "color": "#FF0000"
+},
+{
+  "attributeKey": "subclassO",
+  "label": "Sub class of",
+  "color": "#00FF00"
+}
+]
+'></visualization-component>
   <script>
   </script>
 </body>
