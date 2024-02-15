@@ -219,11 +219,12 @@ export class VisualizationComponent {
     this.d3GraphSetup.createCustomMarkers(svg, transformedData.links, colorType);
     const uniqueAttributeNames = Array.from(new Set(transformedData.nodes.filter(node => node.category === 'attribute').map(node => Object.keys(node)[1])));
     const { attributeColorMap, attributeColorScale } = this.d3GraphSetup.attributeColorSetup(uniqueAttributeNames, this.parsedConfig);
+    this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
 
     // The color for primary nodes
-    const legendConfigurations = this.d3GraphSetup.prepareLegend(uniqueAttributeNames, this.parsedConfig, attributeColorScale);
+    const {legendConfigurations, primaryConfig} = this.d3GraphSetup.prepareLegend(uniqueAttributeNames, this.parsedConfig, attributeColorScale);
     // Create the node legend
-    this.d3GraphSetup.createNodeLegend(svg, this.primaryNodeColor, this.showLegend, legendConfigurations, attributeColorMap);
+    this.d3GraphSetup.createNodeLegend(svg, this.primaryNodeColor, this.showLegend, legendConfigurations, attributeColorMap, this.tooltip , primaryConfig);
     this.d3GraphSetup.updateForceProperties({
       center: {
         x: 0.5, // Center position on the x-axis (0.5 for the middle of the SVG)
@@ -248,8 +249,6 @@ export class VisualizationComponent {
     const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, this.primaryNodeColor, attributeColorMap);
 
     // this.tooltip = svg.append('g').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute');
-    this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
-
     // Apply event handlers
     this.handleEvents.onClick(nodes, links);
     if (this.displayHovered) this.handleEvents.applyMouseover(nodes, links, this.tooltip);

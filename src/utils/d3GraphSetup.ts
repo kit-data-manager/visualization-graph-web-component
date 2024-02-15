@@ -73,19 +73,15 @@ export class GraphSetup {
     const numericWidth = parseInt(width, 10);
     const numericHeight = parseInt(height, 10);
 
-    // Create a container group for all graph elements
-    const container = svg.append('g').attr('class', 'zoom-container');
-
-    // Set up zoom behavior
+    // Set up zoom behavior directly on the SVG element
     const zoom = d3
       .zoom()
-      .scaleExtent([0.5, 10]) // Adjust scale extent as needed
+      .scaleExtent([0.5, 5]) // Adjust scale extent as needed
       .on('zoom', event => {
-        container.attr('transform', event.transform);
+        svg.attr('transform', event.transform); // Apply zoom directly to SVG
       });
-
     svg.call(zoom);
-    return { svg, container, numericWidth, numericHeight };
+    return { svg, numericWidth, numericHeight };
   }
 
   /**
@@ -337,22 +333,66 @@ export class GraphSetup {
    */
   prepareLegend(uniqueAttributeNames, config, attributeColorScale) {
     const userConfigs = Array.isArray(config) ? config : [];
+
     if (userConfigs.length === 0) {
-      return uniqueAttributeNames.map(attributeName => ({
-        label: attributeName,
-        color: attributeColorScale(attributeName) || '#defaultColor',
-        attributeKey: attributeName,
-      }));
-    }
-    return uniqueAttributeNames.map(attributeName => {
-      const customConfig = userConfigs.find(config => config.attributeKey === attributeName);
       return {
-        label: customConfig ? customConfig.label : attributeName,
-        color: customConfig ? customConfig.color : attributeColorScale(attributeName) || '#defaultColor',
-        attributeKey: attributeName,
+        primaryConfig: {
+          label: '',
+          color: '',
+          description: '',
+        },
+        legendConfigurations: uniqueAttributeNames.map(attributeName => ({
+          label: attributeName,
+          color: attributeColorScale(attributeName) || '#defaultColor',
+          attributeKey: attributeName,
+          description: 'default',
+        })),
       };
+    }
+    // Extract primary values from the first configuration in the config array
+    const primaryConfig = userConfigs[0];
+    const primaryLabel = primaryConfig.label || '';
+    const primaryColor = primaryConfig.color || '';
+    const primaryDescription = primaryConfig.description || '';
+
+    const legendConfigurations = uniqueAttributeNames.map(attributeName => {
+      let customConfig = null;
+      for (const config of userConfigs) {
+        const matchingProperty = config.properties.find(property => attributeName in property);
+        if (matchingProperty) {
+          customConfig = matchingProperty[attributeName];
+          console.log('customConfig', customConfig);
+          break; // Stop searching once a match is found
+        }
+      }
+
+      if (customConfig) {
+        return {
+          label: customConfig.label || attributeName,
+          color: customConfig.color || attributeColorScale(attributeName) || '#defaultColor',
+          attributeKey: attributeName,
+          description: customConfig.description || '',
+        };
+      } else {
+        return {
+          label: attributeName,
+          color: attributeColorScale(attributeName) || '#defaultColor',
+          attributeKey: attributeName,
+          description: '',
+        };
+      }
     });
+    // Return an object containing legend configurations and primary values
+    return {
+      primaryConfig: {
+        label: primaryLabel,
+        color: primaryColor,
+        description: primaryDescription,
+      },
+      legendConfigurations: legendConfigurations,
+    };
   }
+
   /**
    * Creates a legend for nodes in the graph.
    *
@@ -362,7 +402,8 @@ export class GraphSetup {
    * @param {any[]} legendConfigurations - The legend configurations.
    * @param {Map<string, string>} attributeColorMap - The attribute color map.
    */
-  createNodeLegend(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap) {
+  createNodeLegend(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap, tooltip, primaryValues) {
+    // console.log('legendConfigurations',legendConfigurations)
     if (!showLegend) {
       return; // Do not create the legend if showLegend is false
     }
@@ -388,11 +429,46 @@ export class GraphSetup {
     const legend = legendContainer.append('div').style('cursor', 'pointer');
 
     // Add primary node color to the legend
-    this.addLegendItem(legend, primaryNodeColor, 'Primary Node', 10); // Size 10 for primary nodes
+    const primaryItem = this.addLegendItem(legend, primaryValues.color || primaryNodeColor, primaryValues.label || 'Primary Node', 10, primaryValues.description || 'Primary'); // Size 10 for primary node
+    // Event listener for primary item mouseover
+    primaryItem.on('mouseover', event => {
+      tooltip
+      .html(`<strong>${primaryValues.label || 'Primary Node'}</strong>`)
+      .html(`<strong>${primaryValues.label || 'Primary Node'}</strong><br>${primaryValues.description || ''}`)
+      .transition()
+        .duration(200)
+        .style('opacity', 1)
+        .style('left', `${event.pageX + 10}px`)
+        .style('top', `${event.pageY - 10}px`);
+    });
+
+    // Event listener for primary item mouseout
+    primaryItem.on('mouseout', () => {
+      tooltip.style('opacity', 0);
+    });
+
     // Create legend items from the configurations or directly from attributeColorMap
-    legendConfigurations.forEach(({ attributeKey, label }) => {
+    legendConfigurations.forEach(({ attributeKey, label, description }) => {
       const color = attributeColorMap.get(attributeKey) || primaryNodeColor; // Fallback to primaryNodeColor if not found
-      this.addLegendItem(legend, color, label || attributeKey, 6); // Use label or attributeKey if label not provided
+      const item = this.addLegendItem(legend, color, label || attributeKey, 6, description); // Use label or attributeKey if label not provided
+      // Event listener for legend item mouseover
+      item.on('mouseover', event => {
+        const hoveredLegend = d3.select(event.currentTarget);
+        const legendLabel = hoveredLegend.text();
+        const legendDescription = description;
+        tooltip
+          .html(`<strong>${legendLabel}</strong><br>${legendDescription}`) // Customize tooltip content for legends
+          .transition()
+          .duration(200)
+          .style('opacity', 1)
+          .style('left', `${event.pageX + 10}px`)
+          .style('top', `${event.pageY - 10}px`);
+      });
+
+      // Event listener for legend item mouseout
+      item.on('mouseout', () => {
+        tooltip.style('opacity', 0);
+      });
     });
   }
 
@@ -404,7 +480,7 @@ export class GraphSetup {
    * @param {string} label - The label for the legend item.
    * @param {number} size - The size of the legend item.
    */
-  addLegendItem(legend, color, label, size) {
+  addLegendItem(legend, color, label, size, description) {
     const item = legend.append('div').style('display', 'flex').style('align-items', 'center').style('margin-bottom', '10px'); // Increase spacing if needed
 
     // Adjust the circle to reflect the node size
@@ -412,12 +488,15 @@ export class GraphSetup {
       .append('svg')
       .attr('width', 24)
       .attr('height', 24)
+      .attr('class', 'legend-item')
       .append('circle')
       .attr('cx', 12) // Center the circle in the SVG
       .attr('cy', 12) // Adjust cy to vertically center, considering the SVG's height
       .attr('r', size) // Use the dynamic size for the circle
-      .style('fill', color);
+      .style('fill', color)
+      .attr('data-description', description); // Set data attribute for description
 
     item.append('span').style('margin-left', '10px').text(label); // The label already describes the node
+    return item;
   }
 }
