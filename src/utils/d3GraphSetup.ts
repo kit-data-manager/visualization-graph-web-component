@@ -402,7 +402,7 @@ export class GraphSetup {
    * @param {any[]} legendConfigurations - The legend configurations.
    * @param {Map<string, string>} attributeColorMap - The attribute color map.
    */
-  createNodeLegend(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap, tooltip, primaryValues) {
+  createNodeLegend(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap, tooltip, primaryConfig) {
     // console.log('legendConfigurations',legendConfigurations)
     if (!showLegend) {
       return; // Do not create the legend if showLegend is false
@@ -429,12 +429,11 @@ export class GraphSetup {
     const legend = legendContainer.append('div').style('cursor', 'pointer');
 
     // Add primary node color to the legend
-    const primaryItem = this.addLegendItem(legend, primaryValues.color || primaryNodeColor, primaryValues.label || 'Primary Node', 10, primaryValues.description || 'Primary'); // Size 10 for primary node
+    const primaryItem = this.addLegendItem(legend, primaryConfig.color || primaryNodeColor, primaryConfig.label || 'Primary Node', 10, primaryConfig.description || 'Primary'); // Size 10 for primary node
     // Event listener for primary item mouseover
     primaryItem.on('mouseover', event => {
       tooltip
-      .html(`<strong>${primaryValues.label || 'Primary Node'}</strong>`)
-      .html(`<strong>${primaryValues.label || 'Primary Node'}</strong><br>${primaryValues.description || ''}`)
+      .html(`</strong><br>${primaryConfig.description || ''}`)
       .transition()
         .duration(200)
         .style('opacity', 1)
@@ -457,7 +456,7 @@ export class GraphSetup {
         const legendLabel = hoveredLegend.text();
         const legendDescription = description;
         tooltip
-          .html(`<strong>${legendLabel}</strong><br>${legendDescription}`) // Customize tooltip content for legends
+          .html(`</strong><br>${legendDescription}`) // Customize tooltip content for legends
           .transition()
           .duration(200)
           .style('opacity', 1)
