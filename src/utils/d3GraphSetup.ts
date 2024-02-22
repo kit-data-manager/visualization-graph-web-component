@@ -101,7 +101,7 @@ export class GraphSetup {
         d3
           .forceLink(links)
           .id((d: any) => d.id)
-          .distance(d => (d.category === 'attribute' ? 50 : 70)), // Shorter distance for attribute links
+          .distance(d => (d.category === 'attribute' ? 35 : 70)), // Shorter distance for attribute links
       )
       .force(
         'charge',
@@ -159,7 +159,6 @@ export class GraphSetup {
       });
 
       if (color && color.length > 0) {
-        console.log('properties,', color);
         // Use properties from matching attributes if available
         attributeColorMap.set(attributeName, color);
       } else {
@@ -195,7 +194,7 @@ export class GraphSetup {
     // Append the text to each group
     linkGroup
       .append('text')
-      .text(d => d.relationType) // Replace 'type' with the name of the property in your data
+      .text(d => d.category === 'attribute' ? '' : d.relationType) 
       .attr('fill', 'black') // Style as needed
       .attr('font-size', 3)
       .attr('text-anchor', 'middle')
@@ -352,7 +351,7 @@ export class GraphSetup {
     // Extract primary values from the first configuration in the config array
     const primaryConfig = userConfigs[0];
     const primaryLabel = primaryConfig.label || '';
-    const primaryColor = primaryConfig.color || '';
+    const primaryColor = primaryConfig.color || '#008080';
     const primaryDescription = primaryConfig.description || '';
 
     const legendConfigurations = uniqueAttributeNames.map(attributeName => {
@@ -361,7 +360,6 @@ export class GraphSetup {
         const matchingProperty = config.properties.find(property => attributeName in property);
         if (matchingProperty) {
           customConfig = matchingProperty[attributeName];
-          console.log('customConfig', customConfig);
           break; // Stop searching once a match is found
         }
       }
@@ -403,7 +401,6 @@ export class GraphSetup {
    * @param {Map<string, string>} attributeColorMap - The attribute color map.
    */
   createNodeLegend(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap, tooltip, primaryConfig) {
-    // console.log('legendConfigurations',legendConfigurations)
     if (!showLegend) {
       return; // Do not create the legend if showLegend is false
     }
@@ -433,7 +430,7 @@ export class GraphSetup {
     // Event listener for primary item mouseover
     primaryItem.on('mouseover', event => {
       tooltip
-      .html(`</strong><br>${primaryConfig.description || ''}`)
+      .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${primaryConfig.description || ''}</span></div>`) // Content with span for text
       .transition()
         .duration(200)
         .style('opacity', 1)
@@ -452,11 +449,9 @@ export class GraphSetup {
       const item = this.addLegendItem(legend, color, label || attributeKey, 6, description); // Use label or attributeKey if label not provided
       // Event listener for legend item mouseover
       item.on('mouseover', event => {
-        const hoveredLegend = d3.select(event.currentTarget);
-        const legendLabel = hoveredLegend.text();
-        const legendDescription = description;
+        const legendDescription = description || attributeKey;
         tooltip
-          .html(`</strong><br>${legendDescription}`) // Customize tooltip content for legends
+        .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${legendDescription}</span></div>`) // Content with span for text
           .transition()
           .duration(200)
           .style('opacity', 1)

@@ -14,7 +14,7 @@ export class HandleEvents {
    */
   constructor(hostElement) {
     this.hostElement = hostElement;
-    console.log(this.currentlyClicked, this.hostElement);
+    // console.log(this.currentlyClicked, this.hostElement);
   }
   /**
    * Apply mouseover event handling to the nodes for displaying tooltips and highlighting connected nodes.
@@ -47,7 +47,7 @@ export class HandleEvents {
       });
 
       tooltip
-        .html(`<span>${d.name}</span>`) // Content with span for text
+      .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${d.name}</span></div>`) // Content with span for text
         .transition()
         .duration(200) // Smooth transition for appearing
         .style('opacity', 1) // Make tooltip visible
@@ -62,10 +62,10 @@ export class HandleEvents {
       tooltip.style('opacity', 0); // Hide tooltip
     };
 
-    d3.select('body').on('mouseover', () => {
-      this.clearSelection();
-      tooltip.style('opacity', 0);
-    });
+    // d3.select('body').on('mouseover', () => {
+    //   this.clearSelection();
+    //   tooltip.style('opacity', 0);
+    // });
 
     nodes.on('mouseover', (event, d) => handleNodeMouseover(event, d));
     nodes.on('mouseout', handleNodeMouseout);
@@ -90,10 +90,9 @@ export class HandleEvents {
     nodes.on('click', (event, d) => this.handleNodeClick(event, d, nodes, links));
   }
   handleNodeClick(event, d, nodes, links) {
-    if (this.currentlyClicked) {
+    if (this.currentlyClicked && this.currentlyClicked !== event.currentTarget) {
       this.clearSelection(); // Clear any existing selection
     }
-
     this.currentlyClicked = event.currentTarget; // Store clicked node reference
     // Mark the clicked node
     d3.select(this.currentlyClicked).classed('selected', true);

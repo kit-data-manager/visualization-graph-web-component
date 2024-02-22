@@ -75,8 +75,8 @@ export class VisualizationComponent {
    * @type {boolean}
    */
   @Prop() showLegend: boolean = true;
-   
-   /**
+
+  /**
    * The configuration object for customizing the graph color, and legend.
    *
    * @prop
@@ -135,7 +135,6 @@ export class VisualizationComponent {
    */
   @Watch('showAttributes')
   showAttributesChanged(newValue: boolean) {
-    // console.log('showAttributesChanged called with:', newValue);
     this.dataUtil = new PrepareData(this.showPrimaryLinks, newValue);
     this.generateD3Graph(this.chartData);
   }
@@ -222,9 +221,11 @@ export class VisualizationComponent {
     this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
 
     // The color for primary nodes
-    const {legendConfigurations, primaryConfig} = this.d3GraphSetup.prepareLegend(uniqueAttributeNames, this.parsedConfig, attributeColorScale);
+    const { legendConfigurations, primaryConfig } = this.d3GraphSetup.prepareLegend(uniqueAttributeNames, this.parsedConfig, attributeColorScale);
+    this.primaryNodeColor = primaryConfig.color;
+
     // Create the node legend
-    this.d3GraphSetup.createNodeLegend(svg, this.primaryNodeColor, this.showLegend, legendConfigurations, attributeColorMap, this.tooltip , primaryConfig);
+    this.d3GraphSetup.createNodeLegend(svg, this.primaryNodeColor, this.showLegend, legendConfigurations, attributeColorMap, this.tooltip, primaryConfig);
     this.d3GraphSetup.updateForceProperties({
       center: {
         x: 0.5, // Center position on the x-axis (0.5 for the middle of the SVG)
