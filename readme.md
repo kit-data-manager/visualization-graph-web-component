@@ -83,6 +83,7 @@ Users can easily customize the web component by setting various properties:
 - `showPrimaryLinks`: Choose to show primary links(relation between two entities). If true it will show all the links between primary nodes. Defaults to true.
 - `excludeProperties`: Specify any properties to exclude from the visualization.
 - `displayHovered`: Enable or disable hover effects on graph nodes.
+- `show-legend`: Allow user to chose to see legend. 
 
 These properties allow for flexible configuration, catering to different data sets and visualization requirements, making the Visualization Component a versatile tool for data analysis and presentation.
 
