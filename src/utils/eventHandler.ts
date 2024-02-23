@@ -14,7 +14,7 @@ export class HandleEvents {
    */
   constructor(hostElement) {
     this.hostElement = hostElement;
-    // console.log(this.currentlyClicked, this.hostElement);
+    console.log(this.currentlyClicked, this.hostElement);
   }
   /**
    * Apply mouseover event handling to the nodes for displaying tooltips and highlighting connected nodes.
@@ -61,12 +61,7 @@ export class HandleEvents {
       links.attr('stroke-opacity', 0.2); // Reset links' opacity
       tooltip.style('opacity', 0); // Hide tooltip
     };
-
-    // d3.select('body').on('mouseover', () => {
-    //   this.clearSelection();
-    //   tooltip.style('opacity', 0);
-    // });
-
+    
     nodes.on('mouseover', (event, d) => handleNodeMouseover(event, d));
     nodes.on('mouseout', handleNodeMouseout);
   }

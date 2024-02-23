@@ -174,7 +174,6 @@ export class VisualizationComponent {
 
     try {
       if (this.config && Object.keys(this.config).length > 0) {
-        // Check if config is provided and not empty
         this.parsedConfig = JSON.parse(this.config); // Parse legendConfig
       } else {
         this.parsedConfig = [];
@@ -240,7 +239,6 @@ export class VisualizationComponent {
       link: {
         distance: 90, // Adjust link distance as needed
       },
-      // Add or update additional force properties as needed
     });
     // Create force simulation
     const simulation = this.d3GraphSetup.createForceSimulation(transformedData.nodes, transformedData.links, numericWidth, numericHeight);
@@ -249,7 +247,6 @@ export class VisualizationComponent {
     const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
     const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, this.primaryNodeColor, attributeColorMap);
 
-    // this.tooltip = svg.append('g').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute');
     // Apply event handlers
     this.handleEvents.onClick(nodes, links);
     if (this.displayHovered) this.handleEvents.applyMouseover(nodes, links, this.tooltip);
