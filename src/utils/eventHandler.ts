@@ -47,7 +47,7 @@ export class HandleEvents {
       });
 
       tooltip
-      .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${d.name}</span></div>`) // Content with span for text
+        .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${d.name}</span></div>`) // Content with span for text
         .transition()
         .duration(200) // Smooth transition for appearing
         .style('opacity', 1) // Make tooltip visible
@@ -90,6 +90,12 @@ export class HandleEvents {
     nodes.on('click', (event, d) => this.handleNodeClick(event, d, nodes, links));
   }
   handleNodeClick(event, d, nodes, links) {
+    // Check if the clicked node is already selected
+    const isNodeSelected = d3.select(this.currentlyClicked).classed('selected');
+    // If the clicked node is already selected, clear the selection
+    if (isNodeSelected) {
+      return;
+    }
     if (this.currentlyClicked && this.currentlyClicked !== event.currentTarget) {
       this.clearSelection(); // Clear any existing selection
     }
@@ -116,9 +122,13 @@ export class HandleEvents {
    * Applies a click handler to the body element to reset currentlyClicked when clicking outside the graph.
    */
   applyClickHandler() {
-    d3.select('body').on('click', function (event) {
-      if (event.target.nodeName === 'body' || event.target.nodeName === 'svg') {
-        this.currentlyClicked = null;
+    const self = this; // Store the reference to the class instance
+    d3.select('body').on('click', function (event: MouseEvent) {
+      const target = event.target as HTMLElement;
+      const nodeName = target.nodeName.toLowerCase();
+      if (nodeName === 'body' || nodeName === 'svg') {
+        self.clearSelection(); // Reset the selection
+        self.currentlyClicked = null; // Reset currentlyClicked
       }
     });
   }
