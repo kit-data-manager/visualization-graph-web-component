@@ -1,0 +1,45 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import * as VisualizationComponentStories from './visualization-component.stories';
+
+<Meta title="Introduction/Visualization Component" />
+
+# Visualization Component
+
+The `visualization-component` is a dynamic, interactive graph component built using D3.js. It is designed to render graphs based on provided JSON data, making it ideal for visualizing complex relationships and networks in an intuitive manner. The component supports various interactive features like hover effects, node dragging, and click events to reveal connections between entities. This makes it an excellent tool for exploring and understanding intricate data relationships.
+
+## Data Format and Connection Representation
+
+The `visualization-component` requires a specific JSON data format to accurately represent and visualize relationships between entities. Here's an overview of the data format and how connections are established:
+
+### JSON Data Structure
+
+The component accepts an array of objects, where each object represents an entity with a unique identifier and a set of properties. The structure is as follows:
+
+```json
+[
+  {
+    "id": "Unique Identifier",
+    "properties": {
+      "propertyName": "propertyValue"
+    }
+  }
+]
+```
+
+Storybook Demonstrations
+Default Visualization
+
+<Canvas>
+  <Story id="components-visualizationcomponent--default" />
+</Canvas>
+Interactive Controls
+<ArgsTable story="Default" />
+Show Attributes
+<Canvas>
+  <Story id="components-visualizationcomponent--show-attributes" />
+</Canvas>
+Dynamic Data Input This story allows for dynamic input of JSON data, providing a way to visualize custom datasets.
+
+<Canvas>
+  <Story id="components-visualizationcomponent--dynamic-data" />
+</Canvas>

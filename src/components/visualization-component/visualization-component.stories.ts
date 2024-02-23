@@ -1,3 +1,4 @@
+import { StoriesData } from '../../utils/storiesData';
 /**
  * Storybook configuration for the 'visualization-component' web component.
  * Defines different stories and their corresponding parameters.
@@ -35,6 +36,7 @@ export default {
  */
 const Template = args => `<div style="display: flex; justify-content: center; align-items: center; height: 90vh;">
 <visualization-component 
+  data='${args.data}'
   show-attributes="${args.showAttributes}" 
   show-primary-links="${args.showPrimaryLinks}"
   display-hovered="${args.displayHovered}"
@@ -89,7 +91,35 @@ ExcludeProperties.args = {
   excludeProperties: '', //
 };
 
-// export const size = Template.bind({});
-// size.args = {
-//   size: "1350px,650px"
-// };
+/**
+ * Story for the 'visualization-component' with dynamic data input.
+ *
+ * @story
+ * @type {Object}
+ */
+export const DynamicData = Template.bind({});
+DynamicData.args = {
+  showAttributes: true,
+  showPrimaryLinks: true,
+  displayHovered: true,
+  excludeProperties: '',
+  data: '[]', 
+};
+DynamicData.argTypes = {
+  ...Default.argTypes,
+  data: {
+    control: 'text',
+    description: 'JSON data for the visualization',
+  },
+};
+
+const entityNetwork = new StoriesData();
+const entityNetworkData = entityNetwork.getNetworkData();
+// Usage example for Storybook:
+export const EntityNetworkData = Template.bind({});
+EntityNetworkData.args = {
+  showAttributes: false,
+  showPrimaryLinks: true,
+  displayHovered: true,
+  data: JSON.stringify(entityNetworkData),
+};

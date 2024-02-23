@@ -15,52 +15,76 @@
   <!-- <my-component included-properties="K1" excluded-properties="k1,p1,k2" visualization-mode="all"></my-component> -->
   <visualization-component data='[
   {
-    "pid": "21.T11148/b9b76f887845e32d29f7",
+    "id": "AtomicScaleSample",
     "properties": {
-      "profile": "KIP",
-      "hasMetada": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
-      "isMetada": "21.11152/ba06424b-17c7",
-      "digitalObjectType":"object",
-      "digitalObjectLocation":"github",
-      "digitalObjectLocationAccessProtocol":"digitalObjectLocationAccessProtocol",
-      "license":"cc4",
-      "checksum":"md5sum",
-      "dateCreated":"24-04-2010",
-      "dataModified":"24-04-2020"
+      "hasNumberofAtoms": "123",
+      "subclassOf": "SubclassOf: NanoscaleSample"
     }
   },
   {
-    "pid": "21.11152/ba06424b-17c7-4e3f-9a2e-8d09cf797be3",
+    "id": "SimulationCell",
     "properties": {
-      "profile": "KIP",
-      "Licence": "cc4",
-      "digitalObjectType":"object",
-      "digitalObjectLocation":"github",
-      "digitalObjectLocationAccessProtocol":"digitalObjectLocationAccessProtocol",
-      "checksum":"md5sum",
-      "hasMetada": "21.11152/ba0",
-      "isMetada": "21.11152/ba0",
-      "dateCreated":"24-04-2010",
-      "dataModified":"24-04-2020"
+      "hasAttribute": "AtomicScaleSample",
+      "hasVolume": "Volume= 250.5",
+      "hasRepetition_x": "RepetitionX= 5"
     }
   },
   {
-    "pid": "21.T11148/b9b76f887845e32d29f7-8d09cf797be3",
+    "id": "Atom",
     "properties": {
-      "profile": "KIP",
-      "Licence": "cc4",
-      "digitalObjectType":"object",
-      "digitalObjectLocation":"github",
-      "digitalObjectLocationAccessProtocol":"digitalObjectLocationAccessProtocol",
-      "checksum":"md5sum",
-      "hasMetada": "21.11152/ba06424b",
-      "isMetada": "21.11152/ba06",
-      "dateCreated":"24-04-2010",
-      "dataModified":"24-04-2020"
+      "hasPath": "path/to/data",
+      "subclassOf": "AtomicScaleSample"
+    }
+  },
+  {
+    "id": "Element",
+    "properties": {
+      "hasSymbol": "Symbol: He",
+      "hasElementRatio": "ElementRation= 0.982"
+    }
+  },
+  {
+    "id": "UnitCell",
+    "properties": {
+      "hasBravaisLattice": "FCC",
+      "hasLength_x": "XLength= 2.5"
+    }
+  },
+  {
+    "id": "LatticeParameter",
+    "properties": {
+      "hasLength_x": "XLength= 2.5",
+      "subclassOf": "Subclass of: UnitCell"
     }
   }
 ]
-' size="1350px,650px" exclude-properties="" show-attributes="true" show-primary-links="true">></visualization-component>
+
+' size="1350px,650px" show-legend="true" exclude-properties="hasLength_x" show-attributes="true" 
+show-primary-links="true"  
+config='
+[
+  {
+    "label":"Primary from configuration",
+    "color":"",
+    "description":"Primary Long Text",
+    "properties":
+        [
+        {
+          "hasVolume":
+          {
+            "label":"has volume",
+            "color":"black",
+            "description":"Long Text"
+          },
+          "subclassOf":
+          {"label":"Sub---class",
+          "color":"#00FF00",
+          "description":"Long Text"
+          }
+        }
+        ]
+  }
+]'></visualization-component>
   <script>
   </script>
 </body>

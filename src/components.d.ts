@@ -8,6 +8,12 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface VisualizationComponent {
         /**
+          * The configuration object for customizing the graph color, and legend.
+          * @prop 
+          * @type {any}
+         */
+        "config": any;
+        /**
           * Input data in JSON format for the graph.
           * @prop 
           * @type {string}
@@ -26,13 +32,19 @@ export namespace Components {
          */
         "excludeProperties": string;
         /**
-          * Whether to show attributes in the graph. Defaults to true. If true it will show all the attributes/properties  If false it wont show any attributes Default value : true
+          * Whether to show attributes in the graph. Defaults to true. If true it will show all the attributes/properties If false it wont show any attributes Default value : true
           * @prop 
           * @type {boolean}
          */
         "showAttributes": boolean;
         /**
-          * Whether to show primary links in the graph.  If true it will show all the links between primary nodes Defaults to true.
+          * Whether to show the legend in the graph. Defaults to true.
+          * @prop 
+          * @type {boolean}
+         */
+        "showLegend": boolean;
+        /**
+          * Whether to show primary links in the graph. If true it will show all the links between primary nodes Defaults to true.
           * @prop 
           * @type {boolean}
          */
@@ -59,6 +71,12 @@ declare global {
 declare namespace LocalJSX {
     interface VisualizationComponent {
         /**
+          * The configuration object for customizing the graph color, and legend.
+          * @prop 
+          * @type {any}
+         */
+        "config"?: any;
+        /**
           * Input data in JSON format for the graph.
           * @prop 
           * @type {string}
@@ -77,13 +95,19 @@ declare namespace LocalJSX {
          */
         "excludeProperties"?: string;
         /**
-          * Whether to show attributes in the graph. Defaults to true. If true it will show all the attributes/properties  If false it wont show any attributes Default value : true
+          * Whether to show attributes in the graph. Defaults to true. If true it will show all the attributes/properties If false it wont show any attributes Default value : true
           * @prop 
           * @type {boolean}
          */
         "showAttributes"?: boolean;
         /**
-          * Whether to show primary links in the graph.  If true it will show all the links between primary nodes Defaults to true.
+          * Whether to show the legend in the graph. Defaults to true.
+          * @prop 
+          * @type {boolean}
+         */
+        "showLegend"?: boolean;
+        /**
+          * Whether to show primary links in the graph. If true it will show all the links between primary nodes Defaults to true.
           * @prop 
           * @type {boolean}
          */

@@ -16,36 +16,68 @@ export class HandleEvents {
     this.hostElement = hostElement;
     // console.log(this.currentlyClicked, this.hostElement);
   }
-
   /**
-   * Applies mouseover event handling to the nodes for displaying tooltips.
+   * Apply mouseover event handling to the nodes for displaying tooltips and highlighting connected nodes.
    *
    * @param {any} nodes - D3 selection of graph nodes.
+   * @param {any} links - D3 selection of graph links.
+   * @param {any} tooltip - D3 selection of the tooltip element.
    */
-  applyMouseover(nodes, tooltip) {
-    nodes.on('mouseover', (event, d) => {
-      tooltip.transition().duration(200).style('opacity', 1);
+  applyMouseover(nodes, links, tooltip) {
+    const handleNodeMouseover = (event, d) => {
+      if (this.currentlyClicked === event.currentTarget) return; // Ignore if this node is clicked
+      this.clearSelection();
 
-      // Get the length of the tooltip content
-      const tooltipContent = `${d.id}`;
-      const textLength = tooltipContent.length * 7.3;
+      // Reduce the visibility of all nodes and links except the text on the links
+      links.selectAll('line').attr('stroke-opacity', 0.25); // Affect only the line part of the link
+      nodes.attr('opacity', 0.25);
+      const hoveredNode = d3.select(event.currentTarget);
+      hoveredNode.attr('stroke', '#FFA500').attr('opacity', 1);
 
-      const rectWidth = textLength + 20; // Additional padding
+      links.each(function (l) {
+        const isConnected = (l.source.id === d.id || l.target.id === d.id) && l.category === 'non_attribute';
+        if (isConnected) {
+          d3.select(this).select('line').attr('stroke-opacity', 1); // Affect only the line part of the link
+          d3.select(this).select('text').attr('opacity', 1); // Keep text fully opaque
+          nodes
+            .filter(n => n.id === l.source.id || n.id === l.target.id)
+            .attr('opacity', 1)
+            .attr('stroke', '#FFA500');
+        }
+      });
 
-      const tooltipContentHtml = `<rect width="${rectWidth}" height="40" fill="#fff" stroke="#ccc" rx="15" ry="15"></rect>
-            <text x="10" y="25" fill="#000">${d.id}</text>`;
+      tooltip
+        .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${d.name}</span></div>`) // Content with span for text
+        .transition()
+        .duration(200) // Smooth transition for appearing
+        .style('opacity', 1) // Make tooltip visible
+        .style('left', `${event.pageX + 10}px`) // Position right of the cursor
+        .style('top', `${event.pageY - 10}px`); // Position above the cursor
+    };
 
-      tooltip.html(tooltipContentHtml).style('transform', `translate(${event.pageX - 100}px, ${event.pageY - 40}px)`);
-    });
+    const handleNodeMouseout = () => {
+      if (this.currentlyClicked) return; // Ignore if a node is clicked
+      nodes.attr('stroke', null).attr('opacity', 1); // Reset stroke and restore opacity
+      links.attr('stroke-opacity', 0.2); // Reset links' opacity
+      tooltip.style('opacity', 0); // Hide tooltip
+    };
 
-    nodes.on('mousemove', event => {
-      tooltip.style('transform', `translate(${event.pageX - 40}px, ${event.pageY - 40}px)`);
-    });
+    // d3.select('body').on('mouseover', () => {
+    //   this.clearSelection();
+    //   tooltip.style('opacity', 0);
+    // });
 
-    // Handle mouseout event for nodes
-    nodes.on('mouseout', () => {
-      tooltip.transition().duration(200).style('opacity', 0);
-    });
+    nodes.on('mouseover', (event, d) => handleNodeMouseover(event, d));
+    nodes.on('mouseout', handleNodeMouseout);
+  }
+  /**
+   * Clears the current selection by resetting node and link styles.
+   */
+  clearSelection() {
+    if (!this.currentlyClicked) {
+      d3.selectAll('.node').attr('opacity', 1).attr('stroke', null).classed('selected', false);
+      d3.selectAll('.link').attr('stroke-opacity', 0.2).classed('connected', false);
+    }
   }
 
   /**
@@ -55,38 +87,48 @@ export class HandleEvents {
    * @param {any} links - D3 selection of graph links.
    */
   onClick(nodes, links) {
-    const handleNodeClick = (event, d) => {
-      // Reset the size for all nodes
-      nodes.attr('r', 10);
-
-      // Increase the size of the clicked primary node
-      const selectedNode = d3.select(event.currentTarget);
-      if (selectedNode.category === 'non_attribute') {
-        selectedNode.attr('r', 15).attr('opacity', 1);
-      }
-
-      // Iterate through links and update size
-      links.each(function (l) {
-        if (l.category === 'non_attribute' && (l.source.id === d.id || l.target.id === d.id)) {
-          d3.select(this).attr('stroke-opacity', 1);
-          nodes
-            .filter(n => n.id === l.source.id || n.id === l.target.id)
-            .attr('r', 20)
-            .attr('opacity', 1);
-        }
-      });
-    };
-
-    nodes.on('click', (event, d) => handleNodeClick(event, d));
+    nodes.on('click', (event, d) => this.handleNodeClick(event, d, nodes, links));
   }
-
+  handleNodeClick(event, d, nodes, links) {
+    // Check if the clicked node is already selected
+    const isNodeSelected = d3.select(this.currentlyClicked).classed('selected');
+    // If the clicked node is already selected, clear the selection
+    if (isNodeSelected) {
+      return;
+    }
+    if (this.currentlyClicked && this.currentlyClicked !== event.currentTarget) {
+      this.clearSelection(); // Clear any existing selection
+    }
+    this.currentlyClicked = event.currentTarget; // Store clicked node reference
+    // Mark the clicked node
+    d3.select(this.currentlyClicked).classed('selected', true);
+    // Logic to highlight the clicked node and its connected nodes
+    d3.select(this.currentlyClicked).attr('stroke', '#FFA500').attr('opacity', 1);
+    links.each(function (l) {
+      const isConnected = (l.source.id === d.id || l.target.id === d.id) && l.category === 'non_attribute';
+      if (isConnected) {
+        d3.select(this).attr('stroke-opacity', 1).classed('connected', true);
+        d3.select(this).select('line').attr('stroke-opacity', 1); // Affect only the line part of the link
+        d3.select(this).select('text').attr('opacity', 1); // Keep text fully opaque
+        nodes
+          .filter(n => n.id === l.source.id || n.id === l.target.id)
+          .attr('opacity', 1)
+          .attr('stroke', '#FFA500')
+          .classed('connected', true);
+      }
+    });
+  }
   /**
    * Applies a click handler to the body element to reset currentlyClicked when clicking outside the graph.
    */
   applyClickHandler() {
-    d3.select('body').on('click', function (event) {
-      if (event.target.nodeName === 'body' || event.target.nodeName === 'svg') {
-        this.currentlyClicked = null;
+    const self = this; // Store the reference to the class instance
+    d3.select('body').on('click', function (event: MouseEvent) {
+      const target = event.target as HTMLElement;
+      const nodeName = target.nodeName.toLowerCase();
+      if (nodeName === 'body' || nodeName === 'svg') {
+        self.clearSelection(); // Reset the selection
+        self.currentlyClicked = null; // Reset currentlyClicked
       }
     });
   }

@@ -9,7 +9,7 @@ import { HandleEvents } from '../../utils/eventHandler';
   shadow: true,
 })
 /**
- * MyComponent is a custom web component that creates an interactive, force-directed graph
+ * VisualizationComponent is a custom web component that creates an interactive, force-directed graph
  * using D3.js. It visualizes nodes and links based on provided JSON data.
  */
 export class VisualizationComponent {
@@ -68,8 +68,27 @@ export class VisualizationComponent {
    */
   @Prop() displayHovered: boolean = true;
 
+  /**
+   * Whether to show the legend in the graph. Defaults to true.
+   *
+   * @prop
+   * @type {boolean}
+   */
+  @Prop() showLegend: boolean = true;
+
+  /**
+   * The configuration object for customizing the graph color, and legend.
+   *
+   * @prop
+   * @type {any}
+   */
+  @Prop() config: any;
+
   private tooltip;
   public chartData: any;
+  public parsedConfig: any;
+  public primaryNodeColor = '#008080';
+
   /**
    * Declare a private instance variable of the 'PrepareData' class.
    * It is used for preparing or processing data for the chart.
@@ -116,11 +135,17 @@ export class VisualizationComponent {
    */
   @Watch('showAttributes')
   showAttributesChanged(newValue: boolean) {
-    console.log('showAttributesChanged called with:', newValue);
     this.dataUtil = new PrepareData(this.showPrimaryLinks, newValue);
     this.generateD3Graph(this.chartData);
   }
 
+  /**
+   * Callback invoked when the 'showPrimaryLinks' property changes.
+   * Updates the data utility and regenerates the D3 graph.
+   *
+   * @watch
+   * @param {boolean} newValue - The new value of 'showPrimaryLinks'.
+   */
   @Watch('showPrimaryLinks')
   showPrimaryLinksChanged(newValue: boolean) {
     this.dataUtil = new PrepareData(newValue, this.showAttributes);
@@ -143,8 +168,20 @@ export class VisualizationComponent {
         this.chartData = [];
       }
     } catch (error) {
-      console.error('Input data is incorrect', error);
+      console.error('Error parsing input data:', error);
       this.chartData = [];
+    }
+
+    try {
+      if (this.config && Object.keys(this.config).length > 0) {
+        // Check if config is provided and not empty
+        this.parsedConfig = JSON.parse(this.config); // Parse legendConfig
+      } else {
+        this.parsedConfig = [];
+      }
+    } catch (error) {
+      console.error('Error parsing legendConfig:', error);
+      this.parsedConfig = [];
     }
   }
   /**
@@ -166,13 +203,12 @@ export class VisualizationComponent {
    */
   generateD3Graph(setupData: any[]) {
     this.dataUtil.setShowAttributes(this.showAttributes);
-
     // Prepare data
     let defaultComponentData = Array.isArray(setupData) && setupData.length > 0 ? setupData : this.dataUtil.getDefaultComponentData();
     const excludeProperties = this.excludeProperties.split(',');
     let transformedData = this.dataUtil.transformData(defaultComponentData, excludeProperties);
 
-    // Set up color scale
+    // Set up color scale for links
     const colorType = d3.scaleOrdinal(transformedData.links.map(d => d.relationType).sort(d3.ascending), d3.schemeCategory10);
 
     // Initialize SVG and graph setup
@@ -180,18 +216,43 @@ export class VisualizationComponent {
     this.d3GraphSetup.clearSVG(svg);
 
     this.d3GraphSetup.createCustomMarkers(svg, transformedData.links, colorType);
+    const uniqueAttributeNames = Array.from(new Set(transformedData.nodes.filter(node => node.category === 'attribute').map(node => Object.keys(node)[1])));
+    const { attributeColorMap, attributeColorScale } = this.d3GraphSetup.attributeColorSetup(uniqueAttributeNames, this.parsedConfig);
+    this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
+
+    // The color for primary nodes
+    const { legendConfigurations, primaryConfig } = this.d3GraphSetup.prepareLegend(uniqueAttributeNames, this.parsedConfig, attributeColorScale);
+    this.primaryNodeColor = primaryConfig.color;
+
+    // Create the node legend
+    this.d3GraphSetup.createNodeLegend(svg, this.primaryNodeColor, this.showLegend, legendConfigurations, attributeColorMap, this.tooltip, primaryConfig);
+    this.d3GraphSetup.updateForceProperties({
+      center: {
+        x: 0.5, // Center position on the x-axis (0.5 for the middle of the SVG)
+        y: 0.5, // Center position on the y-axis (0.5 for the middle of the SVG)
+      },
+      charge: {
+        enabled: true,
+        strength: -10,
+        distanceMin: 40,
+        distanceMax: 2000,
+      },
+      link: {
+        distance: 90, // Adjust link distance as needed
+      },
+      // Add or update additional force properties as needed
+    });
     // Create force simulation
     const simulation = this.d3GraphSetup.createForceSimulation(transformedData.nodes, transformedData.links, numericWidth, numericHeight);
 
     // Create links and nodes
     const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
-    const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes);
+    const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, this.primaryNodeColor, attributeColorMap);
 
-    this.tooltip = svg.append('g').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute');
-
+    // this.tooltip = svg.append('g').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute');
     // Apply event handlers
     this.handleEvents.onClick(nodes, links);
-    if (this.displayHovered) this.handleEvents.applyMouseover(nodes, this.tooltip);
+    if (this.displayHovered) this.handleEvents.applyMouseover(nodes, links, this.tooltip);
     this.handleEvents.applyDragToNodes(nodes, simulation);
     this.handleEvents.applyClickHandler();
 
