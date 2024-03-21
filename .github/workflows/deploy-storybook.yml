@@ -32,3 +32,5 @@ jobs:
           build_command: |
             npm run build
             npm run build-storybook
+env:
+  name: github-pages
