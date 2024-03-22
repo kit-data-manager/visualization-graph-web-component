@@ -20,6 +20,8 @@ jobs:
       contents: read
       pages: write
       id-token: write
+    environment: 
+        name: github-pages
 
     steps:
       - name: Checkout
@@ -32,5 +34,3 @@ jobs:
           build_command: |
             npm run build
             npm run build-storybook
-env:
-  name: github-pages
