@@ -44,10 +44,10 @@
     "d3": "^7.8.5"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^7.6.17",
-    "@storybook/addon-links": "^8.0.0",
+    "@storybook/addon-essentials": "^8.0.4",
+    "@storybook/addon-links": "^8.0.4",
     "@storybook/blocks": "^7.3.1",
-    "@storybook/web-components": "^8.0.0",
+    "@storybook/web-components": "^8.0.4",
     "@storybook/web-components-vite": "^8.0.2",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.30",
