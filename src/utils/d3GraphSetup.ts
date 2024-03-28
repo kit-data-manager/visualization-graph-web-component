@@ -21,6 +21,8 @@ export class GraphSetup {
    * @type {string}
    */
   private size: string = '1350px,650px';
+  private legendNodeSize= 8;
+  private legendTextSize= 14;
 
   /**
    * Default force properties for the graph simulation.
@@ -201,7 +203,7 @@ export class GraphSetup {
       .attr('dy', -5); // Offset from the line
 
     return linkGroup;
-  }
+}
 
   /**
    * Creates and appends node elements to the graph SVG.
@@ -412,21 +414,23 @@ export class GraphSetup {
     const legendHeight = 200;
     const legendWidth = 250;
 
-    // Create a container for the scrollable legend
-    const legendContainer = svg
-      .append('foreignObject')
-      .attr('x', legendX - legendWidth)
-      .attr('y', 420)
-      .attr('width', legendWidth)
-      .attr('height', legendHeight)
-      .append('xhtml:div')
-      .style('overflow', 'auto')
-      .style('height', `${legendHeight}px`);
+// Create a container for the scrollable legend
+const legendContainer = svg
+  .append('foreignObject')
+  .attr('x', legendX - legendWidth)
+  .attr('y', 420)
+  .attr('width', legendWidth)
+  .attr('height', legendHeight)
+  .append('xhtml:div')
+  .style('overflow', 'auto')
+  .style('height', `${legendHeight}px`)
+  .style('font-size', `${this.legendTextSize}px`); // Adjust font size using legendNodeSize variable
+
 
     const legend = legendContainer.append('div').style('cursor', 'pointer');
 
     // Add primary node color to the legend
-    const primaryItem = this.addLegendItem(legend, primaryConfig.color || primaryNodeColor, primaryConfig.label || 'Primary Node', 10, primaryConfig.description || 'Primary'); // Size 10 for primary node
+    const primaryItem = this.addLegendItem(legend, primaryConfig.color || primaryNodeColor, primaryConfig.label || 'Primary Node', this.legendNodeSize, primaryConfig.description || 'Primary'); // Size 10 for primary node
     // Event listener for primary item mouseover
     primaryItem.on('mouseover', event => {
       tooltip
@@ -446,7 +450,7 @@ export class GraphSetup {
     // Create legend items from the configurations or directly from attributeColorMap
     legendConfigurations.forEach(({ attributeKey, label, description }) => {
       const color = attributeColorMap.get(attributeKey) || primaryNodeColor; // Fallback to primaryNodeColor if not found
-      const item = this.addLegendItem(legend, color, label || attributeKey, 6, description); // Use label or attributeKey if label not provided
+      const item = this.addLegendItem(legend, color, label || attributeKey, this.legendNodeSize, description); // Use label or attributeKey if label not provided
       // Event listener for legend item mouseover
       item.on('mouseover', event => {
         const legendDescription = description || attributeKey;
