@@ -482,17 +482,19 @@ const legendContainer = svg
     const item = legend.append('div').style('display', 'flex').style('align-items', 'center').style('margin-bottom', '10px'); // Increase spacing if needed
 
     // Adjust the circle to reflect the node size
-    item
-      .append('svg')
-      .attr('width', 24)
-      .attr('height', 24)
-      .attr('class', 'legend-item')
-      .append('circle')
-      .attr('cx', 12) // Center the circle in the SVG
-      .attr('cy', 12) // Adjust cy to vertically center, considering the SVG's height
-      .attr('r', size) // Use the dynamic size for the circle
-      .style('fill', color)
-      .attr('data-description', description); // Set data attribute for description
+       item
+       .append('svg')
+       .attr('width', size * 2 ) // Adjust width and height to match the square size
+       .attr('height', size * 2 )
+       .attr('class', 'legend-item')
+       .append('rect') // Use rect instead of circle
+       .attr('x', 0) // Set x position to 0
+       .attr('y', 0) // Set y position to 0
+       .attr('width', size * 2) // Set width and height to match the square size
+       .attr('height', size * 2)
+       .style('fill', color)
+       .attr('data-description', description); // Set data attribute for description
+
 
     item.append('span').style('margin-left', '10px').text(label); // The label already describes the node
     return item;
