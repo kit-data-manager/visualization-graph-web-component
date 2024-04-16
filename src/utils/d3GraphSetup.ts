@@ -78,10 +78,10 @@ export class GraphSetup {
     // Set up zoom behavior directly on the SVG element
     const zoom = d3
       .zoom()
-      .scaleExtent([0.5, 5]) // Adjust scale extent as needed
+      .scaleExtent([1, 1]) // Adjust scale extent as needed
       .on('zoom', event => {
         svg.attr('transform', event.transform); // Apply zoom directly to SVG
-      });
+      }); 
     svg.call(zoom);
     return { svg, numericWidth, numericHeight };
   }
@@ -339,14 +339,12 @@ export class GraphSetup {
       return {
         primaryConfig: {
           label: '',
-          color: '',
-          description: '',
+          color: 'grey'
         },
         legendConfigurations: uniqueAttributeNames.map(attributeName => ({
           label: attributeName,
           color: attributeColorScale(attributeName) || '#defaultColor',
-          attributeKey: attributeName,
-          description: 'default',
+          attributeKey: attributeName
         })),
       };
     }
@@ -354,7 +352,7 @@ export class GraphSetup {
     const primaryConfig = userConfigs[0];
     const primaryLabel = primaryConfig.label || '';
     const primaryColor = primaryConfig.color || '#008080';
-    const primaryDescription = primaryConfig.description || '';
+    const primaryDescription = primaryConfig.description ? primaryConfig.description : '';
 
     const legendConfigurations = uniqueAttributeNames.map(attributeName => {
       let customConfig = null;
@@ -371,14 +369,13 @@ export class GraphSetup {
           label: customConfig.label || attributeName,
           color: customConfig.color || attributeColorScale(attributeName) || '#defaultColor',
           attributeKey: attributeName,
-          description: customConfig.description || '',
+          description: customConfig.description
         };
       } else {
         return {
           label: attributeName,
           color: attributeColorScale(attributeName) || '#defaultColor',
-          attributeKey: attributeName,
-          description: '',
+          attributeKey: attributeName
         };
       }
     });
@@ -429,23 +426,25 @@ const legendContainer = svg
 
     const legend = legendContainer.append('div').style('cursor', 'pointer');
 
-    // Add primary node color to the legend
-    const primaryItem = this.addLegendItem(legend, primaryConfig.color || primaryNodeColor, primaryConfig.label || 'Primary Node', this.legendNodeSize, primaryConfig.description || 'Primary'); // Size 10 for primary node
-    // Event listener for primary item mouseover
-    primaryItem.on('mouseover', event => {
-      tooltip
-      .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${primaryConfig.description || ''}</span></div>`) // Content with span for text
-      .transition()
-        .duration(200)
-        .style('opacity', 1)
-        .style('left', `${event.pageX + 10}px`)
-        .style('top', `${event.pageY - 10}px`);
-    });
+ // Add primary node color to the legend
+const primaryItem = this.addLegendItem(legend, primaryConfig.color || primaryNodeColor, primaryConfig.label || 'Primary Node', this.legendNodeSize, primaryConfig.description || 'Primary'); // Size 10 for primary node
+// Event listener for primary item mouseover
+primaryItem.on('mouseover', event => {
+    if (primaryConfig.description) {
+        tooltip
+            .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${primaryConfig.description}</span></div>`) // Content with span for text
+            .transition()
+            .duration(200)
+            .style('opacity', 1)
+            .style('left', `${event.pageX + 10}px`)
+            .style('top', `${event.pageY - 10}px`);
+    }
+});
 
-    // Event listener for primary item mouseout
-    primaryItem.on('mouseout', () => {
-      tooltip.style('opacity', 0);
-    });
+// Event listener for primary item mouseout
+primaryItem.on('mouseout', () => {
+    tooltip.style('opacity', 0);
+});
 
     // Create legend items from the configurations or directly from attributeColorMap
     legendConfigurations.forEach(({ attributeKey, label, description }) => {
@@ -453,14 +452,15 @@ const legendContainer = svg
       const item = this.addLegendItem(legend, color, label || attributeKey, this.legendNodeSize, description); // Use label or attributeKey if label not provided
       // Event listener for legend item mouseover
       item.on('mouseover', event => {
-        const legendDescription = description || attributeKey;
-        tooltip
-        .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${legendDescription}</span></div>`) // Content with span for text
-          .transition()
-          .duration(200)
-          .style('opacity', 1)
-          .style('left', `${event.pageX + 10}px`)
-          .style('top', `${event.pageY - 10}px`);
+        if(description){
+          tooltip
+          .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${description}</span></div>`) // Content with span for text
+            .transition()
+            .duration(200)
+            .style('opacity', 1)
+            .style('left', `${event.pageX + 10}px`)
+            .style('top', `${event.pageY - 10}px`);
+        }
       });
 
       // Event listener for legend item mouseout
