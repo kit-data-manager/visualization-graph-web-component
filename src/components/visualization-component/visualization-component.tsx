@@ -66,7 +66,7 @@ export class VisualizationComponent {
    * @prop
    * @type {boolean}
    */
-  @Prop() displayHovered: boolean = true;
+  @Prop() showDetailsOnHover: boolean = true;
 
   /**
    * Whether to show the legend in the graph. Defaults to true.
@@ -82,7 +82,7 @@ export class VisualizationComponent {
    * @prop
    * @type {any}
    */
-  @Prop() config: any;
+  @Prop() configurations: any;
 
   private tooltip;
   public chartData: any;
@@ -173,8 +173,8 @@ export class VisualizationComponent {
     }
 
     try {
-      if (this.config && Object.keys(this.config).length > 0) {
-        this.parsedConfig = JSON.parse(this.config); // Parse legendConfig
+      if (this.configurations && Object.keys(this.configurations).length > 0) {
+        this.parsedConfig = JSON.parse(this.configurations); // Parse legendConfig
       } else {
         this.parsedConfig = [];
       }
@@ -214,7 +214,7 @@ export class VisualizationComponent {
     const { svg, numericWidth, numericHeight } = this.d3GraphSetup.initializeSVG();
     this.d3GraphSetup.clearSVG(svg);
 
-    this.d3GraphSetup.createCustomMarkers(svg, transformedData.links, colorType);
+    // this.d3GraphSetup.createCustomMarkers(svg, transformedData.links, colorType);
     const uniqueAttributeNames = Array.from(new Set(transformedData.nodes.filter(node => node.category === 'attribute').map(node => Object.keys(node)[1])));
     const { attributeColorMap, attributeColorScale } = this.d3GraphSetup.attributeColorSetup(uniqueAttributeNames, this.parsedConfig);
     this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
@@ -249,7 +249,7 @@ export class VisualizationComponent {
 
     // Apply event handlers
     this.handleEvents.onClick(nodes, links);
-    if (this.displayHovered) this.handleEvents.applyMouseover(nodes, links, this.tooltip);
+    if (this.showDetailsOnHover) this.handleEvents.applyMouseover(nodes, links, this.tooltip);
     this.handleEvents.applyDragToNodes(nodes, simulation);
     this.handleEvents.applyClickHandler();
 

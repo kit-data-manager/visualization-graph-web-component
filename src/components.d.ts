@@ -12,19 +12,13 @@ export namespace Components {
           * @prop 
           * @type {any}
          */
-        "config": any;
+        "configurations": any;
         /**
           * Input data in JSON format for the graph.
           * @prop 
           * @type {string}
          */
         "data": string;
-        /**
-          * Whether to show hover effects on the graph nodes. Defaults to true.
-          * @prop 
-          * @type {boolean}
-         */
-        "displayHovered": boolean;
         /**
           * Properties to be excluded from outside the component. Defaults to an empty string.
           * @prop 
@@ -37,6 +31,12 @@ export namespace Components {
           * @type {boolean}
          */
         "showAttributes": boolean;
+        /**
+          * Whether to show hover effects on the graph nodes. Defaults to true.
+          * @prop 
+          * @type {boolean}
+         */
+        "showDetailsOnHover": boolean;
         /**
           * Whether to show the legend in the graph. Defaults to true.
           * @prop 
@@ -75,19 +75,13 @@ declare namespace LocalJSX {
           * @prop 
           * @type {any}
          */
-        "config"?: any;
+        "configurations"?: any;
         /**
           * Input data in JSON format for the graph.
           * @prop 
           * @type {string}
          */
         "data"?: string;
-        /**
-          * Whether to show hover effects on the graph nodes. Defaults to true.
-          * @prop 
-          * @type {boolean}
-         */
-        "displayHovered"?: boolean;
         /**
           * Properties to be excluded from outside the component. Defaults to an empty string.
           * @prop 
@@ -100,6 +94,12 @@ declare namespace LocalJSX {
           * @type {boolean}
          */
         "showAttributes"?: boolean;
+        /**
+          * Whether to show hover effects on the graph nodes. Defaults to true.
+          * @prop 
+          * @type {boolean}
+         */
+        "showDetailsOnHover"?: boolean;
         /**
           * Whether to show the legend in the graph. Defaults to true.
           * @prop 

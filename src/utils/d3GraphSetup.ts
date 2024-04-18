@@ -276,27 +276,27 @@ export class GraphSetup {
         .attr('fill', colorType(elem));
     });
   }
-  /**
-   * Creates a custom marker for use in SVG definitions.
-   *
-   * @param {SVGDefsElement} defs - The SVG definitions element.
-   * @param {string} id - The ID of the marker.
-   * @param {string} color - The color of the marker.
-   */
-  createMarker(defs, id, color) {
-    defs
-      .append('svg:marker')
-      .attr('id', id)
-      .attr('refX', 20)
-      .attr('refY', 20)
-      .attr('markerWidth', 40)
-      .attr('markerHeight', 40)
-      .attr('markerUnits', 'userSpaceOnUse')
-      .attr('orient', 'auto')
-      .append('path')
-      .attr('d', 'M0,0Q15,0,20,10,15,20,0,20A1,1,0,000,0') //d3.line()([[0, 0], [0, 20], [20, 10]]))
-      .style('fill', color);
-  }
+  // /**
+  //  * Creates a custom marker for use in SVG definitions.
+  //  *
+  //  * @param {SVGDefsElement} defs - The SVG definitions element.
+  //  * @param {string} id - The ID of the marker.
+  //  * @param {string} color - The color of the marker.
+  //  */
+  // createMarker(defs, id, color) {
+  //   defs
+  //     .append('svg:marker')
+  //     .attr('id', id)
+  //     .attr('refX', 20)
+  //     .attr('refY', 20)
+  //     .attr('markerWidth', 40)
+  //     .attr('markerHeight', 40)
+  //     .attr('markerUnits', 'userSpaceOnUse')
+  //     .attr('orient', 'auto')
+  //     .append('path')
+  //     .attr('d', 'M0,0Q15,0,20,10,15,20,0,20A1,1,0,000,0') //d3.line()([[0, 0], [0, 20], [20, 10]]))
+  //     .style('fill', color);
+  // }
 
   /**
    * Applies the force simulation to update link and node positions on each simulation tick.
@@ -444,6 +444,7 @@ primaryItem.on('mouseover', event => {
 // Event listener for primary item mouseout
 primaryItem.on('mouseout', () => {
     tooltip.style('opacity', 0);
+    tooltip.html(''); // Clear tooltip content
 });
 
     // Create legend items from the configurations or directly from attributeColorMap

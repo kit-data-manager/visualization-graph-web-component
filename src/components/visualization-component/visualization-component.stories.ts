@@ -20,13 +20,6 @@ export default {
    * @story
    * @type {Object}
    */
-  argTypes: {
-    showAttributes: { control: 'radio', options: [true, false] },
-    excludeProperties: {
-      control: 'text',
-      description: 'Comma-separated list of properties to exclude',
-    },
-  },
 };
 /**
  * Template function to create a basic story with the 'visualization-component'.
@@ -39,26 +32,73 @@ const Template = args => `<div style="display: flex; justify-content: center; al
   data='${args.data}'
   show-attributes="${args.showAttributes}" 
   show-primary-links="${args.showPrimaryLinks}"
-  display-hovered="${args.displayHovered}"
+  show-details-on-hover="${args.showDetailsOnHover}"
   exclude-properties="${args.excludeProperties}"
   size ="1350px,650px"
+  config='${args.configurations}'
 ></visualization-component>`;
+
+const storiesData = new StoriesData();
+const entityNetworkData = storiesData.getNetworkData();
+const defaultConfigurationSettings = storiesData.getDefaultConfigurationSettings();
+
+const defaultData = storiesData.getDefaultData();
 
 export const Default = Template.bind({});
 Default.args = {
   showAttributes: true,
+  showLegend: true,
+  showDetailsOnHover: true,
   showPrimaryLinks: true,
-  displayHovered: true,
+  data: JSON.stringify(defaultData, null, 2),
+  configurations: JSON.stringify(defaultConfigurationSettings,null,2)
 };
+
+export const ChangeConfigurationsSettings = Template.bind({});
+ChangeConfigurationsSettings.args = {
+  configurations: JSON.stringify(defaultConfigurationSettings,null,2), // Pass the configuration data here
+  showLegend: true,
+  showAttributes: true,
+  showPrimaryLinks: true,
+  showDetailsOnHover: true,
+  data: JSON.stringify(entityNetworkData, null, 2),
+};
+
+export const ExcludeSomeProperties = Template.bind({});
+ExcludeSomeProperties.args = {
+  excludeProperties: 'genre,title',
+  showLegend: true,
+  showAttributes: true,
+  showPrimaryLinks: true,
+  showDetailsOnHover: true,
+  data: JSON.stringify(entityNetworkData, null, 2),
+  configurations: JSON.stringify(defaultConfigurationSettings,null,2), // Pass the configuration data here
+};
+
+export const EnterData = Template.bind({});
+EnterData.args = {
+  data: JSON.stringify(entityNetworkData, null, 2),
+  configurations: JSON.stringify(defaultConfigurationSettings,null,2), // Pass the configuration data here
+  showLegend: true,
+  showAttributes: true,
+  showPrimaryLinks: true,
+  showDetailsOnHover: true,
+};
+
 /**
  * Story for the 'visualization-component' with showAttributes set to true.
  *
  * @story
  * @type {Object}
  */
-export const ShowAttributes = Template.bind({});
-ShowAttributes.args = {
-  showAttributes: true,
+export const HideAttributes = Template.bind({});
+HideAttributes.args = {
+  showAttributes: false,
+  showLegend: true,
+  showPrimaryLinks: true,
+  showDetailsOnHover: true,
+  data: JSON.stringify(defaultData, null, 2),
+  configurations: JSON.stringify(defaultConfigurationSettings,null,2)
 };
 
 /**
@@ -67,59 +107,33 @@ ShowAttributes.args = {
  * @story
  * @type {Object}
  */
-// export const ShowAttributesFalse = Template.bind({});
-// ShowAttributesFalse.args = {
-//   showAttributes: false,
-// };
 
-export const showPrimaryLinks = Template.bind({});
-showPrimaryLinks.args = {
+export const HidePrimaryLinks = Template.bind({});
+HidePrimaryLinks.args = {
   showPrimaryLinks: false,
+  showLegend: true,
+  showAttributes: true,
+  showDetailsOnHover: true,
+  data: JSON.stringify(defaultData, null, 2),
+  configurations: JSON.stringify(defaultConfigurationSettings,null,2)
 };
 
-export const displayHovered = Template.bind({});
-displayHovered.args = {
-  displayHovered: true,
-};
-
-export const ExcludeProperties = Template.bind({});
-ExcludeProperties.args = {
+export const HideDetailsOnHover = Template.bind({});
+HideDetailsOnHover.args = {
+  showDetailsOnHover: false,
+  showLegend: true,
   showAttributes: true,
   showPrimaryLinks: true,
-  displayHovered: true,
-  size: '1350px,650px',
-  excludeProperties: '', //
+  data: JSON.stringify(defaultData, null, 2),
+  configurations: JSON.stringify(defaultConfigurationSettings,null,2)
 };
 
-/**
- * Story for the 'visualization-component' with dynamic data input.
- *
- * @story
- * @type {Object}
- */
-export const DynamicData = Template.bind({});
-DynamicData.args = {
+export const HideLegend = Template.bind({});
+HideLegend.args = {
+  showLegend: false,
   showAttributes: true,
   showPrimaryLinks: true,
-  displayHovered: true,
-  excludeProperties: '',
-  data: '[]', 
-};
-DynamicData.argTypes = {
-  ...Default.argTypes,
-  data: {
-    control: 'text',
-    description: 'JSON data for the visualization',
-  },
-};
-
-const entityNetwork = new StoriesData();
-const entityNetworkData = entityNetwork.getNetworkData();
-// Usage example for Storybook:
-export const EntityNetworkData = Template.bind({});
-EntityNetworkData.args = {
-  showAttributes: false,
-  showPrimaryLinks: true,
-  displayHovered: true,
-  data: JSON.stringify(entityNetworkData),
+  showDetailsOnHover: true,
+  data: JSON.stringify(defaultData, null, 2),
+  configurations: JSON.stringify(defaultConfigurationSettings,null,2)
 };
