@@ -39,10 +39,16 @@ const Template = args => `<div style="display: flex; justify-content: center; al
 ></visualization-component>`;
 
 const storiesData = new StoriesData();
-const entityNetworkData = storiesData.getNetworkData();
-const defaultConfigurationSettings = storiesData.getDefaultConfigurationSettings();
 
+const entityNetworkData = storiesData.getNetworkData();
 const defaultData = storiesData.getDefaultData();
+const midSizeData = storiesData.getMidSizeData();
+const highSizeData = storiesData.getMidSizeData();
+
+const defaultConfigurationSettings = storiesData.getDefaultConfigurationSettings();
+const midSizeConfigurationSettings = storiesData.getMidSizeConfigurationSettings();
+const highSizeConfigurationSettings = storiesData.getHighSizeConfigurationSettings();
+
 
 export const Default = Template.bind({});
 Default.args = {
@@ -136,4 +142,26 @@ HideLegend.args = {
   showDetailsOnHover: true,
   data: JSON.stringify(defaultData, null, 2),
   configurations: JSON.stringify(defaultConfigurationSettings,null,2)
+};
+
+export const MidComplexityExample = Template.bind({});
+MidComplexityExample.args = {
+  showLegend: false,
+  showAttributes: false,
+  showPrimaryLinks: true,
+  showDetailsOnHover: true,
+  data: JSON.stringify(midSizeData, null, 2),
+  configurations: JSON.stringify(midSizeConfigurationSettings,null,2),
+  size :"900px,650px"
+};
+
+export const HighComplexityExample = Template.bind({});
+HighComplexityExample.args = {
+  showLegend: false,
+  showAttributes: false,
+  showPrimaryLinks: true,
+  showDetailsOnHover: true,
+  data: JSON.stringify(highSizeData, null, 2),
+  configurations: JSON.stringify(highSizeConfigurationSettings,null,2),
+  size :"900px,650px"
 };
