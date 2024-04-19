@@ -1,6 +1,7 @@
 # Visualization Component
 
-The visualization-component is a dynamic, interactive graph component built using D3.js. It is designed to render graphs based on provided JSON data, making it ideal for visualizing complex relationships and networks in an intuitive manner. The component supports various interactive features like hover effects, node dragging, and click events to reveal connections between entities. This makes it an excellent tool for exploring and understanding intricate data relationships.
+The visualization-component is a dynamic, interactive graph component built using D3.js library. It is designed to render graphs based on provided JSON data, making it ideal for visualizing complex relationships and networks in an intuitive manner. The component supports various interactive features like hover effects, node dragging, and click events to reveal connections between entities. 
+There are features that allows users to customize color, description, label dynamically. This makes it an excellent tool for exploring and understanding intricate data relationships.
 
 ## Data Format and Connection Representation
 
@@ -82,8 +83,9 @@ Users can easily customize the web component by setting various properties:
 - `showAttributes`: Choose to show or hide attributes(in above case properties any entity) in the graph. Defaults to true.
 - `showPrimaryLinks`: Choose to show primary links(relation between two entities). If true it will show all the links between primary nodes. Defaults to true.
 - `excludeProperties`: Specify any properties to exclude from the visualization.
-- `displayHovered`: Enable or disable hover effects on graph nodes.
-- `show-legend`: Allow user to chose to see legend. 
+- `showDetailsOnHover`: Enable or disable hover effects on graph nodes.
+- `showLegend`: Allow user to chose to see legend. 
+- `configurations`: Allow user to customize properties dynamically. eg: color, label, description etc  
 
 These properties allow for flexible configuration, catering to different data sets and visualization requirements, making the Visualization Component a versatile tool for data analysis and presentation.
 
