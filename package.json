@@ -1,6 +1,6 @@
 {
   "name": "@kit-data-manager/visualization-component",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "The visualization-component is a dynamic, interactive graph component built using D3.js. It is designed to render graphs based on provided JSON data, making it ideal for visualizing complex relationships and networks in an intuitive manner.",
   "author":"Ajay Kirar <ajay.kirar@kit.edu> (https://orcid.org/0009-0008-3532-7018) ",
   "contributors": [
