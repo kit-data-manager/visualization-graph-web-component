@@ -52,28 +52,6 @@ export class StoriesData {
             }
           }
           ];
-        
-        this.defaultConfigurationSettings = [
-            {
-              label: "Primary Node",
-              color: "red",
-              description: "Famous artists and their art",
-              properties: [
-                {
-                  hitSong: {
-                    label: "Hit Song",
-                    color: "",
-                    description: "Song which was top of billboard chart for a year"
-                  },
-                  album:{
-                    label: "Album",
-                    color: "",
-                    description: ""
-                  }
-                }
-              ]
-            }
-          ];
 
           this.midSizeData = [
             {
@@ -443,23 +421,6 @@ export class StoriesData {
                   field: "Physics",
                   recognition: "Schrödinger cat"
               }
-            }
-          ];
-
-          this.midSizeConfigurationSettings = [
-            {
-              label: "Primary Node",
-              color: "",
-              description: "Scientists and Discoveries/Inventions",
-              properties: [
-                {
-                  contribution: {
-                    label: "Contribution",
-                    color: "",
-                    description: "Most known contibution in the lifetime"
-                  }
-                }
-              ]
             }
           ];
           
@@ -882,7 +843,44 @@ export class StoriesData {
                 }
               }
             ]
-
+          
+          this.defaultConfigurationSettings = [
+              {
+                label: "Primary Node",
+                color: "",
+                description: "Famous artists and their art",
+                properties: [
+                  {
+                    hitSong: {
+                      label: "Hit Song",
+                      color: "",
+                      description: "Song which was top of billboard chart for a year"
+                    },
+                    album:{
+                      label: "Album",
+                      color: "",
+                      description: ""
+                    }
+                  }
+                ]
+              }
+            ];
+            this.midSizeConfigurationSettings = [
+              {
+                label: "Primary Node",
+                color: "",
+                description: "Scientists and Discoveries/Inventions",
+                properties: [
+                  {
+                    contribution: {
+                      label: "Contribution",
+                      color: "",
+                      description: "Most known contibution in the lifetime"
+                    }
+                  }
+                ]
+              }
+            ];
           this.highSizeConfigurationSettings = [
             {
               label: "Primary Node",
