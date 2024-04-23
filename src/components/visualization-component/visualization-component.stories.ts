@@ -34,8 +34,9 @@ const Template = args => `<div style="display: flex; justify-content: center; al
   show-primary-links="${args.showPrimaryLinks}"
   show-details-on-hover="${args.showDetailsOnHover}"
   exclude-properties="${args.excludeProperties}"
+  show-legend="${args.showLegend}"
   size ="1350px,650px"
-  config='${args.configurations}'
+  configurations='${args.configurations}'
 ></visualization-component>`;
 
 const storiesData = new StoriesData();

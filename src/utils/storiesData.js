@@ -7,76 +7,50 @@ export class StoriesData {
      */  
       constructor() {
         this.defaultData = [
-            {
-              id: 'Michael Jackson',
-              properties: {
-                genre: 'Pop',
-                hitSong: 'Thriller',
-                album: 'Thriller'
-              }
-            },
-            {
-              id: 'Thriller',
-              properties: {
-                title: 'Thriller',
-                artist: 'Michael Jackson',
-                year: '1982'
-              }
-            },
-            {
-              id: 'The Beatles',
-              properties: {
-                genre: 'Rock',
-                hitSong: 'Hey Jude',
-                album: 'Abbey Road'
-              }
-            },
-            {
-              id: 'Abbey Road',
-              properties: {
-                title: 'Abbey Road',
-                artist: 'The Beatles',
-                year: '1969'
-              }
-            },
-            {
-              id: 'Elvis Presley',
-              properties: {
-                genre: 'Rock and Roll',
-                hitSong: 'Heartbreak Hotel',
-                album: 'Elvis Presley'
-              }
-            },
-            {
-              id: 'Leonardo Da Vinci',
-              properties: {
-                occupation: 'Polymath',
-                knownFor: 'Mona Lisa',
-                birthYear: '1452'
-              }
+          {
+            "id": "Michael Jackson",
+            "properties": {
+              "genre": "Pop",
+              "hitSong": "Thriller"
             }
-          ];
-        
-        this.defaultConfigurationSettings = [
-            {
-              label: "Primary Node",
-              color: "",
-              description: "Famous artists and their art",
-              properties: [
-                {
-                  hitSong: {
-                    label: "Hit Song",
-                    color: "",
-                    description: "Song which was top of billboard chart for a year"
-                  },
-                  album:{
-                    label: "Album",
-                    color: "",
-                    description: ""
-                  }
-                }
-              ]
+          },
+          {
+            "id": "Thriller",
+            "properties": {
+              "artist": "Michael Jackson",
+              "year": "1982"
             }
+          },
+          {
+            "id": "The Beatles",
+            "properties": {
+              "genre": "Rock",
+              "hitSong": "Hey Jude",
+              "album": "Abbey Road"
+            }
+          },
+          {
+            "id": "Abbey Road",
+            "properties": {
+              "artist": "The Beatles",
+              "year": "1969"
+            }
+          },
+          {
+            "id": "Elvis Presley",
+            "properties": {
+              "genre": "Rock and Roll",
+              "hitSong": "Heartbreak Hotel"
+            }
+          },
+          {
+            "id": "Leonardo Da Vinci",
+            "properties": {
+              "occupation": "Polymath",
+              "knownFor": "Mona Lisa",
+              "birthYear": "1452"
+            }
+          }
           ];
 
           this.midSizeData = [
@@ -447,23 +421,6 @@ export class StoriesData {
                   field: "Physics",
                   recognition: "Schrödinger cat"
               }
-            }
-          ];
-
-          this.midSizeConfigurationSettings = [
-            {
-              label: "Primary Node",
-              color: "",
-              description: "Scientists and Discoveries/Inventions",
-              properties: [
-                {
-                  contribution: {
-                    label: "Contribution",
-                    color: "",
-                    description: "Most known contibution in the lifetime"
-                  }
-                }
-              ]
             }
           ];
           
@@ -886,7 +843,44 @@ export class StoriesData {
                 }
               }
             ]
-
+          
+          this.defaultConfigurationSettings = [
+              {
+                label: "Primary Node",
+                color: "",
+                description: "Famous artists and their art",
+                properties: [
+                  {
+                    hitSong: {
+                      label: "Hit Song",
+                      color: "",
+                      description: "Song which was top of billboard chart for a year"
+                    },
+                    album:{
+                      label: "Album",
+                      color: "",
+                      description: ""
+                    }
+                  }
+                ]
+              }
+            ];
+            this.midSizeConfigurationSettings = [
+              {
+                label: "Primary Node",
+                color: "",
+                description: "Scientists and Discoveries/Inventions",
+                properties: [
+                  {
+                    contribution: {
+                      label: "Contribution",
+                      color: "",
+                      description: "Most known contibution in the lifetime"
+                    }
+                  }
+                ]
+              }
+            ];
           this.highSizeConfigurationSettings = [
             {
               label: "Primary Node",
