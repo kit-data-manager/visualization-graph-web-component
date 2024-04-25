@@ -8,49 +8,49 @@ export class StoriesData {
       constructor() {
         this.defaultData = [
           {
-            "id": "Michael Jackson",
-            "properties": {
-              "genre": "Pop",
-              "hitSong": "Thriller"
+            id: "Michael Jackson",
+            properties: {
+                genre: "Pop",
+                hitSong: "Thriller"
             }
-          },
-          {
-            "id": "Thriller",
-            "properties": {
-              "artist": "Michael Jackson",
-              "year": "1982"
+        },
+        {
+            id: "Thriller",
+            properties: {
+                artist: "Michael Jackson",
+                year: "1982"
             }
-          },
-          {
-            "id": "The Beatles",
-            "properties": {
-              "genre": "Rock",
-              "hitSong": "Hey Jude",
-              "album": "Abbey Road"
+        },
+        {
+            id: "The Beatles",
+            properties: {
+                genre: "Rock",
+                hitSong: "Hey Jude",
+                album: "Abbey Road"
             }
-          },
-          {
-            "id": "Abbey Road",
-            "properties": {
-              "artist": "The Beatles",
-              "year": "1969"
+        },
+        {
+            id: "Abbey Road",
+            properties: {
+                artist: "The Beatles",
+                year: "1969"
             }
-          },
-          {
-            "id": "Elvis Presley",
-            "properties": {
-              "genre": "Rock and Roll",
-              "hitSong": "Heartbreak Hotel"
+        },
+        {
+            id: "Elvis Presley",
+            properties: {
+                genre: "Rock and Roll",
+                hitSong: "Heartbreak Hotel"
             }
-          },
-          {
-            "id": "Leonardo Da Vinci",
-            "properties": {
-              "occupation": "Polymath",
-              "knownFor": "Mona Lisa",
-              "birthYear": "1452"
+        },
+        {
+            id: "Leonardo Da Vinci",
+            properties: {
+                occupation: "Polymath",
+                knownFor: "Mona Lisa",
+                birthYear: "1452"
             }
-          }
+        }        
           ];
 
           this.midSizeData = [
@@ -846,18 +846,18 @@ export class StoriesData {
           
           this.defaultConfigurationSettings = [
               {
-                label: "Primary Node",
+                label: "primary node",
                 color: "",
                 description: "Famous artists and their art",
                 properties: [
                   {
                     hitSong: {
-                      label: "Hit Song",
+                      label: "hit song",
                       color: "",
                       description: "Song which was top of billboard chart for a year"
                     },
                     album:{
-                      label: "Album",
+                      label: "album",
                       color: "",
                       description: ""
                     }
@@ -873,7 +873,7 @@ export class StoriesData {
                 properties: [
                   {
                     contribution: {
-                      label: "Contribution",
+                      label: "contribution",
                       color: "",
                       description: "Most known contibution in the lifetime"
                     }
@@ -883,13 +883,13 @@ export class StoriesData {
             ];
           this.highSizeConfigurationSettings = [
             {
-              label: "Primary Node",
+              label: "primary Node",
               color: "",
               description: "Scientists and Discoveries/Inventions",
               properties: [
                 {
                   contribution: {
-                    label: "Contribution",
+                    label: "contribution",
                     color: "",
                     description: "Most known contibution in the lifetime"
                   }

@@ -18,21 +18,21 @@
     "id": "AtomicScaleSample",
     "properties": {
       "hasNumberofAtoms": "123",
-      "subclassOf": "SubclassOf: NanoscaleSample"
+      "subclassOf": "NanoscaleSample"
     }
   },
   {
     "id": "SimulationCell",
     "properties": {
       "hasAttribute": "AtomicScaleSample",
-      "hasVolume": "Volume= 250.5",
-      "hasRepetition_x": "RepetitionX= 5"
+      "hasVolume": "250.5",
+      "hasRepetition_x": "5"
     }
   },
   {
     "id": "Atom",
     "properties": {
-      "hasPath": "path/to/data",
+"hasPath": "path/to/data",
       "subclassOf": "AtomicScaleSample"
     }
   },
@@ -40,21 +40,21 @@
     "id": "Element",
     "properties": {
       "hasSymbol": "Symbol: He",
-      "hasElementRatio": "ElementRation= 0.982"
+      "hasElementRatio": "0.982"
     }
   },
   {
     "id": "UnitCell",
     "properties": {
       "hasBravaisLattice": "FCC",
-      "hasLength_x": "XLength= 2.5"
+      "hasLength_x": "2.5"
     }
   },
   {
     "id": "LatticeParameter",
     "properties": {
-      "hasLength_x": "XLength= 2.5",
-      "subclassOf": "Subclass of: UnitCell"
+      "hasLength_x": "2.55",
+      "subclassOf": "UnitCell"
     }
   }
 ]
@@ -77,13 +77,13 @@ configurations='
             "description":"Describes volume in milli liter"
           },
           "subclassOf":
-          {"label":"Sub class",
-          "color":"#00FF00",
+          {"label":"Sub class of",
+          "color":"",
           "description":""
           },
           "hasSymbol":
           {"label":"Symbol of the element",
-          "color":"#00FF00",
+          "color":"",
           "description":"Symbol aas per atomic table"
           }
         }
