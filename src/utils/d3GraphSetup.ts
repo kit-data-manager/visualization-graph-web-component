@@ -197,6 +197,8 @@ export class GraphSetup {
     linkGroup
       .append('text')
       .text(d => d.category === 'attribute' ? '' : d.relationType) 
+      .attr('stroke-opacity', 0)
+      .attr('opacity', '1')
       .attr('fill', 'black') // Style as needed
       .attr('font-size', 3)
       .attr('text-anchor', 'middle')

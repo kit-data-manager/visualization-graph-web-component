@@ -29,7 +29,8 @@ export class HandleEvents {
       this.clearSelection();
 
       // Reduce the visibility of all nodes and links except the text on the links
-      links.selectAll('line').attr('stroke-opacity', 0.25); // Affect only the line part of the link
+      links.selectAll('line').attr('stroke-opacity', 0); // Affect only the line part of the link
+      links.selectAll('text').attr('opacity', 0); // Affect only the text part of the link
       nodes.attr('opacity', 0.25);
       const hoveredNode = d3.select(event.currentTarget);
       hoveredNode.attr('stroke', '#FFA500').attr('opacity', 1);
@@ -58,7 +59,8 @@ export class HandleEvents {
     const handleNodeMouseout = () => {
       if (this.currentlyClicked) return; // Ignore if a node is clicked
       nodes.attr('stroke', null).attr('opacity', 1); // Reset stroke and restore opacity
-      links.attr('stroke-opacity', 0.2); // Reset links' opacity
+      links.selectAll('line').attr('stroke-opacity', 1); // Affect only the line part of the link
+      links.selectAll('text').attr('opacity', 1); // Affect only the text part of the link
       tooltip.style('opacity', 0); // Hide tooltip
       tooltip.html(''); // Clear tooltip content
     };
