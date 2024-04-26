@@ -36,7 +36,7 @@ export class HandleEvents {
       hoveredNode.attr('stroke', '#FFA500').attr('opacity', 1);
 
       links.each(function (l) {
-        const isConnected = (l.source.id === d.id || l.target.id === d.id) && l.category === 'non_attribute';
+        const isConnected = (l.source.id === d.id || l.target.id === d.id);
         if (isConnected) {
           d3.select(this).select('line').attr('stroke-opacity', 1); // Affect only the line part of the link
           d3.select(this).select('text').attr('opacity', 1); // Keep text fully opaque
