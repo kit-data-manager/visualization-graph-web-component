@@ -50,7 +50,7 @@
   "devDependencies": {
     "@storybook/addon-essentials": "^7.6.16",
     "@storybook/addon-links": "^7.6.16",
-    "@storybook/blocks": "^7.6.16",
+    "@storybook/blocks": "^8.0.10",
     "@storybook/web-components": "^7.6.16",
     "@storybook/web-components-vite": "^7.6.16",
     "@types/jest": "^29.5.12",
