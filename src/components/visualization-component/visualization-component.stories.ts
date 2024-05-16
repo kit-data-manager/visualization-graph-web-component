@@ -1,4 +1,5 @@
 import { StoriesData } from '../../utils/storiesData';
+import { DemoData } from '../../utils/demoData';
 /**
  * Storybook configuration for the 'visualization-component' web component.
  * Defines different stories and their corresponding parameters.
@@ -40,16 +41,36 @@ const Template = args => `<div style="display: flex; justify-content: center; al
 ></visualization-component>`;
 
 const storiesData = new StoriesData();
+const demoData = new DemoData();
 
 const entityNetworkData = storiesData.getNetworkData();
 const defaultData = storiesData.getDefaultData();
 const midSizeData = storiesData.getMidSizeData();
 const highSizeData = storiesData.getMidSizeData();
+const firstDemoData =  demoData.getFirstDemoData();
+const ontologiesData = demoData.getOntologiesData();
 
 const defaultConfigurationSettings = storiesData.getDefaultConfigurationSettings();
 const midSizeConfigurationSettings = storiesData.getMidSizeConfigurationSettings();
 const highSizeConfigurationSettings = storiesData.getHighSizeConfigurationSettings();
 
+export const FirstDemo = Template.bind({});
+FirstDemo.args = {
+  showAttributes: true,
+  showLegend: true,
+  showDetailsOnHover: true,
+  showPrimaryLinks: true,
+  data: JSON.stringify(firstDemoData, null, 2),
+};
+
+export const OntologiesDemo = Template.bind({});
+OntologiesDemo.args = {
+  showAttributes: true,
+  showLegend: true,
+  showDetailsOnHover: true,
+  showPrimaryLinks: true,
+  data: JSON.stringify(ontologiesData, null, 2),
+};
 
 export const Default = Template.bind({});
 Default.args = {
