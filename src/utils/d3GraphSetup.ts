@@ -36,12 +36,12 @@ export class GraphSetup {
    */
   private forceProperties = {
     center: {
-      x: 0.5,
-      y: 0.5,
+      x: 0,
+      y: 0,
     },
     charge: {
       enabled: true,
-      strength: -70,
+      strength: 0,
       distanceMin: 40,
       distanceMax: 2000,
     },
@@ -68,23 +68,52 @@ export class GraphSetup {
    *
    * @returns {{ svg: d3.Selection, numericWidth: number, numericHeight: number }} - The initialized SVG element and its dimensions.
    */
-  initializeSVG() {
-    const svg = d3.select(this.hostElement.shadowRoot.querySelector('#graph'));
+  initializeSVG(numPrimaryNodes: number) {
+    const svg = d3.select(this.hostElement.shadowRoot.querySelector("#graph"));
     const [width, height] = this.size.split(',').map(s => s.trim());
-    svg.attr('viewBox', `0 0 ${parseInt(width, 10)} ${parseInt(height, 10)}`).attr('preserveAspectRatio', 'xMidYMid meet');
+    svg.attr("viewBox", `0 0 ${parseInt(width, 10)} ${parseInt(height, 10)}`).attr("preserveAspectRatio", "xMidYMid meet");
     const numericWidth = parseInt(width, 10);
     const numericHeight = parseInt(height, 10);
 
     // Set up zoom behavior directly on the SVG element
-    const zoom = d3
-      .zoom()
-      .scaleExtent([1, 1]) // Adjust scale extent as needed
-      .on('zoom', event => {
-        svg.attr('transform', event.transform); // Apply zoom directly to SVG
-      }); 
-    svg.call(zoom);
+    const zoom = d3.zoom()
+        .extent([[1000, 1000], [numericWidth, numericHeight]])
+        .scaleExtent([0, 5]) // Adjust scale extent as needed
+        .on("zoom", (event) => {
+            svg.attr("transform", event.transform); // Apply zoom directly to SVG
+        });
+
+    const initialZoomScale = numPrimaryNodes > 30 ? 0.5 : 1;
+    svg.call(zoom).call(zoom.transform, d3.zoomIdentity.scale(initialZoomScale));
+
     return { svg, numericWidth, numericHeight };
-  }
+}
+
+
+// initializeSVG() {
+//   const svg = d3.select(this.hostElement.shadowRoot.querySelector('#graph'));
+//   const [width, height] = this.size.split(',').map(s => s.trim());
+//   svg.attr('viewBox', `0 0 ${parseInt(width, 10)} ${parseInt(height, 10)}`).attr('preserveAspectRatio', 'xMidYMid meet');
+//   const numericWidth = parseInt(width, 10);
+//   const numericHeight = parseInt(height, 10);
+
+//   // Set up zoom behavior directly on the SVG element
+//   const zoom = d3
+//     .zoom()
+//     .extent([[0, 0], [numericWidth, numericHeight]])
+//     .scaleExtent([0, 10]) // Adjust scale extent as needed
+//     .on('zoom', event => {
+//       svg.attr('transform', event.transform); // Apply zoom directly to SVG
+//       // Translate the SVG to the cursor position before zooming
+//       svg.attr('transform', `
+//         translate(${-event.transform.x}, ${event.transform.y})
+//         scale(${event.transform.k})
+//         translate(${event.transform.x}, ${-event.transform.y})
+//       `);
+//     }); 
+//   svg.call(zoom);
+//   return { svg, numericWidth, numericHeight };
+// }
 
   /**
    * Creates a force simulation for the graph nodes and links.
@@ -202,7 +231,16 @@ export class GraphSetup {
       .attr('fill', 'black') // Style as needed
       .attr('font-size', 3)
       .attr('text-anchor', 'middle')
-      .attr('dy', -5); // Offset from the line
+      .attr('dy',  d => {
+        // Calculate the vertical position of the text relative to the line
+        const yOffset = -5; // Adjust this value to control the vertical offset
+        return d.source.y < d.target.y ? yOffset : -yOffset; // Position above or below the line based on y-coordinates of source and target nodes
+    })
+    .attr('dx', d => {
+        // Calculate the horizontal position of the text relative to the line
+        const xOffset = 5; // Adjust this value to control the horizontal offset
+        return (d.source.x + d.target.x) / 2 > 0 ? xOffset : -xOffset; // Position to the right or left of the line based on the average x-coordinates of source and target nodes
+    });
 
     return linkGroup;
 }
@@ -215,8 +253,9 @@ export class GraphSetup {
    * @param {d3.ScaleOrdinal<string, string>} colorScale - The color scale for node colors.
    * @returns {d3.Selection} - The created node elements.
    */
-  createNodes(svg, nodes, primaryNodeColor, attributeColorMap) {
+  createNodes(svg, nodes, primaryNodeColorMap, attributeColorMap) {
     // Extract unique attribute names from attribute nodes
+    console.log('primaryNodeColorMap',primaryNodeColorMap);
     // Create a color scale for attribute nodes
     return svg
       .selectAll('.node')
@@ -231,7 +270,11 @@ export class GraphSetup {
           const attributeName = Object.keys(d)[1];
           return attributeColorMap.get(attributeName); // Directly use color from attributeColorMap
         } else {
-          return primaryNodeColor; // Use primaryNodeColor for non-attribute nodes
+          console.log('Node data:', d); // Log the node data to check its structure and properties
+          console.log('Primary node color map:', primaryNodeColorMap); // Log the primaryNodeColorMap to check its structure
+          console.log('Node type:', d.type); // Log the node type to check if it's correct
+          console.log('Primary node color:', primaryNodeColorMap[d.type]); // Log the color to check if it's correct
+         return  primaryNodeColorMap[d.type]; // Use primaryNodeColor for non-attribute nodes
         }
       })
       .attr('stroke', '#fff')

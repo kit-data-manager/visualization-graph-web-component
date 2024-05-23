@@ -88,6 +88,7 @@ export class VisualizationComponent {
   public chartData: any;
   public parsedConfig: any;
   public primaryNodeColor = '#008080';
+  public primaryNodeColorMap;
 
   /**
    * Declare a private instance variable of the 'PrepareData' class.
@@ -209,9 +210,10 @@ export class VisualizationComponent {
 
     // Set up color scale for links
     const colorType = d3.scaleOrdinal(transformedData.links.map(d => d.relationType).sort(d3.ascending), d3.schemeCategory10);
+  const numPrimaryNodes = transformedData.nodes.filter(node => node.category === 'non_attribute').length;
 
     // Initialize SVG and graph setup
-    const { svg, numericWidth, numericHeight } = this.d3GraphSetup.initializeSVG();
+    const { svg, numericWidth, numericHeight } = this.d3GraphSetup.initializeSVG(numPrimaryNodes);
     this.d3GraphSetup.clearSVG(svg);
 
     // this.d3GraphSetup.createCustomMarkers(svg, transformedData.links, colorType);
@@ -219,6 +221,21 @@ export class VisualizationComponent {
     const { attributeColorMap, attributeColorScale } = this.d3GraphSetup.attributeColorSetup(uniqueAttributeNames, this.parsedConfig);
     this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
 
+        // Define color map for different primary node types
+        this.primaryNodeColorMap = {
+          'Person': '#FF5733',
+          'Manuscript': '#33FF57',
+          'Symbolic Object': '#3357FF',
+          'Painting': '#FF33A1',
+          // Add more types and colors as needed
+        };
+    
+        // Apply colors to primary nodes based on their type
+        transformedData.nodes.forEach(node => {
+          if (node.category === 'non_attribute') {
+            node.color = this.primaryNodeColorMap[node.type] || this.primaryNodeColor;
+          }
+        });
     // The color for primary nodes
     const { legendConfigurations, primaryConfig } = this.d3GraphSetup.prepareLegend(uniqueAttributeNames, this.parsedConfig, attributeColorScale);
     this.primaryNodeColor = primaryConfig.color;
@@ -232,8 +249,8 @@ export class VisualizationComponent {
       },
       charge: {
         enabled: true,
-        strength: -10,
-        distanceMin: 40,
+        strength: -5,
+        distanceMin: 0,
         distanceMax: 2000,
       },
       link: {
@@ -245,7 +262,7 @@ export class VisualizationComponent {
 
     // Create links and nodes
     const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
-    const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, this.primaryNodeColor, attributeColorMap);
+    const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, this.primaryNodeColorMap, attributeColorMap);
 
     // Apply event handlers
     this.handleEvents.onClick(nodes, links);

@@ -5,7 +5,7 @@ There are features that allows users to customize color, description, label dyna
 
 ## Data Format and Connection Representation
 
-The `visualization-component` requires a specific JSON data format to accurately represent and visualize relationships between entities. Here's an overview of the data format and how connections are established:
+The `visualization-component` requires data in a specific JSON format to accurately represent and visualize relationships between entities. Here's an overview of the data format and how connections are established:
 
 ### JSON Data Structure
 

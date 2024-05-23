@@ -33,6 +33,7 @@ export class PrepareData {
           field: 'Physics',
           birthYear: '1879',
           deathYear: '1955',
+          type:'Person'
         },
       },
       {
@@ -54,6 +55,7 @@ export class PrepareData {
           field: 'Mathematics and Physics',
           birthYear: '1643',
           deathYear: '1727',
+          type: 'Person'
         },
       },
       {
@@ -76,6 +78,7 @@ export class PrepareData {
           field: 'Art and Science',
           birthYear: '1452',
           deathYear: '1519',
+          type: 'Person'
         },
       },
       {
@@ -85,7 +88,7 @@ export class PrepareData {
           paintedBy: 'Da-Vinci',
           location: 'Louvre Museum, Paris',
           yearCreated: '1503',
-          type: 'Painting',
+          type: 'Painting'
         },
       },
     ];
@@ -119,6 +122,7 @@ export class PrepareData {
         props: [],
         name: item.id,
         category: 'non_attribute',
+        type:item.properties.type
       };
       primaryNodeIds.push(item.id);
       nodes.push(node);
@@ -144,6 +148,7 @@ export class PrepareData {
               [propKey]: propValue,
               name: propValue,
               category: 'attribute',
+              type: item.type
             };
             nodes.push(secondaryNode);
             const link = {
