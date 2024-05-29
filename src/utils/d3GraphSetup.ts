@@ -175,6 +175,7 @@ export class GraphSetup {
 
       // Search for the attribute in properties of each config item
       parsedConfig.forEach(item => {
+        // console.log('parsedConfig',parsedConfig)
         if (item.properties) {
           item.properties.forEach(propertyObj => {
             // Iterate over keys of each property object
@@ -244,6 +245,29 @@ export class GraphSetup {
 
     return linkGroup;
 }
+createPrimaryNodeMap(nodes, primaryNodeConfig) {
+  let primaryNodeMap = new Map();
+  // Extract primaryNodeConfigurations from the configuration
+  // Loop through each node
+  nodes.forEach(node => {
+    if (node.category === 'non_attribute') {
+      // Loop through each primaryNodeConfiguration
+      primaryNodeConfig.forEach(primaryNode => {
+        const regex = new RegExp(primaryNode.typeRegEx, 'i');
+        if (regex.test(node.type)) {
+          // Store the node's ID, label, and color in the map
+          primaryNodeMap.set(node.id, {
+            nodeLabel: primaryNode.nodeLabel,
+            nodeColor: primaryNode.nodeColor,
+            matchedBy: primaryNode.typeRegEx
+          });
+        }
+      });
+    }
+  });
+
+  return primaryNodeMap;
+}
 
   /**
    * Creates and appends node elements to the graph SVG.
@@ -253,11 +277,28 @@ export class GraphSetup {
    * @param {d3.ScaleOrdinal<string, string>} colorScale - The color scale for node colors.
    * @returns {d3.Selection} - The created node elements.
    */
-  createNodes(svg, nodes, primaryNodeColorMap, attributeColorMap) {
+  createNodes(svg, nodes, primaryNodeConfig, attributeColorMap, config) {
+    const userConfigs = Array.isArray(config) ? config : [];
+    // Extract primary values from the first configuration in the config array
+    const userConfig = userConfigs[0];
+    const primaryLabel = userConfig.label || '';
+    const primaryColor = userConfig.color || '#008080';
+
+// Provide default values for the maps
+let typeRegExColorMap = new Map([['defaultColor', primaryColor]]);
+let typeRegExLabelMap = new Map([['defaultLabel', primaryLabel]]);
+    primaryNodeConfig.forEach(primaryNode => {
+      typeRegExColorMap.set(primaryNode.typeRegEx, primaryNode.nodeColor);
+      typeRegExLabelMap.set(primaryNode.typeRegEx, primaryNode.nodeLabel);
+    });
+
+
+    console.log('typeRegExColorMap',typeRegExColorMap)
     // Extract unique attribute names from attribute nodes
-    console.log('primaryNodeColorMap',primaryNodeColorMap);
     // Create a color scale for attribute nodes
-    return svg
+    let defaultPrimaryNodeColor= '#add8e6';
+    let typeMatchedPrimaryNodes = [];
+    let nodesCreated = svg
       .selectAll('.node')
       .data(nodes)
       .enter()
@@ -269,16 +310,24 @@ export class GraphSetup {
           // Assuming the attribute name is the second key of the node object
           const attributeName = Object.keys(d)[1];
           return attributeColorMap.get(attributeName); // Directly use color from attributeColorMap
-        } else {
-          console.log('Node data:', d); // Log the node data to check its structure and properties
-          console.log('Primary node color map:', primaryNodeColorMap); // Log the primaryNodeColorMap to check its structure
-          console.log('Node type:', d.type); // Log the node type to check if it's correct
-          console.log('Primary node color:', primaryNodeColorMap[d.type]); // Log the color to check if it's correct
-         return  primaryNodeColorMap[d.type]; // Use primaryNodeColor for non-attribute nodes
+        }else {
+          const color = typeRegExColorMap.get(d.type)  || primaryColor;
+          const label = typeRegExLabelMap.get(d.type) || primaryLabel;
+          if (color && color!==primaryColor) {
+            typeMatchedPrimaryNodes.push({ node: d, color: color, label: label });
+          }
+          else
+          {
+            const color = typeRegExColorMap.get('defaultColor');
+            const label = typeRegExLabelMap.get('defaultLabel');
+          }
+          return color || defaultPrimaryNodeColor; // Use primaryNodeColor for non-attribute nodes
         }
       })
       .attr('stroke', '#fff')
       .attr('stroke-width', 1.5);
+      return { nodesCreated, typeMatchedPrimaryNodes };
+
   }
   /**
    * Creates custom markers for links based on their types.
@@ -377,12 +426,12 @@ export class GraphSetup {
    * @param {d3.ScaleOrdinal<string, string>} attributeColorScale - The attribute color scale.
    * @returns {any[]} - The prepared legend data.
    */
-  prepareLegend(uniqueAttributeNames, config, attributeColorScale) {
+  prepareLegend(typeMatchedPrimaryNodes,uniqueAttributeNames, config, attributeColorScale) {
+    console.log('typeMatchedPrimaryNodes',typeMatchedPrimaryNodes)
     const userConfigs = Array.isArray(config) ? config : [];
-
-    if (userConfigs.length === 0) {
+    if (userConfigs.length === 0 ) {
       return {
-        primaryConfig: {
+        primaryConfigFallback: {
           label: '',
           color: 'grey'
         },
@@ -394,11 +443,28 @@ export class GraphSetup {
       };
     }
     // Extract primary values from the first configuration in the config array
-    const primaryConfig = userConfigs[0];
-    const primaryLabel = primaryConfig.label || '';
-    const primaryColor = primaryConfig.color || '#008080';
-    const primaryDescription = primaryConfig.description ? primaryConfig.description : '';
+    const userConfig = userConfigs[0];
+    const primaryLabel = userConfig.label || '';
+    const primaryColor = userConfig.color || '#008080';
+    const primaryDescription = userConfig.description ? userConfig.description : '';
+      // Check for primaryNodeConfigurations
+  const primaryNodeConfig = userConfig.primaryNodeConfigurations || [];
 
+  console.log('primaryNodeConfig',primaryNodeConfig);
+     // Create legendPrimaryConfig
+     const legendPrimaryConfig = typeMatchedPrimaryNodes.length > 0 ? 
+     typeMatchedPrimaryNodes.map(pNode => {
+       return {
+         label: pNode.label || primaryLabel,
+         color: pNode.color || primaryColor,
+         attributeKey: pNode.node.id || primaryDescription
+       };
+     }) : [{
+       label: primaryLabel,
+       color: primaryColor
+      }];
+
+    // Searching if attribute mentioned in configurations file matches to any attribute of our graph
     const legendConfigurations = uniqueAttributeNames.map(attributeName => {
       let customConfig = null;
       for (const config of userConfigs) {
@@ -424,14 +490,16 @@ export class GraphSetup {
         };
       }
     });
+
     // Return an object containing legend configurations and primary values
     return {
-      primaryConfig: {
+      primaryConfigFallback: {
         label: primaryLabel,
         color: primaryColor,
         description: primaryDescription,
       },
-      legendConfigurations: legendConfigurations,
+      legendPrimaryConfig: legendPrimaryConfig,
+      legendAttributesConfig: legendConfigurations,
     };
   }
 
@@ -444,7 +512,7 @@ export class GraphSetup {
    * @param {any[]} legendConfigurations - The legend configurations.
    * @param {Map<string, string>} attributeColorMap - The attribute color map.
    */
-  createNodeLegend(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap, tooltip, primaryConfig) {
+  createLegendNodes(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap, tooltip, primaryConfigFallback,legendPrimaryConfig) {
     if (!showLegend) {
       return; // Do not create the legend if showLegend is false
     }
@@ -467,32 +535,46 @@ const legendContainer = svg
   .style('overflow', 'auto')
   .style('height', `${legendHeight}px`)
   .style('font-size', `${this.legendTextSize}px`); // Adjust font size using legendNodeSize variable
+  const legend = legendContainer.append('div').style('cursor', 'pointer');
 
-
-    const legend = legendContainer.append('div').style('cursor', 'pointer');
-
- // Add primary node color to the legend
-const primaryItem = this.addLegendItem(legend, primaryConfig.color || primaryNodeColor, primaryConfig.label || 'Primary Node', this.legendNodeSize, primaryConfig.description || 'Primary'); // Size 10 for primary node
-// Event listener for primary item mouseover
-primaryItem.on('mouseover', event => {
-    if (primaryConfig.description) {
-        tooltip
-            .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${primaryConfig.description}</span></div>`) // Content with span for text
-            .transition()
-            .duration(200)
-            .style('opacity', 1)
-            .style('left', `${event.pageX + 10}px`)
-            .style('top', `${event.pageY - 10}px`);
+  // Extract unique label names and their corresponding items
+  const uniqueTypesMap = legendPrimaryConfig.reduce((map, item) => {
+    if (!map.has(item.label)) {
+      map.set(item.label, []);
     }
-});
+    map.get(item.label).push(item);
+    return map;
+  }, new Map());
 
-// Event listener for primary item mouseout
-primaryItem.on('mouseout', () => {
+
+// Iterate over unique labels and add items to the legend
+uniqueTypesMap.forEach((items, label) => {
+  // Get the color of the first item in the array
+  const color = items[0].color;
+
+  const primarylegendItemTypes = this.addLegendItem(legend, color || primaryNodeColor, label || 'Primary Node', this.legendNodeSize, items[0].description || 'Primary');
+  
+  // Event listener for item mouseover
+  primarylegendItemTypes.on('mouseover', event => {
+    if (items[0].description) {
+      tooltip
+        .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${items[0].description}</span></div>`) // Content with span for text
+        .transition()
+        .duration(200)
+        .style('opacity', 1)
+        .style('left', `${event.pageX + 10}px`)
+        .style('top', `${event.pageY - 10}px`);
+    }
+  });
+
+  // Event listener for item mouseout
+  primarylegendItemTypes.on('mouseout', () => {
     tooltip.style('opacity', 0);
     tooltip.html(''); // Clear tooltip content
+  });
 });
 
-    // Create legend items from the configurations or directly from attributeColorMap
+      // Create legend attribute items from the configurations
     legendConfigurations.forEach(({ attributeKey, label, description }) => {
       const color = attributeColorMap.get(attributeKey) || primaryNodeColor; // Fallback to primaryNodeColor if not found
       const item = this.addLegendItem(legend, color, label || attributeKey, this.legendNodeSize, description); // Use label or attributeKey if label not provided
@@ -512,6 +594,7 @@ primaryItem.on('mouseout', () => {
       // Event listener for legend item mouseout
       item.on('mouseout', () => {
         tooltip.style('opacity', 0);
+        tooltip.html(''); // Clear tooltip content
       });
     });
   }

@@ -88,7 +88,6 @@ export class VisualizationComponent {
   public chartData: any;
   public parsedConfig: any;
   public primaryNodeColor = '#008080';
-  public primaryNodeColorMap;
 
   /**
    * Declare a private instance variable of the 'PrepareData' class.
@@ -210,7 +209,7 @@ export class VisualizationComponent {
 
     // Set up color scale for links
     const colorType = d3.scaleOrdinal(transformedData.links.map(d => d.relationType).sort(d3.ascending), d3.schemeCategory10);
-  const numPrimaryNodes = transformedData.nodes.filter(node => node.category === 'non_attribute').length;
+    const numPrimaryNodes = transformedData.nodes.filter(node => node.category === 'non_attribute').length;
 
     // Initialize SVG and graph setup
     const { svg, numericWidth, numericHeight } = this.d3GraphSetup.initializeSVG(numPrimaryNodes);
@@ -218,31 +217,77 @@ export class VisualizationComponent {
 
     // this.d3GraphSetup.createCustomMarkers(svg, transformedData.links, colorType);
     const uniqueAttributeNames = Array.from(new Set(transformedData.nodes.filter(node => node.category === 'attribute').map(node => Object.keys(node)[1])));
+    const uniquePrimaryNodeNames = Array.from(new Set(transformedData.nodes.filter(node => node.category == 'non_attribute').map(node => Object.values(node)[0])));
     const { attributeColorMap, attributeColorScale } = this.d3GraphSetup.attributeColorSetup(uniqueAttributeNames, this.parsedConfig);
+    this.d3GraphSetup.attributeColorSetup(uniquePrimaryNodeNames, this.parsedConfig);
     this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
+    const primaryNodeConfig = this.parsedConfig[0]?.primaryNodeConfigurations || [];
 
-        // Define color map for different primary node types
-        this.primaryNodeColorMap = {
-          'Person': '#FF5733',
-          'Manuscript': '#33FF57',
-          'Symbolic Object': '#3357FF',
-          'Painting': '#FF33A1',
-          // Add more types and colors as needed
-        };
-    
-        // Apply colors to primary nodes based on their type
-        transformedData.nodes.forEach(node => {
-          if (node.category === 'non_attribute') {
-            node.color = this.primaryNodeColorMap[node.type] || this.primaryNodeColor;
-          }
-        });
-    // The color for primary nodes
-    const { legendConfigurations, primaryConfig } = this.d3GraphSetup.prepareLegend(uniqueAttributeNames, this.parsedConfig, attributeColorScale);
-    this.primaryNodeColor = primaryConfig.color;
+    // Extract primary node configurations from the config
 
-    // Create the node legend
-    this.d3GraphSetup.createNodeLegend(svg, this.primaryNodeColor, this.showLegend, legendConfigurations, attributeColorMap, this.tooltip, primaryConfig);
-    this.d3GraphSetup.updateForceProperties({
+// // Function to create the primary node map
+// function createPrimaryNodeMap(nodes, primaryNodeConfig) {
+//   let primaryNodeMap = new Map();
+//   // Extract primaryNodeConfigurations from the configuration
+//   // Loop through each node
+//   nodes.forEach(node => {
+//     if (node.category === 'non_attribute') {
+//       // Loop through each primaryNodeConfiguration
+//       primaryNodeConfig.forEach(primaryNode => {
+//         const regex = new RegExp(primaryNode.typeRegEx, 'i');
+//         if (regex.test(node.type)) {
+//           // Store the node's ID, label, and color in the map
+//           primaryNodeMap.set(node.id, {
+//             nodeLabel: primaryNode.nodeLabel,
+//             nodeColor: primaryNode.nodeColor,
+//             matchedBy: primaryNode.typeRegEx
+//           });
+//         }
+//       });
+//     }
+//   });
+
+//   return primaryNodeMap;
+// }
+
+// Create the primary node map
+const primaryNodeMap = this.d3GraphSetup.createPrimaryNodeMap(transformedData.nodes, primaryNodeConfig);
+console.log('primaryNodeMap',primaryNodeMap);
+// Apply colors and other properties to primary nodes based on their type and configurations
+// transformedData.nodes.forEach(node => {
+//   if (node.category === 'non_attribute') {
+//     // Check if any primaryNodeConfigurations match the node type
+//     let customConfig = null;
+//     for (const primaryNode of primaryNodeConfig) {
+//       // console.log('primaryNode',primaryNode)
+//       const regex = new RegExp(`\\b${primaryNode.typeRegEx}\\b`, 'i');
+//       // console.log('regex',regex)
+//       // console.log('node.type',node.type)
+//       // console.log('node',node)
+//       if (regex.test(node.type)) {
+//         customConfig = primaryNode;
+//         break;
+//       }
+//     }
+//     // console.log('customConfig',customConfig)
+//     // Apply custom configuration if available
+//     if (customConfig) {
+//       node.color = customConfig.nodeColor || this.primaryNodeColorMap[node.type] || this.primaryNodeColor;
+//       node.label = customConfig.nodeLabel || node.label;
+//     } else {
+//       // Fallback to default color map
+//       node.color = this.primaryNodeColorMap[node.type] || this.primaryNodeColor;
+//     }
+//   }
+// });
+
+//         // Apply colors to primary nodes based on their type
+//         transformedData.nodes.forEach(node => {
+//           if (node.category === 'non_attribute') {
+//             node.color = this.primaryNodeColorMap[node.type] || this.primaryNodeColor;
+//           }
+//         });
+ this.d3GraphSetup.updateForceProperties({
       center: {
         x: 0.5, // Center position on the x-axis (0.5 for the middle of the SVG)
         y: 0.5, // Center position on the y-axis (0.5 for the middle of the SVG)
@@ -260,18 +305,22 @@ export class VisualizationComponent {
     // Create force simulation
     const simulation = this.d3GraphSetup.createForceSimulation(transformedData.nodes, transformedData.links, numericWidth, numericHeight);
 
-    // Create links and nodes
-    const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
-    const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, this.primaryNodeColorMap, attributeColorMap);
-
+        // Create links and nodes
+        const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
+        const { nodesCreated, typeMatchedPrimaryNodes } = this.d3GraphSetup.createNodes(svg, transformedData.nodes, primaryNodeConfig, attributeColorMap, this.parsedConfig);
+        const { legendAttributesConfig, primaryConfigFallback,legendPrimaryConfig } = this.d3GraphSetup.prepareLegend(typeMatchedPrimaryNodes,uniqueAttributeNames, this.parsedConfig, attributeColorScale);
+        this.primaryNodeColor = primaryConfigFallback.color;
+        // Create the node legend
+        this.d3GraphSetup.createLegendNodes(svg, this.primaryNodeColor, this.showLegend, legendAttributesConfig, attributeColorMap, this.tooltip, primaryConfigFallback,legendPrimaryConfig);
+        
     // Apply event handlers
-    this.handleEvents.onClick(nodes, links);
-    if (this.showDetailsOnHover) this.handleEvents.applyMouseover(nodes, links, this.tooltip);
-    this.handleEvents.applyDragToNodes(nodes, simulation);
+    this.handleEvents.onClick(nodesCreated, links);
+    if (this.showDetailsOnHover) this.handleEvents.applyMouseover(nodesCreated, links, this.tooltip);
+    this.handleEvents.applyDragToNodes(nodesCreated, simulation);
     this.handleEvents.applyClickHandler();
 
     // Apply simulation
-    this.d3GraphSetup.applySimulation(nodes, links, simulation);
+    this.d3GraphSetup.applySimulation(nodesCreated, links, simulation);
   }
 
   /**

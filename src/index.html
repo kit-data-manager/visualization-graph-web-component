@@ -46,7 +46,7 @@
   {
     "id": "UnitCell",
     "properties": {
-      "hasBravaisLattice": "FCC",
+      "hasBravaisLattice": "FCC"
       "hasLength_x": "2.5"
     }
   },
@@ -64,32 +64,43 @@ show-primary-links="true"
 configurations='
 [
   {
-    "label":"Primary Node",
-    "color":"",
-    "description":"Sample and its properties",
-    "properties":
-        [
-        {
-          "hasVolume":
-          {
-            "label":"has volume",
-            "color":"black",
-            "description":"Describes volume in milli liter"
-          },
-          "subclassOf":
-          {"label":"Sub class of",
-          "color":"",
-          "description":""
-          },
-          "hasSymbol":
-          {"label":"Symbol of the element",
-          "color":"",
-          "description":"Symbol aas per atomic table"
-          }
+    "label": "Primary Node",
+    "color": "red",
+    "description": "Sample and its properties",
+    "properties": [
+      {
+        "hasVolume": {
+          "label": "has volume",
+          "color": "black",
+          "description": "Describes volume in milli liter",
+          "type": "Person"
+        },
+        "subclassOf": {
+          "label": "Sub class of",
+          "color": "",
+          "description": ""
+        },
+        "hasSymbol": {
+          "label": "Symbol of the element",
+          "color": "",
+          "description": "Symbol as per atomic table"
         }
-        ]
+      }
+    ],
+    "primaryNodeConfigurations": [
+      {
+        "typeRegEx": "Person",
+        "nodeLabel": "People"
+      },
+      {
+        "typeRegEx": "Painting",
+        "nodeLabel": "Painting",
+        "nodeColor": "green"
+      }
+    ]
   }
-]'></visualization-component>
+]
+'></visualization-component>
   <script>
   </script>
 </body>
