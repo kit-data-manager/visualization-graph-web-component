@@ -11,14 +11,16 @@ export class StoriesData {
             id: "Michael Jackson",
             properties: {
                 genre: "Pop",
-                hitSong: "Thriller"
+                hitSong: "Thriller",
+                type:"artist"
             }
         },
         {
             id: "Thriller",
             properties: {
                 artist: "Michael Jackson",
-                year: "1982"
+                year: "1982",
+                type: "album"
             }
         },
         {
@@ -26,21 +28,24 @@ export class StoriesData {
             properties: {
                 genre: "Rock",
                 hitSong: "Hey Jude",
-                album: "Abbey Road"
+                album: "Abbey Road",
+                type: "band"
             }
         },
         {
             id: "Abbey Road",
             properties: {
                 artist: "The Beatles",
-                year: "1969"
+                year: "1969",
+                type: "album"
             }
         },
         {
             id: "Elvis Presley",
             properties: {
                 genre: "Rock and Roll",
-                hitSong: "Heartbreak Hotel"
+                hitSong: "Heartbreak Hotel",
+                type:"artist"
             }
         },
         {
@@ -48,7 +53,8 @@ export class StoriesData {
             properties: {
                 occupation: "Polymath",
                 knownFor: "Mona Lisa",
-                birthYear: "1452"
+                birthYear: "1452",
+                type:"artist"
             }
         }        
           ];
@@ -57,13 +63,16 @@ export class StoriesData {
             {
               id: "Radioactivity discovery",
               properties: {
-                discoveredBy: "Marie Curie"
+                discoveredBy: "Marie Curie",
+                type: "discovery"
               }
             },
             {
               id: "Observational Astronomy",
               properties: {
-                discoveredBy: "Galileo Galilei"
+                discoveredBy: "Galileo Galilei",
+                year: "1609",
+                type: "discovery"
               }
             },
             {
@@ -122,7 +131,8 @@ export class StoriesData {
                   birthYear: "1867",
                   nationality: "Polish",
                   field: "Physics and Chemistry",
-                  recognition: "Nobel Prize"
+                  recognition: "Nobel Prize",
+                  type: "person"
               }
             },
             {
@@ -133,7 +143,8 @@ export class StoriesData {
                   birthYear: "1564",
                   nationality: "Italian",
                   field: "Physics and Astronomy",
-                  recognition: "Galileos telescope"
+                  recognition: "Galileos telescope",
+                  type: "person"
               }
             },
             {
@@ -144,7 +155,8 @@ export class StoriesData {
                   birthYear: "1942",
                   nationality: "British",
                   field: "Theoretical Physics",
-                  recognition: "Hawking radiation"
+                  recognition: "Hawking radiation",
+                  type: "person"
               }
             },
             {
@@ -155,7 +167,8 @@ export class StoriesData {
                   birthYear: "1856",
                   nationality: "Serbian-American",
                   field: "Electrical Engineering",
-                  recognition: "Tesla Coil"
+                  recognition: "Tesla Coil",
+                  type: "person"
               }
             },
             {
@@ -166,7 +179,8 @@ export class StoriesData {
                   birthYear: "1912",
                   nationality: "British",
                   field: "Mathematics and Computer Science",
-                  recognition: "Turing Machine"
+                  recognition: "Turing Machine",
+                  type: "person"
               }
             },
             {
@@ -862,6 +876,18 @@ export class StoriesData {
                       description: ""
                     }
                   }
+                ],
+                primaryNodeConfigurations: [
+                  {
+                    typeRegEx: "artist",
+                    nodeLabel: "Celebrity",
+                    nodeColor: "blue"
+                  },
+                  {
+                    typeRegEx: "album",
+                    nodeLabel: "Hit-Album",
+                    nodeColor: "green"
+                  }
                 ]
               }
             ];
@@ -878,6 +904,18 @@ export class StoriesData {
                       description: "Most known contibution in the lifetime"
                     }
                   }
+                ],
+                primaryNodeConfigurations: [
+                  {
+                    typeRegEx: "discovery",
+                    nodeLabel: "Discovery/Invention",
+                    nodeColor: "blue"
+                  },
+                  {
+                    typeRegEx: "people",
+                    nodeLabel: "Personality",
+                    nodeColor: "green"
+                  }
                 ]
               }
             ];
@@ -893,6 +931,18 @@ export class StoriesData {
                     color: "",
                     description: "Most known contibution in the lifetime"
                   }
+                }
+              ],
+              primaryNodeConfigurations: [
+                {
+                  typeRegEx: "discovery",
+                  nodeLabel: "Discovery/Invention",
+                  nodeColor: "blue"
+                },
+                {
+                  typeRegEx: "people",
+                  nodeLabel: "Personality",
+                  nodeColor: "green"
                 }
               ]
             }

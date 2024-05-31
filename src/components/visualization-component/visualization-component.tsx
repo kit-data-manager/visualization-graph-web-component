@@ -308,10 +308,9 @@ console.log('primaryNodeMap',primaryNodeMap);
         // Create links and nodes
         const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
         const { nodesCreated, typeMatchedPrimaryNodes } = this.d3GraphSetup.createNodes(svg, transformedData.nodes, primaryNodeConfig, attributeColorMap, this.parsedConfig);
-        const { legendAttributesConfig, primaryConfigFallback,legendPrimaryConfig } = this.d3GraphSetup.prepareLegend(typeMatchedPrimaryNodes,uniqueAttributeNames, this.parsedConfig, attributeColorScale);
-        this.primaryNodeColor = primaryConfigFallback.color;
+        const { legendAttributesConfig,legendPrimaryConfig } = this.d3GraphSetup.prepareLegend(typeMatchedPrimaryNodes,uniqueAttributeNames, this.parsedConfig, attributeColorScale);
         // Create the node legend
-        this.d3GraphSetup.createLegendNodes(svg, this.primaryNodeColor, this.showLegend, legendAttributesConfig, attributeColorMap, this.tooltip, primaryConfigFallback,legendPrimaryConfig);
+        this.d3GraphSetup.createLegendNodes(svg, this.primaryNodeColor, this.showLegend, legendAttributesConfig, attributeColorMap, this.tooltip,legendPrimaryConfig);
         
     // Apply event handlers
     this.handleEvents.onClick(nodesCreated, links);

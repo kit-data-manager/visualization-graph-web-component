@@ -316,11 +316,6 @@ let typeRegExLabelMap = new Map([['defaultLabel', primaryLabel]]);
           if (color && color!==primaryColor) {
             typeMatchedPrimaryNodes.push({ node: d, color: color, label: label });
           }
-          else
-          {
-            const color = typeRegExColorMap.get('defaultColor');
-            const label = typeRegExLabelMap.get('defaultLabel');
-          }
           return color || defaultPrimaryNodeColor; // Use primaryNodeColor for non-attribute nodes
         }
       })
@@ -512,7 +507,7 @@ let typeRegExLabelMap = new Map([['defaultLabel', primaryLabel]]);
    * @param {any[]} legendConfigurations - The legend configurations.
    * @param {Map<string, string>} attributeColorMap - The attribute color map.
    */
-  createLegendNodes(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap, tooltip, primaryConfigFallback,legendPrimaryConfig) {
+  createLegendNodes(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap, tooltip,legendPrimaryConfig) {
     if (!showLegend) {
       return; // Do not create the legend if showLegend is false
     }
