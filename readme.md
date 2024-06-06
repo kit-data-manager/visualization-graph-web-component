@@ -129,4 +129,5 @@ Step 2: Run below command to update version in other files(package-lock.json)
 ```bash
 npm install
 ```
-Step 3: Draft a new release
+Step 3: Push changes to origin/main
+Step 4: Create a new release in GitHub
