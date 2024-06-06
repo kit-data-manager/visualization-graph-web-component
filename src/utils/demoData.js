@@ -67,42 +67,42 @@ export class DemoData {
             id: "AlbertEinstein",
             properties: {
               notableWork:"Theory of Relativity",
-              type : "Person"
+              type : "person"
                 }
             },
             {
             id: "MarieCurie",
             properties: {
               notableWork:"Discovery of Radium",
-              type : "Person"
+              type : "person"
                 }
             },
             {
             id: "WilliamShakespeare",
             properties: {
               notableWork:"Hamlet",
-              type : "Person"
+              type : "person"
                 }
             },
             {
               id: "Theory of Relativity",
               properties: {
                 year:"1905",
-                type : "Discovery"
+                type : "discovery"
                   }
               },
               {
                 id: "Discovery of Radium",
                 properties: {
                   year:"1898",
-                  type : "Discovery"
+                  type : "discovery"
                     }
                 },
                 {
                   id: "Hamlet",
                   properties: {
                     year:"1898",
-                    type : "Discovery"
+                    type : "discovery"
                       }
                   }
           ];

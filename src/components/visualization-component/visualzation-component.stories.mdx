@@ -29,18 +29,18 @@ The component accepts an array of objects, where each object represents an entit
 ### How can i map my data to component acceptible data?
 
 
-Demonstrations of component using simple example_dataset
+Demonstrations of component using simple example.
 
-### Example 1: To map data into this format, you need to determine how each piece of your data will correspond to the component's structure. We'll use a scenario with famous people and their notable works to illustrate this.
+#### Example 1: To map data into this format, you need to determine how each piece of your data will correspond to the component's structure. We'll use a scenario with famous people and their notable works to illustrate this.
 Famous People and Their Notable Works:
 
-1: Person: Albert Einstein
+1: Person: Albert Einstein.
 Notable Works: "Theory of Relativity" (year 1905)
 
-2: Person: Marie Curie
+2: Person: Marie Curie.
 Notable Works: "Discovery of Radium" (year 1898)
 
-3: Person: William Shakespeare
+3: Person: William Shakespeare.
 Notable Works: "Hamlet" (year 1603)
 
 Let's fit above data into component acceptable data.
@@ -158,9 +158,22 @@ Use configurations  to customize the color and label of the nodes. The following
 
 For explanation we will use our initial example of Famous People and Their Notable Works.
 
-Below is the configuration object which can be used to manipulate graph.
-The first part of the object is a fallback configuration for primary ids/nodes.
-Second part of the object deals with the manipulation of properties
+
+
+Below is a configuration object that can be used to manipulate a graph.
+
+Configuration object structure
+
+1. **Fallback Configuration for Primary IDs/Nodes**
+   - The first section of configurationsprovides default values for the primary nodes in case primaryNodeConfigurations is not provided.
+
+2. **Properties Manipulation**
+   - The `properties` section allows for the customization of node properties.
+
+3. **Primary Node Configurations**:
+  - This section, `primaryNodeConfigurations`, allows grouping items using regular expressions to modify their color and label.
+  - The `typeRegEx` attribute's value is checked against the `type` property of all items. If a match is found, the item's color and label are updated according to the specified values in the configuration object.
+  - If no `primaryNodeConfigurations` are provided or if there is no match for `typeRegEx`, the default color and label from the fallback configuration are used. If these default values are also not provided, pre-defined default values will be assigned.
 
 
 configurations:
