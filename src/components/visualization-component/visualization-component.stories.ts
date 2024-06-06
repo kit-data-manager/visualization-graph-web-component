@@ -180,6 +180,7 @@ OntologiesDemo.args = {
   showDetailsOnHover: true,
   showPrimaryLinks: true,
   data: JSON.stringify(ontologiesData, null, 2),
+  configurations: JSON.stringify(defaultConfigurationSettings, null, 2)
 };
 
 export const SingleObjectDemo = Template.bind({});
@@ -189,6 +190,7 @@ SingleObjectDemo.args = {
   showDetailsOnHover: true,
   showPrimaryLinks: true,
   data: JSON.stringify(singleObjectDemoData, null, 2),
+  configurations: JSON.stringify(defaultConfigurationSettings, null, 2)
 };
 
 export const MultipleObjectsDemo = Template.bind({});
