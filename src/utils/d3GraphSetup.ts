@@ -89,32 +89,6 @@ export class GraphSetup {
     return { svg, numericWidth, numericHeight };
 }
 
-
-// initializeSVG() {
-//   const svg = d3.select(this.hostElement.shadowRoot.querySelector('#graph'));
-//   const [width, height] = this.size.split(',').map(s => s.trim());
-//   svg.attr('viewBox', `0 0 ${parseInt(width, 10)} ${parseInt(height, 10)}`).attr('preserveAspectRatio', 'xMidYMid meet');
-//   const numericWidth = parseInt(width, 10);
-//   const numericHeight = parseInt(height, 10);
-
-//   // Set up zoom behavior directly on the SVG element
-//   const zoom = d3
-//     .zoom()
-//     .extent([[0, 0], [numericWidth, numericHeight]])
-//     .scaleExtent([0, 10]) // Adjust scale extent as needed
-//     .on('zoom', event => {
-//       svg.attr('transform', event.transform); // Apply zoom directly to SVG
-//       // Translate the SVG to the cursor position before zooming
-//       svg.attr('transform', `
-//         translate(${-event.transform.x}, ${event.transform.y})
-//         scale(${event.transform.k})
-//         translate(${event.transform.x}, ${-event.transform.y})
-//       `);
-//     }); 
-//   svg.call(zoom);
-//   return { svg, numericWidth, numericHeight };
-// }
-
   /**
    * Creates a force simulation for the graph nodes and links.
    *

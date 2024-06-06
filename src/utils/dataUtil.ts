@@ -33,7 +33,7 @@ export class PrepareData {
           field: 'Physics',
           birthYear: '1879',
           deathYear: '1955',
-          type:'Person'
+          type:'person'
         },
       },
       {
@@ -43,7 +43,7 @@ export class PrepareData {
           createdBy: 'Einstein',
           location: 'Berlin',
           yearCreated: '1915',
-          type: 'Manuscript',
+          type: 'manuscript',
         },
       },
       {
@@ -55,7 +55,7 @@ export class PrepareData {
           field: 'Mathematics and Physics',
           birthYear: '1643',
           deathYear: '1727',
-          type: 'Person'
+          type: 'person'
         },
       },
       {
@@ -66,7 +66,7 @@ export class PrepareData {
           associatedWith: 'Newton',
           location: 'Woolsthorpe Manor, England',
           year: 'Around 1666',
-          type: 'Symbolic Object',
+          type: 'symbolic object',
         },
       },
       {
@@ -78,7 +78,7 @@ export class PrepareData {
           field: 'Art and Science',
           birthYear: '1452',
           deathYear: '1519',
-          type: 'Person'
+          type: 'person'
         },
       },
       {
@@ -88,7 +88,7 @@ export class PrepareData {
           paintedBy: 'Da-Vinci',
           location: 'Louvre Museum, Paris',
           yearCreated: '1503',
-          type: 'Painting'
+          type: 'painting'
         },
       },
     ];
