@@ -40,37 +40,22 @@ const Template = args => `<div style="display: flex; justify-content: center; al
   configurations='${args.configurations}'
 ></visualization-component>`;
 
-const storiesData = new StoriesData();
-const demoData = new DemoData();
+const storiesDataObj = new StoriesData();
+const demoDataObj = new DemoData();
 
-const entityNetworkData = storiesData.getNetworkData();
-const defaultData = storiesData.getDefaultData();
-const midSizeData = storiesData.getMidSizeData();
-const highSizeData = storiesData.getMidSizeData();
-const firstDemoData =  demoData.getFirstDemoData();
-const ontologiesData = demoData.getOntologiesData();
+const entityNetworkData = storiesDataObj.getNetworkData();
+const defaultData = storiesDataObj.getDefaultData();
+const midSizeData = storiesDataObj.getMidSizeData();
+const highSizeData = storiesDataObj.getMidSizeData();
+const ontologiesData = demoDataObj.getOntologiesData();
+const singleObjectDemoData = demoDataObj.getSingleObjectDemoData();
+const multipleObjectsDemoData = demoDataObj.getMultipleObjectsDemoData();
+const demoData = demoDataObj.getDemoData();
 
-const defaultConfigurationSettings = storiesData.getDefaultConfigurationSettings();
-const midSizeConfigurationSettings = storiesData.getMidSizeConfigurationSettings();
-const highSizeConfigurationSettings = storiesData.getHighSizeConfigurationSettings();
-
-export const FirstDemo = Template.bind({});
-FirstDemo.args = {
-  showAttributes: true,
-  showLegend: true,
-  showDetailsOnHover: true,
-  showPrimaryLinks: true,
-  data: JSON.stringify(firstDemoData, null, 2),
-};
-
-export const OntologiesDemo = Template.bind({});
-OntologiesDemo.args = {
-  showAttributes: true,
-  showLegend: true,
-  showDetailsOnHover: true,
-  showPrimaryLinks: true,
-  data: JSON.stringify(ontologiesData, null, 2),
-};
+const defaultConfigurationSettings = storiesDataObj.getDefaultConfigurationSettings();
+const midSizeConfigurationSettings = storiesDataObj.getMidSizeConfigurationSettings();
+const highSizeConfigurationSettings = storiesDataObj.getHighSizeConfigurationSettings();
+const demoConfigurationSettings = demoDataObj.getDemoCongigurations();
 
 export const Default = Template.bind({});
 Default.args = {
@@ -186,4 +171,41 @@ HighComplexityExample.args = {
   data: JSON.stringify(highSizeData, null, 2),
   configurations: JSON.stringify(highSizeConfigurationSettings,null,2),
   size :"900px,650px"
+};
+
+export const OntologiesDemo = Template.bind({});
+OntologiesDemo.args = {
+  showAttributes: true,
+  showLegend: true,
+  showDetailsOnHover: true,
+  showPrimaryLinks: true,
+  data: JSON.stringify(ontologiesData, null, 2),
+};
+
+export const SingleObjectDemo = Template.bind({});
+SingleObjectDemo.args = {
+  showAttributes: true,
+  showLegend: true,
+  showDetailsOnHover: true,
+  showPrimaryLinks: true,
+  data: JSON.stringify(singleObjectDemoData, null, 2),
+};
+
+export const MultipleObjectsDemo = Template.bind({});
+MultipleObjectsDemo.args = {
+  showAttributes: true,
+  showLegend: true,
+  showDetailsOnHover: true,
+  showPrimaryLinks: true,
+  data: JSON.stringify(multipleObjectsDemoData, null, 2),
+};
+
+export const Demo = Template.bind({});
+Demo.args = {
+  configurations: JSON.stringify(demoConfigurationSettings,null,2),
+  showAttributes: true,
+  showLegend: true,
+  showDetailsOnHover: true,
+  showPrimaryLinks: true,
+  data: JSON.stringify(demoData, null, 2),
 };

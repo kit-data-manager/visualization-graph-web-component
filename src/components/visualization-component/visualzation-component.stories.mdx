@@ -29,85 +29,197 @@ The component accepts an array of objects, where each object represents an entit
 ### How can i map my data to component acceptible data?
 
 
-Demonstrations of component using simple example
+Demonstrations of component using simple example.
 
-Lets take a simple example of a FAIR DO [Link](https://kit-data-manager.github.io/fairdoscope/?pid=21.T11981/6ab464ed-978b-4996-876f-f68ea913a308)
+#### Example 1: To map data into this format, you need to determine how each piece of your data will correspond to the component's structure. We'll use a scenario with famous people and their notable works to illustrate this.
+Famous People and Their Notable Works:
 
+1: Person: Albert Einstein.
+Notable Works: "Theory of Relativity" (year 1905)
 
-If you open the link of the FAIR DO you will notice there is a primary id (pid) i.e 21.T11981/6ab464ed-978b-4996-876f-f68ea913a308 and there is PID Information record.
-In order to use visualization-component first step should be to model FAIR DO's data to a data format which is acceptible by the component.
+2: Person: Marie Curie.
+Notable Works: "Discovery of Radium" (year 1898)
 
-Consider this pid to be the equivalent to id in our data model as it is the main identification of the object and the PID information record to be the properties of the data model.
+3: Person: William Shakespeare.
+Notable Works: "Hamlet" (year 1603)
 
-For a short example we will only use few properties from the FAIR DO and map it to our data model.
+Let's fit above data into component acceptable data.
 
-Now our input data for the component becomes 
 ```json
-[
-  {
-    "id": "21.T11981/6ab464ed-978b-4996-876f-f68ea913a308",
-    "properties": {
-      "kernelInformationProfile": "21.T11148/863d938d632b53d62d52",
-      "hasMetadata": "21.T11981/73bfcca4-9f2b-4cfc-a003-30f5a51aab84"
-    }
+
+[{
+  "id": "AlbertEinstein",
+  "properties": {
+    "notableWork":"Theory of Relativity"
+      }
   }
 ]
+
 ```
-If you see the property "hasMetadata" is also a FAIR DO and it is connected to the initial(parent) FAIR DO and the connection is based on property/key "hasMetadata".
-If we integrate "hasMetadata" as a new id to our data model then the data model becomes:
-
-```json
-[
-  {
-    "id": "21.T11981/6ab464ed-978b-4996-876f-f68ea913a308",
-    "properties": {
-      "kernelInformationProfile": "21.T11148/863d938d632b53d62d52",
-      "hasMetadata": "21.T11981/73bfcca4-9f2b-4cfc-a003-30f5a51aab84"
-    }
-  },
-  {
-    "id": "21.T11981/73bfcca4-9f2b-4cfc-a003-30f5a51aab84",
-    "properties": {
-      "kernelInformationProfile": "21.T11148/828b74888f3774d97f73"
-    }
-  }
-]
-``` 
-
-
-To see a better graph of the above example we can some other properties as well in this case the PID Information Record key value pairs.
-
-```json
-  [
-    {
-    "id": "21.T11981/6ab464ed-978b-4996-876f-f68ea913a308",
-    "properties": {
-      "kernelInformationProfile": "21.T11148/863d938d632b53d62d52",
-      "hasMetadata": "21.T11981/73bfcca4-9f2b-4cfc-a003-30f5a51aab84",
-      "digitalObjectLocation": "https://b2share.eudat.eu/api/files/5fc88ad5-2f13-483c-8b80-a5862c91dbbb/Biological.tar#L7_dc3e2161576ff12aa04a2f6a4f7bb69a.jpg",
-      "version": "1.0.0",
-      "digitalObjectType":"21.T11148/1a1e620666cb1713acde",
-      "contact": "https://www.scc.kit.edu/personen/14958.php"
-    }
-  },
-  {
-    "id": "21.T11981/73bfcca4-9f2b-4cfc-a003-30f5a51aab84",
-    "properties": {
-      "kernelInformationProfile": "21.T11148/828b74888f3774d97f73",
-      "digitalObjectLocation": "http://mm3.datamanager.kit.edu:8040/api/v1/metadata/SEMDataSetV2",
-      "dateCreated": "20220605 19:48:04 UTC",
-      "checksum": "{ "sha512sum": "653e874977b3695aac75ef20f237cfc25b5cfff1e72bab0c5cbec5ce0eb7fa3b0a6b29049cbfcf0d2e6f961c7a2d5c5ad1ac2b7d83db194f7aba6ab2518ddc9f" }"
-    }
-  }
-]
-```
-If we use the compoent to visualize above data we will get below result.
+Resulting graph:
 
 <Canvas>
-  <Story id="components-visualizationcomponent--first-demo" />
+  <Story id="components-visualizationcomponent--single-object-demo" />
 </Canvas>
 
-### Example to demonstrate Ontologies [Link to ontology](https://git.rwth-aachen.de/nfdi-matwerk/ta-oms/iuc17_demonstrator/-/blob/dataset_for_viz/example_dataset/dataset_1/triples?ref_type=heads#L132)
+
+Similiarly when we add other 2  objects to the array, data become:
+
+```json
+
+[{
+  "id": "AlbertEinstein",
+  "properties": {
+    "notableWork":"Theory of Relativity"
+      }
+  },
+  {
+  "id": "MarieCurie",
+  "properties": {
+    "notableWork":"Discovery of Radium"
+      }
+  },
+  {
+  "id": "WilliamShakespeare",
+  "properties": {
+    "notableWork":"Hamlet"
+      }
+  }
+]
+
+```
+Resulting graph will look like this:
+
+<Canvas>
+  <Story id="components-visualizationcomponent--multiple-objects-demo" />
+</Canvas>
+
+
+Let's add other ids in this case notableWork can be new id for each notable work, and year can be its property.
+We also recommend to use a property 'type' to all the items, it can be later issued to differentiate  between different types of nodes.(using configurations customization you can assign color, label to nodes: See  [Configurations](#configurations)) for detailed use.
+The  data will look like this:
+
+```json
+
+[{
+  "id": "AlbertEinstein",
+  "properties": {
+    "notableWork":"Theory of Relativity",
+    "type" : "person"
+      }
+  },
+  {
+  "id": "MarieCurie",
+  "properties": {
+    "notableWork":"Discovery of Radium",
+    "type" : "person"
+      }
+  },
+  {
+  "id": "WilliamShakespeare",
+  "properties": {
+    "notableWork":"Hamlet",
+    "type" : "person"
+      }
+  },
+   {
+  "id": "Theory of Relativity",
+  "properties": {
+    "year":"1905",
+    "type" : "discovery"
+      }
+  },
+  {
+  "id": "Discovery of Radium",
+  "properties": {
+    "year":"1898",
+    "type" : "discovery"
+      }
+  },
+  {
+  "id": "Hamlet",
+  "properties": {
+    "year":"1603",
+    "type" : "discovery"
+      }
+  }
+]
+
+```
+Resulting graph will look like this:
+
+<Canvas>
+  <Story id="components-visualizationcomponent--demo" />
+</Canvas>
+
+## Configurations
+### How can i customize color, label of the nodes?
+Use configurations  to customize the color and label of the nodes. The following shows the configuration to customize the color and label of the nodes.
+
+For explanation we will use our initial example of Famous People and Their Notable Works.
+
+
+
+Below is a configuration object that can be used to manipulate a graph.
+
+Configuration object structure
+
+1. **Fallback Configuration for Primary IDs/Nodes**
+   - The first section of configurationsprovides default values for the primary nodes in case primaryNodeConfigurations is not provided.
+
+2. **Properties Manipulation**
+   - The `properties` section allows for the customization of node properties.
+
+3. **Primary Node Configurations**:
+  - This section, `primaryNodeConfigurations`, allows grouping items using regular expressions to modify their color and label.
+  - The `typeRegEx` attribute's value is checked against the `type` property of all items. If a match is found, the item's color and label are updated according to the specified values in the configuration object.
+  - If no `primaryNodeConfigurations` are provided or if there is no match for `typeRegEx`, the default color and label from the fallback configuration are used. If these default values are also not provided, pre-defined default values will be assigned.
+
+
+configurations:
+```json
+[
+  {
+    "label": "Primary Nodes",
+    "color": "brown",
+    "description": "Famous people",
+    "properties": [
+      {
+    
+        "year": {
+          "label": "Creation year",
+          "color": "blue",
+          "description": ""
+        },
+        "notableWork": {
+          "label": "Most famous work",
+          "color": "green",
+          "description": ""
+        }
+      }
+    ],
+    "primaryNodeConfigurations": [
+      {
+        "typeRegEx": "person",
+        "nodeLabel": "Celebrity/artist",
+        "nodeColor": "blue"
+      },
+      {
+        "typeRegEx": "discovery",
+        "nodeLabel": "Discovery/Invention",
+        "nodeColor": "orange"
+      }
+    ]
+  }
+]
+```
+Using above data and configurations you will get below result:
+<Canvas>
+  <Story id="components-visualizationcomponent--demo" />
+</Canvas>
+
+
+### Example 2: To demonstrate Ontologies [Link to ontology](https://git.rwth-aachen.de/nfdi-matwerk/ta-oms/iuc17_demonstrator/-/blob/dataset_for_viz/example_dataset/dataset_1/triples?ref_type=heads#L132)
 
 See the below snapshot from the above examplewhich focuses on id: 'https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:18248'
 
@@ -165,6 +277,39 @@ This is how the above data will look like after mapping to visualization-compone
     "properties": {
       "type": "http://purls.helmholtz-metadaten.de/cmso/Element",
       "hasMetadata": "21.T11981/73bfcca4-9f2b-4cfc-a003-30f5a51aab84",
+      "http://purls.helmholtz-metadaten.de/cmso/hasElementRatio": "1.0",
+      "http://purls.helmholtz-metadaten.de/cmso/hasSymbol": "Fe",
+    }
+  },
+    {
+    "id": "sample:13cab138-c3a0-481d-8c09-2584e24f30ff_ChemicalSpecies",
+    "properties": {
+      "type": "http://purls.helmholtz-metadaten.de/cmso/ChemicalSpecies",
+      "http://purls.helmholtz-metadaten.de/cmso/hasElement": "https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:18248",
+      "http://purls.helmholtz-metadaten.de/cmso/hasElementRatio": "1.0",
+      "http://purls.helmholtz-metadaten.de/cmso/hasSymbol": "Fe",
+    }
+  },
+    {
+    "id": "sample:b2421053-c682-4976-a9eb-49efbc4cb463_ChemicalSpecies",
+    "properties": {
+      "type": "http://purls.helmholtz-metadaten.de/cmso/ChemicalSpecies",
+      "http://purls.helmholtz-metadaten.de/cmso/hasElement": "https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:18248"
+    }
+  }
+]
+```
+To make it more readable short terms can be used to describe the properties. The following shows the short terms in place of their corresponding long terms.
+http://purls.helmholtz-metadaten.de/cmso/hasElement --->  hasElement.
+http://purls.helmholtz-metadaten.de/cmso/hasElementRatio --->  hasElementRatio.
+
+```json
+  [
+    {
+    "id": "https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:18248",
+    "properties": {
+      "type": "http://purls.helmholtz-metadaten.de/cmso/Element",
+      "hasMetadata": "21.T11981/73bfcca4-9f2b-4cfc-a003-30f5a51aab84",
       "hasElementRatio": "1.0",
       "hasSymbol": "Fe",
     }
@@ -188,9 +333,13 @@ This is how the above data will look like after mapping to visualization-compone
 ]
 ```
 
+By using above data as input to the component we will get following resulting graph.
 <Canvas>
   <Story id="components-visualizationcomponent--ontologies-demo" />
 </Canvas>
+
+
+
 
 ## Support and Contributions
 

@@ -5,7 +5,7 @@ There are features that allows users to customize color, description, label dyna
 
 ## Data Format and Connection Representation
 
-The `visualization-component` requires a specific JSON data format to accurately represent and visualize relationships between entities. Here's an overview of the data format and how connections are established:
+The `visualization-component` requires data in a specific JSON format to accurately represent and visualize relationships between entities. Here's an overview of the data format and how connections are established:
 
 ### JSON Data Structure
 
@@ -120,3 +120,12 @@ Attention: Do NOT run npm run start. It will cause the storybook to not work pro
 - dist
 - loader
 - .stencil
+
+
+## How to release.
+Step 1: Increase the version in package.json file
+Step 2: Run below command to update version in other files(package-lock.json)
+```bash
+npm install
+```
+Step 3: Draft a new release

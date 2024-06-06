@@ -209,31 +209,28 @@ export class VisualizationComponent {
 
     // Set up color scale for links
     const colorType = d3.scaleOrdinal(transformedData.links.map(d => d.relationType).sort(d3.ascending), d3.schemeCategory10);
+    const numPrimaryNodes = transformedData.nodes.filter(node => node.category === 'non_attribute').length;
 
     // Initialize SVG and graph setup
-    const { svg, numericWidth, numericHeight } = this.d3GraphSetup.initializeSVG();
+    const { svg, numericWidth, numericHeight } = this.d3GraphSetup.initializeSVG(numPrimaryNodes);
     this.d3GraphSetup.clearSVG(svg);
 
     // this.d3GraphSetup.createCustomMarkers(svg, transformedData.links, colorType);
     const uniqueAttributeNames = Array.from(new Set(transformedData.nodes.filter(node => node.category === 'attribute').map(node => Object.keys(node)[1])));
+    const uniquePrimaryNodeNames = Array.from(new Set(transformedData.nodes.filter(node => node.category == 'non_attribute').map(node => Object.values(node)[0])));
     const { attributeColorMap, attributeColorScale } = this.d3GraphSetup.attributeColorSetup(uniqueAttributeNames, this.parsedConfig);
+    this.d3GraphSetup.attributeColorSetup(uniquePrimaryNodeNames, this.parsedConfig);
     this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
-
-    // The color for primary nodes
-    const { legendConfigurations, primaryConfig } = this.d3GraphSetup.prepareLegend(uniqueAttributeNames, this.parsedConfig, attributeColorScale);
-    this.primaryNodeColor = primaryConfig.color;
-
-    // Create the node legend
-    this.d3GraphSetup.createNodeLegend(svg, this.primaryNodeColor, this.showLegend, legendConfigurations, attributeColorMap, this.tooltip, primaryConfig);
-    this.d3GraphSetup.updateForceProperties({
+    const primaryNodeConfig = this.parsedConfig[0]?.primaryNodeConfigurations || [];
+ this.d3GraphSetup.updateForceProperties({
       center: {
         x: 0.5, // Center position on the x-axis (0.5 for the middle of the SVG)
         y: 0.5, // Center position on the y-axis (0.5 for the middle of the SVG)
       },
       charge: {
         enabled: true,
-        strength: -10,
-        distanceMin: 40,
+        strength: -5,
+        distanceMin: 0,
         distanceMax: 2000,
       },
       link: {
@@ -243,18 +240,21 @@ export class VisualizationComponent {
     // Create force simulation
     const simulation = this.d3GraphSetup.createForceSimulation(transformedData.nodes, transformedData.links, numericWidth, numericHeight);
 
-    // Create links and nodes
-    const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
-    const nodes = this.d3GraphSetup.createNodes(svg, transformedData.nodes, this.primaryNodeColor, attributeColorMap);
-
+        // Create links and nodes
+        const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
+        const { nodesCreated, typeMatchedPrimaryNodes } = this.d3GraphSetup.createNodes(svg, transformedData.nodes, primaryNodeConfig, attributeColorMap, this.parsedConfig);
+        const { legendAttributesConfig,legendPrimaryConfig } = this.d3GraphSetup.prepareLegend(typeMatchedPrimaryNodes,uniqueAttributeNames, this.parsedConfig, attributeColorScale);
+        // Create the node legend
+        this.d3GraphSetup.createLegendNodes(svg, this.primaryNodeColor, this.showLegend, legendAttributesConfig, attributeColorMap, this.tooltip,legendPrimaryConfig);
+        
     // Apply event handlers
-    this.handleEvents.onClick(nodes, links);
-    if (this.showDetailsOnHover) this.handleEvents.applyMouseover(nodes, links, this.tooltip);
-    this.handleEvents.applyDragToNodes(nodes, simulation);
+    this.handleEvents.onClick(nodesCreated, links);
+    if (this.showDetailsOnHover) this.handleEvents.applyMouseover(nodesCreated, links, this.tooltip);
+    this.handleEvents.applyDragToNodes(nodesCreated, simulation);
     this.handleEvents.applyClickHandler();
 
     // Apply simulation
-    this.d3GraphSetup.applySimulation(nodes, links, simulation);
+    this.d3GraphSetup.applySimulation(nodesCreated, links, simulation);
   }
 
   /**
