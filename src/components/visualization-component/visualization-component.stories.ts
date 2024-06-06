@@ -200,6 +200,7 @@ MultipleObjectsDemo.args = {
   showDetailsOnHover: true,
   showPrimaryLinks: true,
   data: JSON.stringify(multipleObjectsDemoData, null, 2),
+  configurations: JSON.stringify(defaultConfigurationSettings, null, 2)
 };
 
 export const Demo = Template.bind({});
