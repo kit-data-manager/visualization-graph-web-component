@@ -64,7 +64,7 @@ export class HandleEvents {
       tooltip.style('opacity', 0); // Hide tooltip
       tooltip.html(''); // Clear tooltip content
     };
-    
+
     nodes.on('mouseover', (event, d) => handleNodeMouseover(event, d));
     nodes.on('mouseout', handleNodeMouseout);
   }

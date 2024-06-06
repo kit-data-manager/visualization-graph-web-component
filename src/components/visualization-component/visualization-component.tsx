@@ -222,7 +222,7 @@ export class VisualizationComponent {
     this.d3GraphSetup.attributeColorSetup(uniquePrimaryNodeNames, this.parsedConfig);
     this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
     const primaryNodeConfig = this.parsedConfig[0]?.primaryNodeConfigurations || [];
- this.d3GraphSetup.updateForceProperties({
+    this.d3GraphSetup.updateForceProperties({
       center: {
         x: 0.5, // Center position on the x-axis (0.5 for the middle of the SVG)
         y: 0.5, // Center position on the y-axis (0.5 for the middle of the SVG)
@@ -240,13 +240,13 @@ export class VisualizationComponent {
     // Create force simulation
     const simulation = this.d3GraphSetup.createForceSimulation(transformedData.nodes, transformedData.links, numericWidth, numericHeight);
 
-        // Create links and nodes
-        const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
-        const { nodesCreated, typeMatchedPrimaryNodes } = this.d3GraphSetup.createNodes(svg, transformedData.nodes, primaryNodeConfig, attributeColorMap, this.parsedConfig);
-        const { legendAttributesConfig,legendPrimaryConfig } = this.d3GraphSetup.prepareLegend(typeMatchedPrimaryNodes,uniqueAttributeNames, this.parsedConfig, attributeColorScale);
-        // Create the node legend
-        this.d3GraphSetup.createLegendNodes(svg, this.primaryNodeColor, this.showLegend, legendAttributesConfig, attributeColorMap, this.tooltip,legendPrimaryConfig);
-        
+    // Create links and nodes
+    const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
+    const { nodesCreated, typeMatchedPrimaryNodes } = this.d3GraphSetup.createNodes(svg, transformedData.nodes, primaryNodeConfig, attributeColorMap, this.parsedConfig);
+    const { legendAttributesConfig, legendPrimaryConfig } = this.d3GraphSetup.prepareLegend(typeMatchedPrimaryNodes, uniqueAttributeNames, this.parsedConfig, attributeColorScale);
+    // Create the node legend
+    this.d3GraphSetup.createLegendNodes(svg, this.primaryNodeColor, this.showLegend, legendAttributesConfig, attributeColorMap, this.tooltip, legendPrimaryConfig);
+
     // Apply event handlers
     this.handleEvents.onClick(nodesCreated, links);
     if (this.showDetailsOnHover) this.handleEvents.applyMouseover(nodesCreated, links, this.tooltip);
