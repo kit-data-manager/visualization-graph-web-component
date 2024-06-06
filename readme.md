@@ -120,3 +120,12 @@ Attention: Do NOT run npm run start. It will cause the storybook to not work pro
 - dist
 - loader
 - .stencil
+
+
+## How to release.
+Step 1: Increase the version in package.json file
+Step 2: Run below command to update version in other files(package-lock.json)
+```bash
+npm install
+```
+Step 3: Draft a new release
