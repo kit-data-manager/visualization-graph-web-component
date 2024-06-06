@@ -21,8 +21,8 @@ export class GraphSetup {
    * @type {string}
    */
   private size: string = '1350px,650px';
-  private legendNodeSize= 8;
-  private legendTextSize= 14;
+  private legendNodeSize = 8;
+  private legendTextSize = 14;
 
   /**
    * Default force properties for the graph simulation.
@@ -77,17 +77,17 @@ export class GraphSetup {
 
     // Set up zoom behavior directly on the SVG element
     const zoom = d3.zoom()
-        .extent([[1000, 1000], [numericWidth, numericHeight]])
-        .scaleExtent([0, 5]) // Adjust scale extent as needed
-        .on("zoom", (event) => {
-            svg.attr("transform", event.transform); // Apply zoom directly to SVG
-        });
+      .extent([[1000, 1000], [numericWidth, numericHeight]])
+      .scaleExtent([0, 5]) // Adjust scale extent as needed
+      .on("zoom", (event) => {
+        svg.attr("transform", event.transform); // Apply zoom directly to SVG
+      });
 
     const initialZoomScale = numPrimaryNodes > 30 ? 0.5 : 1;
     svg.call(zoom).call(zoom.transform, d3.zoomIdentity.scale(initialZoomScale));
 
     return { svg, numericWidth, numericHeight };
-}
+  }
 
   /**
    * Creates a force simulation for the graph nodes and links.
@@ -149,7 +149,6 @@ export class GraphSetup {
 
       // Search for the attribute in properties of each config item
       parsedConfig.forEach(item => {
-        // console.log('parsedConfig',parsedConfig)
         if (item.properties) {
           item.properties.forEach(propertyObj => {
             // Iterate over keys of each property object
@@ -200,48 +199,48 @@ export class GraphSetup {
     // Append the text to each group
     linkGroup
       .append('text')
-      .text(d => d.category === 'attribute' ? '' : d.relationType) 
+      .text(d => d.category === 'attribute' ? '' : d.relationType)
       .attr('stroke-opacity', 0)
       .attr('opacity', '1')
       .attr('fill', 'black') // Style as needed
       .attr('font-size', 3)
       .attr('text-anchor', 'middle')
-      .attr('dy',  d => {
+      .attr('dy', d => {
         // Calculate the vertical position of the text relative to the line
         const yOffset = -5; // Adjust this value to control the vertical offset
         return d.source.y < d.target.y ? yOffset : -yOffset; // Position above or below the line based on y-coordinates of source and target nodes
-    })
-    .attr('dx', d => {
+      })
+      .attr('dx', d => {
         // Calculate the horizontal position of the text relative to the line
         const xOffset = 5; // Adjust this value to control the horizontal offset
         return (d.source.x + d.target.x) / 2 > 0 ? xOffset : -xOffset; // Position to the right or left of the line based on the average x-coordinates of source and target nodes
-    });
+      });
 
     return linkGroup;
-}
-createPrimaryNodeMap(nodes, primaryNodeConfig) {
-  let primaryNodeMap = new Map();
-  // Extract primaryNodeConfigurations from the configuration
-  // Loop through each node
-  nodes.forEach(node => {
-    if (node.category === 'non_attribute') {
-      // Loop through each primaryNodeConfiguration
-      primaryNodeConfig.forEach(primaryNode => {
-        const regex = new RegExp(primaryNode.typeRegEx, 'i');
-        if (regex.test(node.type)) {
-          // Store the node's ID, label, and color in the map
-          primaryNodeMap.set(node.id, {
-            nodeLabel: primaryNode.nodeLabel,
-            nodeColor: primaryNode.nodeColor,
-            matchedBy: primaryNode.typeRegEx
-          });
-        }
-      });
-    }
-  });
+  }
+  createPrimaryNodeMap(nodes, primaryNodeConfig) {
+    let primaryNodeMap = new Map();
+    // Extract primaryNodeConfigurations from the configuration
+    // Loop through each node
+    nodes.forEach(node => {
+      if (node.category === 'non_attribute') {
+        // Loop through each primaryNodeConfiguration
+        primaryNodeConfig.forEach(primaryNode => {
+          const regex = new RegExp(primaryNode.typeRegEx, 'i');
+          if (regex.test(node.type)) {
+            // Store the node's ID, label, and color in the map
+            primaryNodeMap.set(node.id, {
+              nodeLabel: primaryNode.nodeLabel,
+              nodeColor: primaryNode.nodeColor,
+              matchedBy: primaryNode.typeRegEx
+            });
+          }
+        });
+      }
+    });
 
-  return primaryNodeMap;
-}
+    return primaryNodeMap;
+  }
 
   /**
    * Creates and appends node elements to the graph SVG.
@@ -258,19 +257,17 @@ createPrimaryNodeMap(nodes, primaryNodeConfig) {
     const primaryLabel = userConfig.label || '';
     const primaryColor = userConfig.color || '#008080';
 
-// Provide default values for the maps
-let typeRegExColorMap = new Map([['defaultColor', primaryColor]]);
-let typeRegExLabelMap = new Map([['defaultLabel', primaryLabel]]);
+    // Provide default values for the maps
+    let typeRegExColorMap = new Map([['defaultColor', primaryColor]]);
+    let typeRegExLabelMap = new Map([['defaultLabel', primaryLabel]]);
     primaryNodeConfig.forEach(primaryNode => {
       typeRegExColorMap.set(primaryNode.typeRegEx, primaryNode.nodeColor);
       typeRegExLabelMap.set(primaryNode.typeRegEx, primaryNode.nodeLabel);
     });
 
-
-    console.log('typeRegExColorMap',typeRegExColorMap)
     // Extract unique attribute names from attribute nodes
     // Create a color scale for attribute nodes
-    let defaultPrimaryNodeColor= '#add8e6';
+    let defaultPrimaryNodeColor = '#add8e6';
     let typeMatchedPrimaryNodes = [];
     let nodesCreated = svg
       .selectAll('.node')
@@ -284,10 +281,10 @@ let typeRegExLabelMap = new Map([['defaultLabel', primaryLabel]]);
           // Assuming the attribute name is the second key of the node object
           const attributeName = Object.keys(d)[1];
           return attributeColorMap.get(attributeName); // Directly use color from attributeColorMap
-        }else {
-          const color = typeRegExColorMap.get(d.type)  || primaryColor;
+        } else {
+          const color = typeRegExColorMap.get(d.type) || primaryColor;
           const label = typeRegExLabelMap.get(d.type) || primaryLabel;
-          if (color && color!==primaryColor) {
+          if (color && color !== primaryColor) {
             typeMatchedPrimaryNodes.push({ node: d, color: color, label: label });
           }
           return color || defaultPrimaryNodeColor; // Use primaryNodeColor for non-attribute nodes
@@ -295,7 +292,7 @@ let typeRegExLabelMap = new Map([['defaultLabel', primaryLabel]]);
       })
       .attr('stroke', '#fff')
       .attr('stroke-width', 1.5);
-      return { nodesCreated, typeMatchedPrimaryNodes };
+    return { nodesCreated, typeMatchedPrimaryNodes };
 
   }
   /**
@@ -395,10 +392,9 @@ let typeRegExLabelMap = new Map([['defaultLabel', primaryLabel]]);
    * @param {d3.ScaleOrdinal<string, string>} attributeColorScale - The attribute color scale.
    * @returns {any[]} - The prepared legend data.
    */
-  prepareLegend(typeMatchedPrimaryNodes,uniqueAttributeNames, config, attributeColorScale) {
-    console.log('typeMatchedPrimaryNodes',typeMatchedPrimaryNodes)
+  prepareLegend(typeMatchedPrimaryNodes, uniqueAttributeNames, config, attributeColorScale) {
     const userConfigs = Array.isArray(config) ? config : [];
-    if (userConfigs.length === 0 ) {
+    if (userConfigs.length === 0) {
       return {
         primaryConfigFallback: {
           label: '',
@@ -416,21 +412,17 @@ let typeRegExLabelMap = new Map([['defaultLabel', primaryLabel]]);
     const primaryLabel = userConfig.label || '';
     const primaryColor = userConfig.color || '#008080';
     const primaryDescription = userConfig.description ? userConfig.description : '';
-      // Check for primaryNodeConfigurations
-  const primaryNodeConfig = userConfig.primaryNodeConfigurations || [];
-
-  console.log('primaryNodeConfig',primaryNodeConfig);
-     // Create legendPrimaryConfig
-     const legendPrimaryConfig = typeMatchedPrimaryNodes.length > 0 ? 
-     typeMatchedPrimaryNodes.map(pNode => {
-       return {
-         label: pNode.label || primaryLabel,
-         color: pNode.color || primaryColor,
-         attributeKey: pNode.node.id || primaryDescription
-       };
-     }) : [{
-       label: primaryLabel,
-       color: primaryColor
+    // Create legendPrimaryConfig
+    const legendPrimaryConfig = typeMatchedPrimaryNodes.length > 0 ?
+      typeMatchedPrimaryNodes.map(pNode => {
+        return {
+          label: pNode.label || primaryLabel,
+          color: pNode.color || primaryColor,
+          attributeKey: pNode.node.id || primaryDescription
+        };
+      }) : [{
+        label: primaryLabel,
+        color: primaryColor
       }];
 
     // Searching if attribute mentioned in configurations file matches to any attribute of our graph
@@ -481,7 +473,7 @@ let typeRegExLabelMap = new Map([['defaultLabel', primaryLabel]]);
    * @param {any[]} legendConfigurations - The legend configurations.
    * @param {Map<string, string>} attributeColorMap - The attribute color map.
    */
-  createLegendNodes(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap, tooltip,legendPrimaryConfig) {
+  createLegendNodes(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap, tooltip, legendPrimaryConfig) {
     if (!showLegend) {
       return; // Do not create the legend if showLegend is false
     }
@@ -493,65 +485,65 @@ let typeRegExLabelMap = new Map([['defaultLabel', primaryLabel]]);
     const legendHeight = 200;
     const legendWidth = 250;
 
-// Create a container for the scrollable legend
-const legendContainer = svg
-  .append('foreignObject')
-  .attr('x', legendX - legendWidth)
-  .attr('y', 420)
-  .attr('width', legendWidth)
-  .attr('height', legendHeight)
-  .append('xhtml:div')
-  .style('overflow', 'auto')
-  .style('height', `${legendHeight}px`)
-  .style('font-size', `${this.legendTextSize}px`); // Adjust font size using legendNodeSize variable
-  const legend = legendContainer.append('div').style('cursor', 'pointer');
+    // Create a container for the scrollable legend
+    const legendContainer = svg
+      .append('foreignObject')
+      .attr('x', legendX - legendWidth)
+      .attr('y', 420)
+      .attr('width', legendWidth)
+      .attr('height', legendHeight)
+      .append('xhtml:div')
+      .style('overflow', 'auto')
+      .style('height', `${legendHeight}px`)
+      .style('font-size', `${this.legendTextSize}px`); // Adjust font size using legendNodeSize variable
+    const legend = legendContainer.append('div').style('cursor', 'pointer');
 
-  // Extract unique label names and their corresponding items
-  const uniqueTypesMap = legendPrimaryConfig.reduce((map, item) => {
-    if (!map.has(item.label)) {
-      map.set(item.label, []);
-    }
-    map.get(item.label).push(item);
-    return map;
-  }, new Map());
+    // Extract unique label names and their corresponding items
+    const uniqueTypesMap = legendPrimaryConfig.reduce((map, item) => {
+      if (!map.has(item.label)) {
+        map.set(item.label, []);
+      }
+      map.get(item.label).push(item);
+      return map;
+    }, new Map());
 
 
-// Iterate over unique labels and add items to the legend
-uniqueTypesMap.forEach((items, label) => {
-  // Get the color of the first item in the array
-  const color = items[0].color;
+    // Iterate over unique labels and add items to the legend
+    uniqueTypesMap.forEach((items, label) => {
+      // Get the color of the first item in the array
+      const color = items[0].color;
 
-  const primarylegendItemTypes = this.addLegendItem(legend, color || primaryNodeColor, label || 'Primary Node', this.legendNodeSize, items[0].description || 'Primary');
-  
-  // Event listener for item mouseover
-  primarylegendItemTypes.on('mouseover', event => {
-    if (items[0].description) {
-      tooltip
-        .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${items[0].description}</span></div>`) // Content with span for text
-        .transition()
-        .duration(200)
-        .style('opacity', 1)
-        .style('left', `${event.pageX + 10}px`)
-        .style('top', `${event.pageY - 10}px`);
-    }
-  });
+      const primarylegendItemTypes = this.addLegendItem(legend, color || primaryNodeColor, label || 'Primary Node', this.legendNodeSize, items[0].description || 'Primary');
 
-  // Event listener for item mouseout
-  primarylegendItemTypes.on('mouseout', () => {
-    tooltip.style('opacity', 0);
-    tooltip.html(''); // Clear tooltip content
-  });
-});
+      // Event listener for item mouseover
+      primarylegendItemTypes.on('mouseover', event => {
+        if (items[0].description) {
+          tooltip
+            .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${items[0].description}</span></div>`) // Content with span for text
+            .transition()
+            .duration(200)
+            .style('opacity', 1)
+            .style('left', `${event.pageX + 10}px`)
+            .style('top', `${event.pageY - 10}px`);
+        }
+      });
 
-      // Create legend attribute items from the configurations
+      // Event listener for item mouseout
+      primarylegendItemTypes.on('mouseout', () => {
+        tooltip.style('opacity', 0);
+        tooltip.html(''); // Clear tooltip content
+      });
+    });
+
+    // Create legend attribute items from the configurations
     legendConfigurations.forEach(({ attributeKey, label, description }) => {
       const color = attributeColorMap.get(attributeKey) || primaryNodeColor; // Fallback to primaryNodeColor if not found
       const item = this.addLegendItem(legend, color, label || attributeKey, this.legendNodeSize, description); // Use label or attributeKey if label not provided
       // Event listener for legend item mouseover
       item.on('mouseover', event => {
-        if(description){
+        if (description) {
           tooltip
-          .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${description}</span></div>`) // Content with span for text
+            .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${description}</span></div>`) // Content with span for text
             .transition()
             .duration(200)
             .style('opacity', 1)
@@ -580,18 +572,18 @@ uniqueTypesMap.forEach((items, label) => {
     const item = legend.append('div').style('display', 'flex').style('align-items', 'center').style('margin-bottom', '10px'); // Increase spacing if needed
 
     // Adjust the circle to reflect the node size
-       item
-       .append('svg')
-       .attr('width', size * 2 ) // Adjust width and height to match the square size
-       .attr('height', size * 2 )
-       .attr('class', 'legend-item')
-       .append('rect') // Use rect instead of circle
-       .attr('x', 0) // Set x position to 0
-       .attr('y', 0) // Set y position to 0
-       .attr('width', size * 2) // Set width and height to match the square size
-       .attr('height', size * 2)
-       .style('fill', color)
-       .attr('data-description', description); // Set data attribute for description
+    item
+      .append('svg')
+      .attr('width', size * 2) // Adjust width and height to match the square size
+      .attr('height', size * 2)
+      .attr('class', 'legend-item')
+      .append('rect') // Use rect instead of circle
+      .attr('x', 0) // Set x position to 0
+      .attr('y', 0) // Set y position to 0
+      .attr('width', size * 2) // Set width and height to match the square size
+      .attr('height', size * 2)
+      .style('fill', color)
+      .attr('data-description', description); // Set data attribute for description
 
 
     item.append('span').style('margin-left', '10px').text(label); // The label already describes the node

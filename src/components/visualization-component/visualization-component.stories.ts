@@ -64,12 +64,12 @@ Default.args = {
   showDetailsOnHover: true,
   showPrimaryLinks: true,
   data: JSON.stringify(defaultData, null, 2),
-  configurations: JSON.stringify(defaultConfigurationSettings,null,2)
+  configurations: JSON.stringify(defaultConfigurationSettings, null, 2)
 };
 
 export const ChangeConfigurationsSettings = Template.bind({});
 ChangeConfigurationsSettings.args = {
-  configurations: JSON.stringify(defaultConfigurationSettings,null,2), // Pass the configuration data here
+  configurations: JSON.stringify(defaultConfigurationSettings, null, 2), // Pass the configuration data here
   showLegend: true,
   showAttributes: true,
   showPrimaryLinks: true,
@@ -85,13 +85,13 @@ ExcludeSomeProperties.args = {
   showPrimaryLinks: true,
   showDetailsOnHover: true,
   data: JSON.stringify(entityNetworkData, null, 2),
-  configurations: JSON.stringify(defaultConfigurationSettings,null,2), // Pass the configuration data here
+  configurations: JSON.stringify(defaultConfigurationSettings, null, 2), // Pass the configuration data here
 };
 
 export const EnterData = Template.bind({});
 EnterData.args = {
   data: JSON.stringify(entityNetworkData, null, 2),
-  configurations: JSON.stringify(defaultConfigurationSettings,null,2), // Pass the configuration data here
+  configurations: JSON.stringify(defaultConfigurationSettings, null, 2), // Pass the configuration data here
   showLegend: true,
   showAttributes: true,
   showPrimaryLinks: true,
@@ -111,7 +111,7 @@ HideAttributes.args = {
   showPrimaryLinks: true,
   showDetailsOnHover: true,
   data: JSON.stringify(defaultData, null, 2),
-  configurations: JSON.stringify(defaultConfigurationSettings,null,2)
+  configurations: JSON.stringify(defaultConfigurationSettings, null, 2)
 };
 
 /**
@@ -128,7 +128,7 @@ HidePrimaryLinks.args = {
   showAttributes: true,
   showDetailsOnHover: true,
   data: JSON.stringify(defaultData, null, 2),
-  configurations: JSON.stringify(defaultConfigurationSettings,null,2)
+  configurations: JSON.stringify(defaultConfigurationSettings, null, 2)
 };
 
 export const HideDetailsOnHover = Template.bind({});
@@ -138,7 +138,7 @@ HideDetailsOnHover.args = {
   showAttributes: true,
   showPrimaryLinks: true,
   data: JSON.stringify(defaultData, null, 2),
-  configurations: JSON.stringify(defaultConfigurationSettings,null,2)
+  configurations: JSON.stringify(defaultConfigurationSettings, null, 2)
 };
 
 export const HideLegend = Template.bind({});
@@ -148,7 +148,7 @@ HideLegend.args = {
   showPrimaryLinks: true,
   showDetailsOnHover: true,
   data: JSON.stringify(defaultData, null, 2),
-  configurations: JSON.stringify(defaultConfigurationSettings,null,2)
+  configurations: JSON.stringify(defaultConfigurationSettings, null, 2)
 };
 
 export const MidComplexityExample = Template.bind({});
@@ -158,8 +158,8 @@ MidComplexityExample.args = {
   showPrimaryLinks: true,
   showDetailsOnHover: true,
   data: JSON.stringify(midSizeData, null, 2),
-  configurations: JSON.stringify(midSizeConfigurationSettings,null,2),
-  size :"900px,650px"
+  configurations: JSON.stringify(midSizeConfigurationSettings, null, 2),
+  size: "900px,650px"
 };
 
 export const HighComplexityExample = Template.bind({});
@@ -169,8 +169,8 @@ HighComplexityExample.args = {
   showPrimaryLinks: true,
   showDetailsOnHover: true,
   data: JSON.stringify(highSizeData, null, 2),
-  configurations: JSON.stringify(highSizeConfigurationSettings,null,2),
-  size :"900px,650px"
+  configurations: JSON.stringify(highSizeConfigurationSettings, null, 2),
+  size: "900px,650px"
 };
 
 export const OntologiesDemo = Template.bind({});
@@ -202,7 +202,7 @@ MultipleObjectsDemo.args = {
 
 export const Demo = Template.bind({});
 Demo.args = {
-  configurations: JSON.stringify(demoConfigurationSettings,null,2),
+  configurations: JSON.stringify(demoConfigurationSettings, null, 2),
   showAttributes: true,
   showLegend: true,
   showDetailsOnHover: true,
