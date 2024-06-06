@@ -130,4 +130,5 @@ Step 2: Run below command to update version in other files(package-lock.json)
 npm install
 ```
 Step 3: Push changes to origin/main
+
 Step 4: Create a new release in GitHub
