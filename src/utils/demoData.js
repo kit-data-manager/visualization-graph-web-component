@@ -131,7 +131,7 @@ export class DemoData {
             {
               typeRegEx: "person",
               nodeLabel: "Celebrity/artist",
-              nodeColor: "blue"
+              nodeColor: "grey"
             },
             {
               typeRegEx: "discovery",

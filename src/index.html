@@ -15,49 +15,48 @@
   <!-- <my-component included-properties="K1" excluded-properties="k1,p1,k2" visualization-mode="all"></my-component> -->
   <visualization-component data='[
   {
-    "id": "AtomicScaleSample",
+    "id": "AlbertEinstein",
     "properties": {
-      "hasNumberofAtoms": "123",
-      "subclassOf": "NanoscaleSample"
+      "notableWork": "Theory of Relativity",
+      "type": "person"
     }
   },
   {
-    "id": "SimulationCell",
+    "id": "MarieCurie",
     "properties": {
-      "hasAttribute": "AtomicScaleSample",
-      "hasVolume": "250.5",
-      "hasRepetition_x": "5"
+      "notableWork": "Discovery of Radium",
+      "type": "person"
     }
   },
   {
-    "id": "Atom",
+    "id": "WilliamShakespeare",
     "properties": {
-"hasPath": "path/to/data",
-      "subclassOf": "AtomicScaleSample"
+      "notableWork": "Hamlet",
+      "type": "person"
     }
   },
   {
-    "id": "Element",
+    "id": "Theory of Relativity",
     "properties": {
-      "hasSymbol": "Symbol: He",
-      "hasElementRatio": "0.982"
+      "year": "1905",
+      "type": "discovery"
     }
   },
   {
-    "id": "UnitCell",
+    "id": "Discovery of Radium",
     "properties": {
-      "hasBravaisLattice": "FCC"
-      "hasLength_x": "2.5"
+      "year": "1898",
+      "type": "discovery"
     }
   },
   {
-    "id": "LatticeParameter",
+    "id": "Hamlet",
     "properties": {
-      "hasLength_x": "2.55",
-      "subclassOf": "UnitCell"
+      "year": "1898",
+      "type": "discovery"
     }
   }
-]
+];
 
 ' size="1350px,650px" show-legend="true" exclude-properties="hasLength_x" show-attributes="true" 
 show-primary-links="true"  
@@ -88,12 +87,12 @@ configurations='
     ],
     "primaryNodeConfigurations": [
       {
-        "typeRegEx": "Person",
+        "typeRegEx": "person",
         "nodeLabel": "People",
         "nodeColor": "blue"
       },
       {
-        "typeRegEx": "Painting",
+        "typeRegEx": "painting",
         "nodeLabel": "Painting",
         "nodeColor": "green"
       }
