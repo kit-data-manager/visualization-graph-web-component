@@ -1,5 +1,7 @@
-import { StoriesData } from '../../utils/storiesData';
-import { DemoData } from '../../utils/demoData';
+import { DemoData } from '../../utils/storiesData/demoData';
+import { DefaultData} from '../../utils/storiesData/defaultData';
+import { MidSizeData} from '../../utils/storiesData/midSizeData';
+import { HighSizeData} from '../../utils/storiesData/highSizeData';
 /**
  * Storybook configuration for the 'visualization-component' web component.
  * Defines different stories and their corresponding parameters.
@@ -40,21 +42,24 @@ const Template = args => `<div style="display: flex; justify-content: center; al
   configurations='${args.configurations}'
 ></visualization-component>`;
 
-const storiesDataObj = new StoriesData();
-const demoDataObj = new DemoData();
 
-const entityNetworkData = storiesDataObj.getNetworkData();
-const defaultData = storiesDataObj.getDefaultData();
-const midSizeData = storiesDataObj.getMidSizeData();
-const highSizeData = storiesDataObj.getMidSizeData();
+const defaultDataObj = new DefaultData();
+const demoDataObj = new DemoData();
+const midSizeDataObj = new MidSizeData();
+const highSizeDataObj = new HighSizeData();
+
+const config = defaultDataObj.getDefaultConfigurationSettings();
+const defaultData = defaultDataObj.getDefaultData();
+const midSizeData = midSizeDataObj.getMidSizeData();
+const highSizeData = highSizeDataObj.getHighSizeData();
 const ontologiesData = demoDataObj.getOntologiesData();
 const singleObjectDemoData = demoDataObj.getSingleObjectDemoData();
 const multipleObjectsDemoData = demoDataObj.getMultipleObjectsDemoData();
 const demoData = demoDataObj.getDemoData();
 
-const defaultConfigurationSettings = storiesDataObj.getDefaultConfigurationSettings();
-const midSizeConfigurationSettings = storiesDataObj.getMidSizeConfigurationSettings();
-const highSizeConfigurationSettings = storiesDataObj.getHighSizeConfigurationSettings();
+const defaultConfigurationSettings = defaultDataObj.getDefaultConfigurationSettings();
+const midSizeConfigurationSettings = midSizeDataObj.getMidSizeConfigurationSettings();
+const highSizeConfigurationSettings = highSizeDataObj.getHighSizeConfigurationSettings();
 const demoConfigurationSettings = demoDataObj.getDemoCongigurations();
 
 export const Default = Template.bind({});
@@ -64,7 +69,7 @@ Default.args = {
   showDetailsOnHover: true,
   showPrimaryLinks: true,
   data: JSON.stringify(defaultData, null, 2),
-  configurations: JSON.stringify(defaultConfigurationSettings, null, 2)
+  configurations: JSON.stringify(config, null, 2)
 };
 
 export const ChangeConfigurationsSettings = Template.bind({});
@@ -74,7 +79,7 @@ ChangeConfigurationsSettings.args = {
   showAttributes: true,
   showPrimaryLinks: true,
   showDetailsOnHover: true,
-  data: JSON.stringify(entityNetworkData, null, 2),
+  data: JSON.stringify(defaultData, null, 2),
 };
 
 export const ExcludeSomeProperties = Template.bind({});
@@ -84,13 +89,13 @@ ExcludeSomeProperties.args = {
   showAttributes: true,
   showPrimaryLinks: true,
   showDetailsOnHover: true,
-  data: JSON.stringify(entityNetworkData, null, 2),
+  data: JSON.stringify(defaultData, null, 2),
   configurations: JSON.stringify(defaultConfigurationSettings, null, 2), // Pass the configuration data here
 };
 
 export const EnterData = Template.bind({});
 EnterData.args = {
-  data: JSON.stringify(entityNetworkData, null, 2),
+  data: JSON.stringify(defaultData, null, 2),
   configurations: JSON.stringify(defaultConfigurationSettings, null, 2), // Pass the configuration data here
   showLegend: true,
   showAttributes: true,
@@ -98,12 +103,6 @@ EnterData.args = {
   showDetailsOnHover: true,
 };
 
-/**
- * Story for the 'visualization-component' with showAttributes set to true.
- *
- * @story
- * @type {Object}
- */
 export const HideAttributes = Template.bind({});
 HideAttributes.args = {
   showAttributes: false,
@@ -113,13 +112,6 @@ HideAttributes.args = {
   data: JSON.stringify(defaultData, null, 2),
   configurations: JSON.stringify(defaultConfigurationSettings, null, 2)
 };
-
-/**
- * Story for the 'visualization-component' with showAttributes set to false.
- *
- * @story
- * @type {Object}
- */
 
 export const HidePrimaryLinks = Template.bind({});
 HidePrimaryLinks.args = {
@@ -153,8 +145,8 @@ HideLegend.args = {
 
 export const MidComplexityExample = Template.bind({});
 MidComplexityExample.args = {
-  showLegend: false,
-  showAttributes: false,
+  showLegend: true,
+  showAttributes: true,
   showPrimaryLinks: true,
   showDetailsOnHover: true,
   data: JSON.stringify(midSizeData, null, 2),
@@ -164,8 +156,8 @@ MidComplexityExample.args = {
 
 export const HighComplexityExample = Template.bind({});
 HighComplexityExample.args = {
-  showLegend: false,
-  showAttributes: false,
+  showLegend: true,
+  showAttributes: true,
   showPrimaryLinks: true,
   showDetailsOnHover: true,
   data: JSON.stringify(highSizeData, null, 2),

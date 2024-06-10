@@ -21,8 +21,6 @@ export class GraphSetup {
    * @type {string}
    */
   private size: string = '1350px,650px';
-  private legendNodeSize = 8;
-  private legendTextSize = 14;
 
   /**
    * Default force properties for the graph simulation.
@@ -133,48 +131,32 @@ export class GraphSetup {
   }
 
   /**
-   * Sets up attribute color mapping based on provided configurations if not provided then used default colors.
-   *
-   * @param {string[]} uniqueAttributeNames - The unique attribute names.
-   * @param {any[]} parsedConfig - The parsed configuration data.
-   * @returns {{ attributeColorMap: Map<string, string>, attributeColorScale: d3.ScaleOrdinal<string, string> }} - The attribute color map and scale.
-   */
-  attributeColorSetup(uniqueAttributeNames, parsedConfig) {
-    // Prepare attribute color mapping based on config
-    let attributeColorMap = new Map();
-    const defaultColorScale = d3.scaleOrdinal(d3.schemeCategory10);
-    uniqueAttributeNames.forEach(attributeName => {
-      // Initialize an array to store properties for each matching attribute
-      let color;
+ * Applies the force simulation to update link and node positions on each simulation tick.
+ *
+ * @param {d3.Selection} nodes - The node elements in the graph.
+ * @param {d3.Selection} links - The link elements in the graph.
+ * @param {d3.Simulation<any, any>} simulation - The configured force simulation.
+ */
+  applySimulation(nodes, links, simulation) {
+    const ticked = () => {
+      links
+        .select('line')
+        .attr('x1', d => d.source.x)
+        .attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x)
+        .attr('y2', d => d.target.y);
 
-      // Search for the attribute in properties of each config item
-      parsedConfig.forEach(item => {
-        if (item.properties) {
-          item.properties.forEach(propertyObj => {
-            // Iterate over keys of each property object
-            Object.keys(propertyObj).forEach(key => {
-              // Check if the attributeName matches the key and if the property object has a color
-              if (key === attributeName && propertyObj[key].color) {
-                // Add property object to the properties array
-                color = propertyObj[key].color;
-              }
-            });
-          });
-        }
-      });
+      links
+        .select('text')
+        .attr('x', d => (d.source.x + d.target.x) / 2)
+        .attr('y', d => (d.source.y + d.target.y) / 2);
 
-      if (color && color.length > 0) {
-        // Use properties from matching attributes if available
-        attributeColorMap.set(attributeName, color);
-      } else {
-        // Directly assign a color using the attribute name from default scale
-        const color = defaultColorScale(attributeName);
-        attributeColorMap.set(attributeName, color);
-      }
-    });
-    const attributeColorScale = d3.scaleOrdinal(uniqueAttributeNames, d3.schemeCategory10);
-    return { attributeColorMap, attributeColorScale };
+      nodes.attr('cx', d => d.x).attr('cy', d => d.y);
+    };
+
+    simulation.on('tick', ticked);
   }
+  
   /**
    * Creates and appends link elements to the graph SVG.
    *
@@ -217,29 +199,6 @@ export class GraphSetup {
       });
 
     return linkGroup;
-  }
-  createPrimaryNodeMap(nodes, primaryNodeConfig) {
-    let primaryNodeMap = new Map();
-    // Extract primaryNodeConfigurations from the configuration
-    // Loop through each node
-    nodes.forEach(node => {
-      if (node.category === 'non_attribute') {
-        // Loop through each primaryNodeConfiguration
-        primaryNodeConfig.forEach(primaryNode => {
-          const regex = new RegExp(primaryNode.typeRegEx, 'i');
-          if (regex.test(node.type)) {
-            // Store the node's ID, label, and color in the map
-            primaryNodeMap.set(node.id, {
-              nodeLabel: primaryNode.nodeLabel,
-              nodeColor: primaryNode.nodeColor,
-              matchedBy: primaryNode.typeRegEx
-            });
-          }
-        });
-      }
-    });
-
-    return primaryNodeMap;
   }
 
   /**
@@ -296,6 +255,33 @@ export class GraphSetup {
 
   }
   /**
+   * Creates a map which contains configuration information of nodes(Color, Label)
+   *
+   */
+  createPrimaryNodeMap(nodes, primaryNodeConfig) {
+    let primaryNodeMap = new Map();
+    // Extract primaryNodeConfigurations from the configuration
+    // Loop through each node
+    nodes.forEach(node => {
+      if (node.category === 'non_attribute') {
+        // Loop through each primaryNodeConfiguration
+        primaryNodeConfig.forEach(primaryNode => {
+          const regex = new RegExp(primaryNode.typeRegEx, 'i');
+          if (regex.test(node.type)) {
+            // Store the node's ID, label, and color in the map
+            primaryNodeMap.set(node.id, {
+              nodeLabel: primaryNode.nodeLabel,
+              nodeColor: primaryNode.nodeColor,
+              matchedBy: primaryNode.typeRegEx
+            });
+          }
+        });
+      }
+    });
+
+    return primaryNodeMap;
+  }
+  /**
    * Creates custom markers for links based on their types.
    *
    * @param {d3.Selection} svg - The SVG element.
@@ -336,257 +322,48 @@ export class GraphSetup {
         .attr('fill', colorType(elem));
     });
   }
-  // /**
-  //  * Creates a custom marker for use in SVG definitions.
-  //  *
-  //  * @param {SVGDefsElement} defs - The SVG definitions element.
-  //  * @param {string} id - The ID of the marker.
-  //  * @param {string} color - The color of the marker.
-  //  */
-  // createMarker(defs, id, color) {
-  //   defs
-  //     .append('svg:marker')
-  //     .attr('id', id)
-  //     .attr('refX', 20)
-  //     .attr('refY', 20)
-  //     .attr('markerWidth', 40)
-  //     .attr('markerHeight', 40)
-  //     .attr('markerUnits', 'userSpaceOnUse')
-  //     .attr('orient', 'auto')
-  //     .append('path')
-  //     .attr('d', 'M0,0Q15,0,20,10,15,20,0,20A1,1,0,000,0') //d3.line()([[0, 0], [0, 20], [20, 10]]))
-  //     .style('fill', color);
-  // }
 
   /**
-   * Applies the force simulation to update link and node positions on each simulation tick.
-   *
-   * @param {d3.Selection} nodes - The node elements in the graph.
-   * @param {d3.Selection} links - The link elements in the graph.
-   * @param {d3.Simulation<any, any>} simulation - The configured force simulation.
-   */
-  applySimulation(nodes, links, simulation) {
-    const ticked = () => {
-      links
-        .select('line')
-        .attr('x1', d => d.source.x)
-        .attr('y1', d => d.source.y)
-        .attr('x2', d => d.target.x)
-        .attr('y2', d => d.target.y);
+ * Sets up attribute color mapping based on provided configurations if not provided then used default colors.
+ *
+ * @param {string[]} uniqueAttributeNames - The unique attribute names.
+ * @param {any[]} parsedConfig - The parsed configuration data.
+ * @returns {{ attributeColorMap: Map<string, string>, attributeColorScale: d3.ScaleOrdinal<string, string> }} - The attribute color map and scale.
+ */
+  attributeColorSetup(uniqueAttributeNames, parsedConfig) {
+    // Prepare attribute color mapping based on config
+    let attributeColorMap = new Map();
+    const defaultColorScale = d3.scaleOrdinal(d3.schemeCategory10);
+    uniqueAttributeNames.forEach(attributeName => {
+      // Initialize an array to store properties for each matching attribute
+      let color;
 
-      links
-        .select('text')
-        .attr('x', d => (d.source.x + d.target.x) / 2)
-        .attr('y', d => (d.source.y + d.target.y) / 2);
-
-      nodes.attr('cx', d => d.x).attr('cy', d => d.y);
-    };
-
-    simulation.on('tick', ticked);
-  }
-  /**
-   * Prepares legend data based on provided configurationsif not provided then by defualt colors.
-   *
-   * @param {string[]} uniqueAttributeNames - The unique attribute names.
-   * @param {any[]} config - The legend configuration data.
-   * @param {d3.ScaleOrdinal<string, string>} attributeColorScale - The attribute color scale.
-   * @returns {any[]} - The prepared legend data.
-   */
-  prepareLegend(typeMatchedPrimaryNodes, uniqueAttributeNames, config, attributeColorScale) {
-    const userConfigs = Array.isArray(config) ? config : [];
-    if (userConfigs.length === 0) {
-      return {
-        primaryConfigFallback: {
-          label: '',
-          color: 'grey'
-        },
-        legendConfigurations: uniqueAttributeNames.map(attributeName => ({
-          label: attributeName,
-          color: attributeColorScale(attributeName) || '#defaultColor',
-          attributeKey: attributeName
-        })),
-      };
-    }
-    // Extract primary values from the first configuration in the config array
-    const userConfig = userConfigs[0];
-    const primaryLabel = userConfig.label || '';
-    const primaryColor = userConfig.color || '#008080';
-    const primaryDescription = userConfig.description ? userConfig.description : '';
-    // Create legendPrimaryConfig
-    const legendPrimaryConfig = typeMatchedPrimaryNodes.length > 0 ?
-      typeMatchedPrimaryNodes.map(pNode => {
-        return {
-          label: pNode.label || primaryLabel,
-          color: pNode.color || primaryColor,
-          attributeKey: pNode.node.id || primaryDescription
-        };
-      }) : [{
-        label: primaryLabel,
-        color: primaryColor
-      }];
-
-    // Searching if attribute mentioned in configurations file matches to any attribute of our graph
-    const legendConfigurations = uniqueAttributeNames.map(attributeName => {
-      let customConfig = null;
-      for (const config of userConfigs) {
-        const matchingProperty = config.properties.find(property => attributeName in property);
-        if (matchingProperty) {
-          customConfig = matchingProperty[attributeName];
-          break; // Stop searching once a match is found
+      // Search for the attribute in properties of each config item
+      parsedConfig.forEach(item => {
+        if (item.properties) {
+          item.properties.forEach(propertyObj => {
+            // Iterate over keys of each property object
+            Object.keys(propertyObj).forEach(key => {
+              // Check if the attributeName matches the key and if the property object has a color
+              if (key === attributeName && propertyObj[key].color) {
+                // Add property object to the properties array
+                color = propertyObj[key].color;
+              }
+            });
+          });
         }
-      }
+      });
 
-      if (customConfig) {
-        return {
-          label: customConfig.label || attributeName,
-          color: customConfig.color || attributeColorScale(attributeName) || '#defaultColor',
-          attributeKey: attributeName,
-          description: customConfig.description
-        };
+      if (color && color.length > 0) {
+        // Use properties from matching attributes if available
+        attributeColorMap.set(attributeName, color);
       } else {
-        return {
-          label: attributeName,
-          color: attributeColorScale(attributeName) || '#defaultColor',
-          attributeKey: attributeName
-        };
+        // Directly assign a color using the attribute name from default scale
+        const color = defaultColorScale(attributeName);
+        attributeColorMap.set(attributeName, color);
       }
     });
-
-    // Return an object containing legend configurations and primary values
-    return {
-      primaryConfigFallback: {
-        label: primaryLabel,
-        color: primaryColor,
-        description: primaryDescription,
-      },
-      legendPrimaryConfig: legendPrimaryConfig,
-      legendAttributesConfig: legendConfigurations,
-    };
-  }
-
-  /**
-   * Creates a legend for nodes in the graph.
-   *
-   * @param {d3.Selection} svg - The SVG element.
-   * @param {string} primaryNodeColor - The color for primary nodes.
-   * @param {boolean} showLegend - Whether to display the legend.
-   * @param {any[]} legendConfigurations - The legend configurations.
-   * @param {Map<string, string>} attributeColorMap - The attribute color map.
-   */
-  createLegendNodes(svg, primaryNodeColor, showLegend, legendConfigurations, attributeColorMap, tooltip, legendPrimaryConfig) {
-    if (!showLegend) {
-      return; // Do not create the legend if showLegend is false
-    }
-    const svgWidth = parseInt(svg.style('width'));
-    const rightOffset = 50;
-    const legendX = svgWidth - rightOffset;
-
-    // Set a fixed size for the legend area and make it scrollable
-    const legendHeight = 200;
-    const legendWidth = 250;
-
-    // Create a container for the scrollable legend
-    const legendContainer = svg
-      .append('foreignObject')
-      .attr('x', legendX - legendWidth)
-      .attr('y', 420)
-      .attr('width', legendWidth)
-      .attr('height', legendHeight)
-      .append('xhtml:div')
-      .style('overflow', 'auto')
-      .style('height', `${legendHeight}px`)
-      .style('font-size', `${this.legendTextSize}px`); // Adjust font size using legendNodeSize variable
-    const legend = legendContainer.append('div').style('cursor', 'pointer');
-
-    // Extract unique label names and their corresponding items
-    const uniqueTypesMap = legendPrimaryConfig.reduce((map, item) => {
-      if (!map.has(item.label)) {
-        map.set(item.label, []);
-      }
-      map.get(item.label).push(item);
-      return map;
-    }, new Map());
-
-
-    // Iterate over unique labels and add items to the legend
-    uniqueTypesMap.forEach((items, label) => {
-      // Get the color of the first item in the array
-      const color = items[0].color;
-
-      const primarylegendItemTypes = this.addLegendItem(legend, color || primaryNodeColor, label || 'Primary Node', this.legendNodeSize, items[0].description || 'Primary');
-
-      // Event listener for item mouseover
-      primarylegendItemTypes.on('mouseover', event => {
-        if (items[0].description) {
-          tooltip
-            .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${items[0].description}</span></div>`) // Content with span for text
-            .transition()
-            .duration(200)
-            .style('opacity', 1)
-            .style('left', `${event.pageX + 10}px`)
-            .style('top', `${event.pageY - 10}px`);
-        }
-      });
-
-      // Event listener for item mouseout
-      primarylegendItemTypes.on('mouseout', () => {
-        tooltip.style('opacity', 0);
-        tooltip.html(''); // Clear tooltip content
-      });
-    });
-
-    // Create legend attribute items from the configurations
-    legendConfigurations.forEach(({ attributeKey, label, description }) => {
-      const color = attributeColorMap.get(attributeKey) || primaryNodeColor; // Fallback to primaryNodeColor if not found
-      const item = this.addLegendItem(legend, color, label || attributeKey, this.legendNodeSize, description); // Use label or attributeKey if label not provided
-      // Event listener for legend item mouseover
-      item.on('mouseover', event => {
-        if (description) {
-          tooltip
-            .html(`<div style="background-color: lightgray; padding: 5px; border-radius: 5px;"><span>${description}</span></div>`) // Content with span for text
-            .transition()
-            .duration(200)
-            .style('opacity', 1)
-            .style('left', `${event.pageX + 10}px`)
-            .style('top', `${event.pageY - 10}px`);
-        }
-      });
-
-      // Event listener for legend item mouseout
-      item.on('mouseout', () => {
-        tooltip.style('opacity', 0);
-        tooltip.html(''); // Clear tooltip content
-      });
-    });
-  }
-
-  /**
-   * Adds an item to the legend with the specified color, label, and size.
-   *
-   * @param {HTMLElement} legend - The legend container element.
-   * @param {string} color - The color of the legend item.
-   * @param {string} label - The label for the legend item.
-   * @param {number} size - The size of the legend item.
-   */
-  addLegendItem(legend, color, label, size, description) {
-    const item = legend.append('div').style('display', 'flex').style('align-items', 'center').style('margin-bottom', '10px'); // Increase spacing if needed
-
-    // Adjust the circle to reflect the node size
-    item
-      .append('svg')
-      .attr('width', size * 2) // Adjust width and height to match the square size
-      .attr('height', size * 2)
-      .attr('class', 'legend-item')
-      .append('rect') // Use rect instead of circle
-      .attr('x', 0) // Set x position to 0
-      .attr('y', 0) // Set y position to 0
-      .attr('width', size * 2) // Set width and height to match the square size
-      .attr('height', size * 2)
-      .style('fill', color)
-      .attr('data-description', description); // Set data attribute for description
-
-
-    item.append('span').style('margin-left', '10px').text(label); // The label already describes the node
-    return item;
+    const attributeColorScale = d3.scaleOrdinal(uniqueAttributeNames, d3.schemeCategory10);
+    return { attributeColorMap, attributeColorScale };
   }
 }

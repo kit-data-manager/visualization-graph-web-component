@@ -2,7 +2,9 @@ import { Component, Prop, h, Element, Watch } from '@stencil/core';
 import * as d3 from 'd3';
 import { PrepareData } from '../../utils/dataUtil';
 import { GraphSetup } from '../../utils/d3GraphSetup';
-import { HandleEvents } from '../../utils/eventHandler';
+import { HandleEvents } from '../../utils/handleEvents';
+import { LegendSetup } from '../../utils/legendSetup';
+
 @Component({
   tag: 'visualization-component',
   styleUrl: 'visualization-component.css',
@@ -108,6 +110,12 @@ export class VisualizationComponent {
   private handleEvents: HandleEvents;
 
   /**
+ * Declare a private instance variable of the 'HandleEvents' class.
+ * It is used for handling events related to the D3.js graph.
+ */
+  private legendSetup: LegendSetup;
+
+  /**
    * Callback invoked when the 'data' property changes. Updates the visualization.
    *
    * @watch
@@ -157,9 +165,11 @@ export class VisualizationComponent {
    * Initializes data utility, D3 graph setup, and parses input data.
    */
   connectedCallback() {
-    this.dataUtil = new PrepareData(this.showPrimaryLinks, this.showAttributes);
     this.d3GraphSetup = new GraphSetup(this.hostElement);
+    this.dataUtil = new PrepareData(this.showPrimaryLinks, this.showAttributes);
     this.handleEvents = new HandleEvents(this.hostElement);
+    this.legendSetup = new LegendSetup();
+
     // Parse the input data when the component is initialized
     try {
       if (this.data != '') {
@@ -202,26 +212,7 @@ export class VisualizationComponent {
    */
   generateD3Graph(setupData: any[]) {
     this.dataUtil.setShowAttributes(this.showAttributes);
-    // Prepare data
-    let defaultComponentData = Array.isArray(setupData) && setupData.length > 0 ? setupData : this.dataUtil.getDefaultComponentData();
-    const excludeProperties = this.excludeProperties.split(',');
-    let transformedData = this.dataUtil.transformData(defaultComponentData, excludeProperties);
-
-    // Set up color scale for links
-    const colorType = d3.scaleOrdinal(transformedData.links.map(d => d.relationType).sort(d3.ascending), d3.schemeCategory10);
-    const numPrimaryNodes = transformedData.nodes.filter(node => node.category === 'non_attribute').length;
-
-    // Initialize SVG and graph setup
-    const { svg, numericWidth, numericHeight } = this.d3GraphSetup.initializeSVG(numPrimaryNodes);
-    this.d3GraphSetup.clearSVG(svg);
-
-    // this.d3GraphSetup.createCustomMarkers(svg, transformedData.links, colorType);
-    const uniqueAttributeNames = Array.from(new Set(transformedData.nodes.filter(node => node.category === 'attribute').map(node => Object.keys(node)[1])));
-    const uniquePrimaryNodeNames = Array.from(new Set(transformedData.nodes.filter(node => node.category == 'non_attribute').map(node => Object.values(node)[0])));
-    const { attributeColorMap, attributeColorScale } = this.d3GraphSetup.attributeColorSetup(uniqueAttributeNames, this.parsedConfig);
-    this.d3GraphSetup.attributeColorSetup(uniquePrimaryNodeNames, this.parsedConfig);
     this.tooltip = d3.select('body').append('div').attr('class', 'tooltip').style('opacity', 0).style('position', 'absolute').style('pointer-events', 'none');
-    const primaryNodeConfig = this.parsedConfig[0]?.primaryNodeConfigurations || [];
     this.d3GraphSetup.updateForceProperties({
       center: {
         x: 0.5, // Center position on the x-axis (0.5 for the middle of the SVG)
@@ -237,24 +228,63 @@ export class VisualizationComponent {
         distance: 90, // Adjust link distance as needed
       },
     });
-    // Create force simulation
-    const simulation = this.d3GraphSetup.createForceSimulation(transformedData.nodes, transformedData.links, numericWidth, numericHeight);
+  
+    /**
+    * Data preparation from dataUtil class
+    *
+    * 
+    */ 
+    let defaultComponentData = Array.isArray(setupData) && setupData.length > 0 ? setupData : this.dataUtil.getDefaultComponentData();
+    const excludeProperties = this.excludeProperties.split(',');    
+    //Conversion of input data to nodes and links
+    let transformedData = this.dataUtil.transformData(defaultComponentData, excludeProperties);
+    const uniqueAttributeNames = Array.from(new Set(transformedData.nodes.filter(node => node.category === 'attribute').map(node => Object.keys(node)[1])));
+    const uniquePrimaryNodeNames = Array.from(new Set(transformedData.nodes.filter(node => node.category == 'non_attribute').map(node => Object.values(node)[0])));
+    // Set up color scale for links
+    const colorType = d3.scaleOrdinal(transformedData.links.map(d => d.relationType).sort(d3.ascending), d3.schemeCategory10);
+    const numPrimaryNodes = transformedData.nodes.filter(node => node.category === 'non_attribute').length;
 
-    // Create links and nodes
+
+    /**
+    * Graph setup from d3GraphSetup class
+    *
+    * 
+    */ 
+    // Initialize SVG and graph setup
+    const { svg, numericWidth, numericHeight } = this.d3GraphSetup.initializeSVG(numPrimaryNodes);
+    this.d3GraphSetup.clearSVG(svg);
+    const simulation = this.d3GraphSetup.createForceSimulation(transformedData.nodes, transformedData.links, numericWidth, numericHeight);
+    const { attributeColorMap, attributeColorScale } = this.d3GraphSetup.attributeColorSetup(uniqueAttributeNames, this.parsedConfig);
+    this.d3GraphSetup.attributeColorSetup(uniquePrimaryNodeNames, this.parsedConfig);
+    const primaryNodeConfig = this.parsedConfig[0]?.primaryNodeConfigurations || [];
+    //Nodes and links creation. DONOT Create Nodes before Link
     const links = this.d3GraphSetup.createLinks(svg, transformedData.links, colorType);
     const { nodesCreated, typeMatchedPrimaryNodes } = this.d3GraphSetup.createNodes(svg, transformedData.nodes, primaryNodeConfig, attributeColorMap, this.parsedConfig);
-    const { legendAttributesConfig, legendPrimaryConfig } = this.d3GraphSetup.prepareLegend(typeMatchedPrimaryNodes, uniqueAttributeNames, this.parsedConfig, attributeColorScale);
-    // Create the node legend
-    this.d3GraphSetup.createLegendNodes(svg, this.primaryNodeColor, this.showLegend, legendAttributesConfig, attributeColorMap, this.tooltip, legendPrimaryConfig);
+    // Apply simulation
+    this.d3GraphSetup.applySimulation(nodesCreated, links, simulation);
 
-    // Apply event handlers
+
+
+    /**
+    * Legend related code from LegendSetup class
+    *
+    * 
+    */
+    const { legendAttributesConfig, legendPrimaryConfig } = this.legendSetup.prepareLegend(typeMatchedPrimaryNodes, uniqueAttributeNames, this.parsedConfig, attributeColorScale);
+    this.legendSetup.createLegendNodes(svg, this.primaryNodeColor, this.showLegend, legendAttributesConfig, attributeColorMap, this.tooltip, legendPrimaryConfig);
+
+
+    /**
+    * Events related code from handleEvents class
+    *
+    * 
+    */
     this.handleEvents.onClick(nodesCreated, links);
     if (this.showDetailsOnHover) this.handleEvents.applyMouseover(nodesCreated, links, this.tooltip);
     this.handleEvents.applyDragToNodes(nodesCreated, simulation);
     this.handleEvents.applyClickHandler();
 
-    // Apply simulation
-    this.d3GraphSetup.applySimulation(nodesCreated, links, simulation);
+
   }
 
   /**
