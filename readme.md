@@ -131,4 +131,4 @@ npm install
 ```
 Step 3: Push changes to origin/main
 
-Step 4: Create a new release in GitHub
+Step 4: Create and publish a new release in GitHub
